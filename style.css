@@ -1,7 +1,6 @@
-/* =========================================
-   ZYLO — TikTok Style Short Video UI
-   Create • Connect • Grow
-========================================= */
+/* =========================================================
+   ZYLO • TikTok Style Video UI
+   ========================================================= */
 
 * {
   box-sizing: border-box;
@@ -20,10 +19,6 @@ body {
   overflow: hidden;
 }
 
-body {
-  position: relative;
-}
-
 button {
   border: 0;
   outline: 0;
@@ -32,17 +27,58 @@ button {
   cursor: pointer;
 }
 
-/* =========================================
+/* =========================================================
+   VIDEO FEED
+   ========================================================= */
+
+.video-feed {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  background: #000;
+  z-index: 1;
+}
+
+.video-feed::-webkit-scrollbar {
+  display: none;
+}
+
+.video-card {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  scroll-snap-align: start;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Video */
+
+.video-card .video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+
+/* =========================================================
    TOP BAR
-========================================= */
+   ========================================================= */
 
 .top-bar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 76px;
-  z-index: 1000;
+  height: 82px;
+  z-index: 50;
 
   display: flex;
   align-items: center;
@@ -53,6 +89,8 @@ button {
     rgba(0, 0, 0, 0.65),
     rgba(0, 0, 0, 0)
   );
+
+  pointer-events: none;
 }
 
 .top-bar .tabs {
@@ -65,10 +103,9 @@ button {
 .top-bar .tab {
   position: relative;
   padding: 8px 0;
+  font-size: 18px;
   color: rgba(255, 255, 255, 0.75);
-  font-size: 17px;
-  font-weight: 400;
-  white-space: nowrap;
+  pointer-events: auto;
 }
 
 .top-bar .tab.active {
@@ -81,10 +118,14 @@ button {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -6px;
+  bottom: -7px;
   height: 3px;
   border-radius: 3px;
   background: #fff;
+}
+
+.top-bar button {
+  pointer-events: auto;
 }
 
 /* Search */
@@ -92,7 +133,7 @@ button {
 .search-button {
   position: absolute;
   right: 18px;
-  top: 18px;
+  top: 22px;
 
   width: 48px;
   height: 48px;
@@ -102,157 +143,113 @@ button {
   justify-content: center;
 
   border-radius: 50%;
-  background: rgba(30, 30, 30, 0.85);
   color: #fff;
   font-size: 30px;
 }
 
-/* =========================================
-   VIDEO FEED
-========================================= */
-
-.video-feed {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  scroll-snap-type: y mandatory;
-  scrollbar-width: none;
-
-  background: #000;
-}
-
-.video-feed::-webkit-scrollbar {
-  display: none;
-}
-
-.video-card {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-
-  min-height: 100vh;
-
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-
-  overflow: hidden;
-  background: #000;
-}
-
-.video {
-  position: absolute;
-  inset: 0;
-
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-  background: #000;
-}
-
-/* Dark gradient */
-
-.video-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-
-  pointer-events: none;
-
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.25) 0%,
-      rgba(0, 0, 0, 0) 22%,
-      rgba(0, 0, 0, 0) 60%,
-      rgba(0, 0, 0, 0.75) 100%
-    );
-}
-
-/* =========================================
+/* =========================================================
    VIDEO INFORMATION
-========================================= */
+   ========================================================= */
 
 .video-info {
   position: absolute;
 
-  left: 18px;
+  left: 24px;
   right: 105px;
-  bottom: 108px;
+  bottom: 86px;
 
-  z-index: 20;
-
+  z-index: 10;
   color: #fff;
+  text-align: left;
+
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .username {
   font-size: 19px;
   font-weight: 700;
-  margin-bottom: 12px;
+  margin-bottom: 13px;
+}
+
+.username::after {
+  content: "✓";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 17px;
+  height: 17px;
+
+  margin-left: 6px;
+
+  border-radius: 50%;
+  background: #20c8f5;
+  color: #fff;
+
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .caption {
   font-size: 17px;
   line-height: 1.45;
-  margin-bottom: 7px;
+  margin-bottom: 8px;
+}
+
+.hashtags {
+  color: #25d9ff;
+  font-size: 16px;
+  line-height: 1.4;
+  margin-top: 5px;
 }
 
 .music {
-  font-size: 16px;
-  line-height: 1.4;
-  margin-top: 10px;
-
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 
+  margin-top: 13px;
+
+  font-size: 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Hashtags */
-
-.hashtags {
-  color: #18d9ff;
-  font-size: 16px;
-  line-height: 1.45;
-  margin-top: 8px;
+.music::before {
+  content: "♫";
+  font-size: 21px;
 }
 
-/* =========================================
-   RIGHT SIDE ACTION BUTTONS
-   ছোট + সাদা + নিচের দিকে
-========================================= */
+/* =========================================================
+   RIGHT SIDE ACTIONS
+   TikTok-like: smaller + white + lower
+   ========================================================= */
 
 .video-actions {
   position: absolute;
 
-  right: 13px;
-  bottom: 245px;
+  right: 17px;
 
-  z-index: 50;
+  /* নিচে নামানো */
+  bottom: 118px;
 
-  width: 64px;
+  width: 58px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  gap: 17px;
+  gap: 20px;
 
-  color: #fff;
+  z-index: 20;
 }
 
-/* Each action */
+/* Every action */
 
-.action-button {
-  width: 58px;
+.video-actions .action,
+.video-actions button {
+  width: 52px;
   min-height: 52px;
 
   display: flex;
@@ -261,54 +258,46 @@ button {
   justify-content: center;
 
   color: #fff;
-  text-align: center;
-
-  font-size: 13px;
-  line-height: 1.1;
 }
 
-/* ICON */
+/* Icon */
 
-.action-icon {
-  width: 42px;
-  height: 42px;
-
+.video-actions .icon {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  color: #fff;
-  fill: #fff;
-  stroke: #fff;
+  width: 42px;
+  height: 42px;
 
-  font-size: 34px;
+  color: #fff;
+  font-size: 31px;
   line-height: 1;
 }
 
-/* Count / label */
+/* Text/count */
 
-.action-count {
-  margin-top: 5px;
+.video-actions .count,
+.video-actions .label {
+  margin-top: 4px;
 
   color: #fff;
-
   font-size: 13px;
   line-height: 1;
+  text-align: center;
 }
 
-/* =========================================
-   PROFILE / FOLLOW BUTTON
-========================================= */
+/* Profile */
 
-.profile-action {
+.action-profile {
   margin-bottom: 2px;
 }
 
-.profile-avatar {
+.action-profile .avatar {
   position: relative;
 
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
 
   border: 2px solid #fff;
   border-radius: 50%;
@@ -318,152 +307,124 @@ button {
   justify-content: center;
 
   color: #fff;
-  background: #222;
+  font-size: 25px;
 
-  font-size: 28px;
+  background: rgba(0, 0, 0, 0.25);
 }
 
-.follow-plus {
+.action-profile .follow-plus {
   position: absolute;
 
   right: -4px;
-  bottom: -7px;
+  bottom: -5px;
 
-  width: 24px;
-  height: 24px;
-
-  border-radius: 50%;
+  width: 22px;
+  height: 22px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: #fe2c55;
+  border-radius: 50%;
+
+  background: #ff174f;
   color: #fff;
 
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
-
-  border: 2px solid #000;
 }
 
-.follow-text {
-  margin-top: 7px;
-
-  color: #fff;
+.action-profile .label {
   font-size: 13px;
 }
 
-/* =========================================
-   HEART
-========================================= */
+/* Heart */
 
-.like-icon {
-  font-size: 40px;
-  color: #fff;
-  line-height: 1;
-}
-
-.like-icon.liked {
-  color: #fe2c55;
-}
-
-/* =========================================
-   COMMENT
-========================================= */
-
-.comment-icon {
+.like-button .icon {
   font-size: 38px;
-  color: #fff;
-  line-height: 1;
+  font-family: Arial, sans-serif;
 }
 
-/* =========================================
-   SAVE
-========================================= */
+/* Comment */
 
-.save-icon {
-  font-size: 38px;
-  color: #fff;
-  line-height: 1;
+.comment-button .icon {
+  font-size: 35px;
 }
 
-/* =========================================
-   SHARE
-========================================= */
+/* Save */
 
-.share-icon {
-  font-size: 38px;
-  color: #fff;
-  line-height: 1;
+.save-button .icon {
+  font-size: 34px;
 }
 
-/* =========================================
+/* Share */
+
+.share-button .icon {
+  font-size: 34px;
+}
+
+/* =========================================================
    MUSIC DISC
-   Profile-এর ঠিক মাথার কাছাকাছি
-========================================= */
+   একদম নিচে, Profile button-এর মাথার কাছে
+   ========================================================= */
 
-.music-disc {
-  position: fixed;
+.music-button {
+  position: absolute;
 
-  right: 15px;
-  bottom: 93px;
+  right: 17px;
 
-  z-index: 80;
+  /*
+    Profile-এর ঠিক উপরের দিকে থাকবে।
+    bottom কম = নিচে
+  */
+  bottom: 73px;
 
   width: 58px;
   height: 58px;
 
-  border-radius: 50%;
+  z-index: 25;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: #111;
-
-  border: 2px solid #555;
-
-  box-shadow:
-    0 0 0 4px rgba(255, 255, 255, 0.08),
-    0 0 0 8px rgba(255, 255, 255, 0.03);
-
-  color: #fff;
-
-  animation: musicRotate 7s linear infinite;
-}
-
-.music-disc::before {
-  content: "";
-
-  position: absolute;
-  inset: 5px;
-
-  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
-}
 
-.music-disc span {
-  position: relative;
-  z-index: 2;
+  background: radial-gradient(
+    circle,
+    #111 35%,
+    #252525 36%,
+    #111 55%,
+    #333 56%,
+    #111 70%
+  );
 
-  font-size: 25px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+
   color: #fff;
+
+  font-size: 27px;
+
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
 }
 
-@keyframes musicRotate {
-  from {
-    transform: rotate(0deg);
-  }
+.music-button::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
 
-  to {
-    transform: rotate(360deg);
-  }
+  border-radius: 50%;
+
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+
+  transform: rotate(25deg);
 }
 
-/* =========================================
+/* =========================================================
    BOTTOM NAVIGATION
-========================================= */
+   ========================================================= */
 
 .bottom-nav {
   position: fixed;
@@ -472,9 +433,9 @@ button {
   right: 0;
   bottom: 0;
 
-  height: 78px;
+  height: 72px;
 
-  z-index: 500;
+  z-index: 100;
 
   display: flex;
   align-items: center;
@@ -483,11 +444,7 @@ button {
   background: #000;
 
   border-top: 1px solid rgba(255, 255, 255, 0.12);
-
-  padding-bottom: env(safe-area-inset-bottom);
 }
-
-/* Nav button */
 
 .nav-button {
   width: 20%;
@@ -501,85 +458,68 @@ button {
   color: #fff;
 }
 
-.nav-icon {
-  width: 30px;
-  height: 30px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #fff;
-  fill: #fff;
-  stroke: #fff;
-
-  font-size: 28px;
+.nav-button .nav-icon {
+  font-size: 25px;
+  line-height: 1;
 }
 
-.nav-label {
-  margin-top: 4px;
-
+.nav-button .nav-label {
+  margin-top: 5px;
+  font-size: 12px;
   color: #fff;
-
-  font-size: 13px;
 }
 
-/* =========================================
-   CREATE + BUTTON
-========================================= */
+/* Create button */
 
 .upload-button {
   position: relative;
 
-  width: 66px;
-  height: 46px;
+  width: 68px;
+  height: 42px;
 
-  border-radius: 13px;
+  margin-top: -2px;
+
+  border-radius: 11px;
 
   background: #fff;
-
   color: #000;
 
-  border-left: 5px solid #25f4ee;
-  border-right: 5px solid #fe2c55;
+  font-size: 29px;
+  font-weight: 400;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  margin-top: -1px;
+  box-shadow:
+    -5px 0 0 #15e6f5,
+    5px 0 0 #ff2056;
 }
 
 .upload-button span {
   color: #000 !important;
-
-  font-size: 31px !important;
-  font-weight: 400;
 }
 
-/* =========================================
+/* =========================================================
    CREATE SCREEN
-========================================= */
+   ========================================================= */
 
 .create-screen {
   position: fixed;
   inset: 0;
 
-  z-index: 2000;
+  z-index: 300;
 
   display: none;
 
   background: #000;
-
   color: #fff;
+
+  overflow-y: auto;
 }
 
-.create-screen.active {
+.create-screen.show {
   display: block;
 }
 
 .create-header {
-  height: 64px;
+  height: 60px;
 
   display: flex;
   align-items: center;
@@ -590,152 +530,132 @@ button {
 
 .create-header h2 {
   margin: 0;
-
   font-size: 20px;
 }
 
 .create-close {
   position: absolute;
-
-  left: 15px;
-  top: 15px;
+  left: 18px;
 
   font-size: 30px;
-
   color: #fff;
 }
-
-/* =========================================
-   CREATE OPTIONS
-========================================= */
 
 .create-options {
   display: flex;
-
+  flex-direction: column;
   gap: 15px;
 
-  padding: 25px 18px;
+  padding: 35px 20px;
 }
 
 .create-option {
-  flex: 1;
+  width: 100%;
+  height: 55px;
 
-  min-height: 55px;
-
-  border: 1px solid #444;
+  border: 1px solid #333;
   border-radius: 12px;
 
+  background: #151515;
   color: #fff;
-  background: #111;
 
-  font-size: 16px;
+  font-size: 17px;
 }
 
-/* =========================================
-   EDITOR
-========================================= */
-
 .editor {
-  padding: 15px;
+  display: none;
+  padding: 15px 18px 100px;
+}
 
-  overflow-y: auto;
-
-  height: calc(100vh - 64px);
+.editor.show {
+  display: block;
 }
 
 .preview-box {
   width: 100%;
-  max-height: 52vh;
-
-  overflow: hidden;
+  max-height: 58vh;
 
   border-radius: 12px;
+  overflow: hidden;
 
   background: #111;
 }
 
 .preview-video {
+  width: 100%;
+  max-height: 58vh;
+
   display: block;
 
-  width: 100%;
-  max-height: 52vh;
-
   object-fit: contain;
-
   background: #000;
 }
 
 #captionInput {
   width: 100%;
-
-  min-height: 90px;
+  min-height: 100px;
 
   margin-top: 15px;
-
-  padding: 12px;
+  padding: 13px;
 
   border: 1px solid #333;
   border-radius: 10px;
 
   background: #111;
-
   color: #fff;
 
-  resize: none;
-
   font-size: 16px;
-
-  outline: none;
+  resize: vertical;
 }
 
 .sound-row,
 .privacy-row {
   width: 100%;
-
   margin-top: 12px;
+  padding: 14px;
 
-  padding: 15px;
-
+  border: 1px solid #333;
   border-radius: 10px;
 
   background: #111;
-
   color: #fff;
-
-  border: 1px solid #333;
 
   font-size: 15px;
 }
 
+.sound-row span {
+  float: right;
+  color: #bbb;
+}
+
 .choose-again {
+  width: 100%;
   margin-top: 12px;
+  padding: 13px;
 
-  color: #25f4ee;
+  border: 1px solid #444;
+  border-radius: 10px;
 
-  font-size: 14px;
+  color: #fff;
+  background: #171717;
 }
 
 .upload-status {
-  margin-top: 15px;
+  min-height: 24px;
 
-  min-height: 22px;
+  margin: 14px 0;
 
-  color: #fff;
-
+  text-align: center;
   font-size: 14px;
 }
 
 .post-btn {
   width: 100%;
-
   height: 50px;
-
-  margin-top: 15px;
 
   border-radius: 10px;
 
   background: #fff;
-
   color: #000;
 
   font-size: 17px;
@@ -743,42 +663,41 @@ button {
 }
 
 .post-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
-/* =========================================
+/* =========================================================
    SEARCH SCREEN
-========================================= */
+   ========================================================= */
 
 .search-screen {
   position: fixed;
   inset: 0;
 
-  z-index: 2500;
+  z-index: 250;
 
   display: none;
 
   background: #000;
-
   color: #fff;
 }
 
-.search-screen.active {
+.search-screen.show {
   display: block;
 }
 
-/* =========================================
+/* =========================================================
    MOBILE
-========================================= */
+   ========================================================= */
 
 @media (max-width: 600px) {
 
   .top-bar {
-    height: 68px;
+    height: 70px;
   }
 
   .top-bar .tabs {
-    gap: 25px;
+    gap: 28px;
   }
 
   .top-bar .tab {
@@ -787,16 +706,18 @@ button {
 
   .search-button {
     right: 12px;
-    top: 11px;
+    top: 17px;
 
-    width: 48px;
-    height: 48px;
+    width: 45px;
+    height: 45px;
+
+    font-size: 27px;
   }
 
   .video-info {
-    left: 14px;
-    right: 90px;
-    bottom: 91px;
+    left: 24px;
+    right: 100px;
+    bottom: 83px;
   }
 
   .username {
@@ -815,100 +736,96 @@ button {
     font-size: 15px;
   }
 
-  /* RIGHT BUTTONS */
+  /* Right buttons smaller */
+
   .video-actions {
-    right: 8px;
-    bottom: 235px;
-
-    width: 58px;
-
-    gap: 14px;
+    right: 12px;
+    bottom: 122px;
+    gap: 17px;
+    width: 52px;
   }
 
-  .action-button {
-    width: 54px;
-    min-height: 48px;
+  .video-actions .action,
+  .video-actions button {
+    width: 48px;
+    min-height: 47px;
   }
 
-  .action-icon {
+  .video-actions .icon {
     width: 38px;
     height: 38px;
-
-    font-size: 31px;
+    font-size: 29px;
   }
 
-  .profile-avatar {
-    width: 50px;
-    height: 50px;
+  .video-actions .count,
+  .video-actions .label {
+    font-size: 12px;
+  }
+
+  .action-profile .avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 23px;
+  }
+
+  .action-profile .follow-plus {
+    width: 21px;
+    height: 21px;
+    font-size: 16px;
+  }
+
+  /* Music নিচে */
+
+  .music-button {
+    right: 12px;
+    bottom: 74px;
+
+    width: 55px;
+    height: 55px;
 
     font-size: 25px;
   }
 
-  .follow-plus {
-    width: 23px;
-    height: 23px;
+  /* Bottom */
 
-    font-size: 18px;
-  }
-
-  .like-icon {
-    font-size: 37px;
-  }
-
-  .comment-icon,
-  .save-icon,
-  .share-icon {
-    font-size: 35px;
-  }
-
-  /* MUSIC */
-  .music-disc {
-    right: 9px;
-    bottom: 91px;
-
-    width: 56px;
-    height: 56px;
-  }
-
-  /* BOTTOM */
   .bottom-nav {
-    height: 76px;
+    height: 68px;
   }
 
   .nav-button {
     height: 68px;
   }
 
-  .nav-icon {
-    font-size: 26px;
+  .nav-button .nav-icon {
+    font-size: 23px;
   }
 
-  .nav-label {
-    font-size: 12px;
+  .nav-button .nav-label {
+    font-size: 11px;
   }
 
   .upload-button {
-    width: 66px;
-    height: 45px;
-  }
+    width: 65px;
+    height: 40px;
+  } একে
 }
 
-/* =========================================
-   SMALL HEIGHT DEVICES
-========================================= */
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
 
 @media (max-height: 700px) {
 
   .video-actions {
-    bottom: 220px;
-    gap: 10px;
+    bottom: 105px;
+    gap: 12px;
   }
 
-  .music-disc {
-    bottom: 88px;
+  .music-button {
+    bottom: 67px;
   }
 
   .video-info {
-    bottom: 88px;
+    bottom: 78px;
   }
 }
