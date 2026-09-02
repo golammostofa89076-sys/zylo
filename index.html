@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  />
+  >
 
   <title>ZYLO</title>
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -34,9 +35,13 @@
 
     </div>
 
-    <!-- SEARCH BUTTON -->
+    <!-- SEARCH -->
 
-    <button class="top-search" id="topSearch" aria-label="Search">
+    <button
+      class="top-search"
+      id="topSearch"
+      aria-label="Search"
+    >
 
       <svg
         viewBox="0 0 24 24"
@@ -46,8 +51,20 @@
         stroke-linecap="round"
         stroke-linejoin="round"
       >
-        <circle cx="11" cy="11" r="7"></circle>
-        <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+
+        <circle
+          cx="11"
+          cy="11"
+          r="7"
+        ></circle>
+
+        <line
+          x1="16.5"
+          y1="16.5"
+          x2="21"
+          y2="21"
+        ></line>
+
       </svg>
 
     </button>
@@ -57,19 +74,22 @@
 
   <!-- ================= VIDEO FEED ================= -->
 
-  <main class="video-feed" id="videoFeed">
+  <main
+    class="video-feed"
+    id="videoFeed"
+  >
 
-    <!-- VIDEO 1 -->
+    <!-- ================= VIDEO 1 ================= -->
 
     <section class="video-card">
 
       <video
         class="video"
-        src="uploads/video1.mp4"
+        src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
         loop
         muted
         playsinline
-        preload="metadata"
+        preload="auto"
       ></video>
 
       <div class="video-gradient"></div>
@@ -98,12 +118,12 @@
 
         <button class="action-btn like-btn">
 
-          <svg
-            viewBox="0 0 24 24"
-          >
+          <svg viewBox="0 0 24 24">
+
             <path
               d="M20.8 8.7c0 5.5-8.8 10.2-8.8 10.2S3.2 14.2 3.2 8.7C3.2 5.7 5.4 4 8 4c1.5 0 2.9.7 4 2 1.1-1.3 2.5-2 4-2 2.6 0 4.8 1.7 4.8 4.7z"
             ></path>
+
           </svg>
 
           <span class="count">
@@ -117,9 +137,8 @@
 
         <button class="action-btn comment-btn">
 
-          <svg
-            viewBox="0 0 24 24"
-          >
+          <svg viewBox="0 0 24 24">
+
             <path
               d="M20 11.5a7.5 7.5 0 0 1-8 7.5c-1.2 0-2.4-.3-3.4-.8L4 20l1.2-3.8A7.2 7.2 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5z"
             ></path>
@@ -158,12 +177,12 @@
 
         <button class="action-btn save-btn">
 
-          <svg
-            viewBox="0 0 24 24"
-          >
+          <svg viewBox="0 0 24 24">
+
             <path
               d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.5L6 21V4.5z"
             ></path>
+
           </svg>
 
           <span class="count">
@@ -177,9 +196,8 @@
 
         <button class="action-btn share-btn">
 
-          <svg
-            viewBox="0 0 24 24"
-          >
+          <svg viewBox="0 0 24 24">
+
             <path
               d="M20 4L10.5 13.5"
             ></path>
@@ -201,9 +219,8 @@
 
         <button class="action-btn sound-btn">
 
-          <svg
-            viewBox="0 0 24 24"
-          >
+          <svg viewBox="0 0 24 24">
+
             <path
               d="M4 10v4h4l5 4V6l-5 4H4z"
             ></path>
@@ -244,17 +261,17 @@
     </section>
 
 
-    <!-- VIDEO 2 -->
+    <!-- ================= VIDEO 2 ================= -->
 
     <section class="video-card">
 
       <video
         class="video"
-        src="uploads/video2.mp4"
+        src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
         loop
         muted
         playsinline
-        preload="metadata"
+        preload="auto"
       ></video>
 
       <div class="video-gradient"></div>
@@ -280,9 +297,11 @@
         <button class="action-btn like-btn">
 
           <svg viewBox="0 0 24 24">
+
             <path
               d="M20.8 8.7c0 5.5-8.8 10.2-8.8 10.2S3.2 14.2 3.2 8.7C3.2 5.7 5.4 4 8 4c1.5 0 2.9.7 4 2 1.1-1.3 2.5-2 4-2 2.6 0 4.8 1.7 4.8 4.7z"
             ></path>
+
           </svg>
 
           <span class="count">
@@ -333,9 +352,11 @@
         <button class="action-btn save-btn">
 
           <svg viewBox="0 0 24 24">
+
             <path
               d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.5L6 21V4.5z"
             ></path>
+
           </svg>
 
           <span class="count">
@@ -440,7 +461,7 @@
         type="file"
         id="videoInput"
         accept="video/*"
-      />
+      >
 
       <button
         class="upload-submit"
@@ -519,7 +540,6 @@
     <button
       class="nav-button upload-button"
       id="openUpload"
-      aria-label="Upload"
     >
 
       <svg viewBox="0 0 24 24">
@@ -674,9 +694,13 @@
       "click",
       function (event) {
 
-        if (event.target === uploadModal) {
+        if (
+          event.target === uploadModal
+        ) {
 
-          uploadModal.classList.remove("show");
+          uploadModal.classList.remove(
+            "show"
+          );
 
         }
 
@@ -684,9 +708,9 @@
     );
 
 
-    /* ================= VIDEO PLAY / PAUSE ================= */
+    /* ================= VIDEO ================= */
 
-    const videos =
+    let videos =
       document.querySelectorAll(".video");
 
 
@@ -700,25 +724,31 @@
               const video =
                 entry.target;
 
-              if (entry.isIntersecting) {
+              if (
+                entry.isIntersecting
+              ) {
 
-                videos.forEach(
-                  function (otherVideo) {
+                document
+                  .querySelectorAll(".video")
+                  .forEach(
+                    function (other) {
 
-                    if (
-                      otherVideo !== video
-                    ) {
+                      if (
+                        other !== video
+                      ) {
 
-                      otherVideo.pause();
+                        other.pause();
+
+                      }
 
                     }
+                  );
 
-                  }
-                );
-
-                video.play().catch(
-                  function () {}
-                );
+                video
+                  .play()
+                  .catch(
+                    function () {}
+                  );
 
               } else {
 
@@ -736,225 +766,26 @@
       );
 
 
-    videos.forEach(
-      function (video) {
-
-        observer.observe(video);
-
-        video.addEventListener(
-          "click",
-          function () {
-
-            if (video.paused) {
-
-              video.play();
-
-            } else {
-
-              video.pause();
-
-            }
-
-          }
-        );
-
-      }
-    );
-
-
-    /* ================= LIKE ================= */
-
     document
-      .querySelectorAll(".like-btn")
+      .querySelectorAll(".video")
       .forEach(
-        function (button) {
+        function (video) {
 
-          button.addEventListener(
+          observer.observe(video);
+
+          video.addEventListener(
             "click",
             function () {
-
-              button.classList.toggle(
-                "active"
-              );
-
-              const count =
-                button.querySelector(
-                  ".count"
-                );
-
-              count.textContent =
-                button.classList.contains(
-                  "active"
-                )
-                  ? "1"
-                  : "0";
-
-            }
-          );
-
-        }
-      );
-
-
-    /* ================= SAVE ================= */
-
-    document
-      .querySelectorAll(".save-btn")
-      .forEach(
-        function (button) {
-
-          button.addEventListener(
-            "click",
-            function () {
-
-              button.classList.toggle(
-                "active"
-              );
-
-              const count =
-                button.querySelector(
-                  ".count"
-                );
-
-              count.textContent =
-                button.classList.contains(
-                  "active"
-                )
-                  ? "1"
-                  : "0";
-
-            }
-          );
-
-        }
-      );
-
-
-    /* ================= FOLLOW ================= */
-
-    document
-      .querySelectorAll(
-        ".profile-action"
-      )
-      .forEach(
-        function (button) {
-
-          button.addEventListener(
-            "click",
-            function () {
-
-              button.classList.toggle(
-                "following"
-              );
-
-              const plus =
-                button.querySelector(
-                  ".follow-plus"
-                );
-
-              plus.textContent =
-                button.classList.contains(
-                  "following"
-                )
-                  ? "✓"
-                  : "+";
-
-            }
-          );
-
-        }
-      );
-
-
-    /* ================= SOUND ================= */
-
-    document
-      .querySelectorAll(
-        ".sound-btn"
-      )
-      .forEach(
-        function (button) {
-
-          button.addEventListener(
-            "click",
-            function () {
-
-              const card =
-                button.closest(
-                  ".video-card"
-                );
-
-              const video =
-                card.querySelector(
-                  ".video"
-                );
-
-              video.muted =
-                !video.muted;
-
-              button.classList.toggle(
-                "active",
-                !video.muted
-              );
-
-            }
-          );
-
-        }
-      );
-
-
-    /* ================= SHARE ================= */
-
-    document
-      .querySelectorAll(
-        ".share-btn"
-      )
-      .forEach(
-        function (button) {
-
-          button.addEventListener(
-            "click",
-            async function () {
-
-              const url =
-                window.location.href;
 
               if (
-                navigator.share
+                video.paused
               ) {
 
-                try {
-
-                  await navigator.share({
-                    title: "ZYLO",
-                    text:
-                      "Check this video on ZYLO",
-                    url: url
-                  });
-
-                } catch (error) {}
+                video.play();
 
               } else {
 
-                try {
-
-                  await navigator.clipboard.writeText(
-                    url
-                  );
-
-                  alert(
-                    "Link copied!"
-                  );
-
-                } catch (error) {
-
-                  alert(
-                    "Share link: " +
-                    url
-                  );
-
-                }
+                video.pause();
 
               }
 
@@ -963,6 +794,207 @@
 
         }
       );
+
+
+    /* ================= LIKE ================= */
+
+    function setupLike(button) {
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          button.classList.toggle(
+            "active"
+          );
+
+          const count =
+            button.querySelector(
+              ".count"
+            );
+
+          count.textContent =
+            button.classList.contains(
+              "active"
+            )
+              ? "1"
+              : "0";
+
+        }
+      );
+
+    }
+
+
+    document
+      .querySelectorAll(".like-btn")
+      .forEach(setupLike);
+
+
+    /* ================= SAVE ================= */
+
+    function setupSave(button) {
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          button.classList.toggle(
+            "active"
+          );
+
+          const count =
+            button.querySelector(
+              ".count"
+            );
+
+          count.textContent =
+            button.classList.contains(
+              "active"
+            )
+              ? "1"
+              : "0";
+
+        }
+      );
+
+    }
+
+
+    document
+      .querySelectorAll(".save-btn")
+      .forEach(setupSave);
+
+
+    /* ================= FOLLOW ================= */
+
+    function setupFollow(button) {
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          button.classList.toggle(
+            "following"
+          );
+
+          const plus =
+            button.querySelector(
+              ".follow-plus"
+            );
+
+          plus.textContent =
+            button.classList.contains(
+              "following"
+            )
+              ? "✓"
+              : "+";
+
+        }
+      );
+
+    }
+
+
+    document
+      .querySelectorAll(".profile-action")
+      .forEach(setupFollow);
+
+
+    /* ================= SOUND ================= */
+
+    function setupSound(button) {
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          const card =
+            button.closest(
+              ".video-card"
+            );
+
+          const video =
+            card.querySelector(
+              ".video"
+            );
+
+          video.muted =
+            !video.muted;
+
+          button.classList.toggle(
+            "active",
+            !video.muted
+          );
+
+        }
+      );
+
+    }
+
+
+    document
+      .querySelectorAll(".sound-btn")
+      .forEach(setupSound);
+
+
+    /* ================= SHARE ================= */
+
+    function setupShare(button) {
+
+      button.addEventListener(
+        "click",
+        async function () {
+
+          const url =
+            window.location.href;
+
+          if (
+            navigator.share
+          ) {
+
+            try {
+
+              await navigator.share({
+                title: "ZYLO",
+                text:
+                  "Check this video on ZYLO",
+                url: url
+              });
+
+            } catch (error) {}
+
+          } else {
+
+            try {
+
+              await navigator.clipboard.writeText(
+                url
+              );
+
+              alert(
+                "Link copied!"
+              );
+
+            } catch (error) {
+
+              alert(
+                "Share link: " + url
+              );
+
+            }
+
+          }
+
+        }
+      );
+
+    }
+
+
+    document
+      .querySelectorAll(".share-btn")
+      .forEach(setupShare);
 
 
     /* ================= UPLOAD ================= */
@@ -977,7 +1009,7 @@
         if (!file) {
 
           uploadStatus.textContent =
-            "Please select a video.";
+            "একটি ভিডিও নির্বাচন করুন।";
 
           return;
 
@@ -991,7 +1023,7 @@
         ) {
 
           uploadStatus.textContent =
-            "Only video files are allowed.";
+            "শুধু ভিডিও ফাইল আপলোড করা যাবে।";
 
           return;
 
@@ -1004,7 +1036,7 @@
         ) {
 
           uploadStatus.textContent =
-            "Video must be smaller than 200 MB.";
+            "ভিডিও 200 MB-এর কম হতে হবে।";
 
           return;
 
@@ -1015,7 +1047,7 @@
           true;
 
         uploadStatus.textContent =
-          "Uploading...";
+          "ভিডিও আপলোড হচ্ছে...";
 
 
         const formData =
@@ -1098,7 +1130,7 @@
     );
 
 
-    /* ================= ADD NEW VIDEO ================= */
+    /* ================= ADD UPLOADED VIDEO ================= */
 
     function addVideoToFeed(
       videoUrl
@@ -1121,7 +1153,7 @@
           loop
           muted
           playsinline
-          preload="metadata"
+          preload="auto"
         ></video>
 
         <div class="video-gradient"></div>
@@ -1140,12 +1172,15 @@
 
           </button>
 
+
           <button class="action-btn like-btn">
 
             <svg viewBox="0 0 24 24">
+
               <path
                 d="M20.8 8.7c0 5.5-8.8 10.2-8.8 10.2S3.2 14.2 3.2 8.7C3.2 5.7 5.4 4 8 4c1.5 0 2.9.7 4 2 1.1-1.3 2.5-2 4-2 2.6 0 4.8 1.7 4.8 4.7z"
               ></path>
+
             </svg>
 
             <span class="count">
@@ -1153,13 +1188,16 @@
             </span>
 
           </button>
+
 
           <button class="action-btn comment-btn">
 
             <svg viewBox="0 0 24 24">
+
               <path
                 d="M20 11.5a7.5 7.5 0 0 1-8 7.5c-1.2 0-2.4-.3-3.4-.8L4 20l1.2-3.8A7.2 7.2 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5z"
               ></path>
+
             </svg>
 
             <span class="count">
@@ -1167,13 +1205,16 @@
             </span>
 
           </button>
+
 
           <button class="action-btn save-btn">
 
             <svg viewBox="0 0 24 24">
+
               <path
                 d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.5L6 21V4.5z"
               ></path>
+
             </svg>
 
             <span class="count">
@@ -1182,9 +1223,11 @@
 
           </button>
 
+
           <button class="action-btn share-btn">
 
             <svg viewBox="0 0 24 24">
+
               <path
                 d="M20 4L10.5 13.5"
               ></path>
@@ -1192,6 +1235,7 @@
               <path
                 d="M20 4l-6 16-3.5-6.5L4 10l16-6z"
               ></path>
+
             </svg>
 
             <span class="share-text">
@@ -1200,7 +1244,25 @@
 
           </button>
 
+
+          <button class="action-btn sound-btn">
+
+            <svg viewBox="0 0 24 24">
+
+              <path
+                d="M4 10v4h4l5 4V6l-5 4H4z"
+              ></path>
+
+              <path
+                d="M16 9.5a4 4 0 0 1 0 5"
+              ></path>
+
+            </svg>
+
+          </button>
+
         </div>
+
 
         <div class="video-info">
 
@@ -1243,7 +1305,9 @@
         "click",
         function () {
 
-          if (newVideo.paused) {
+          if (
+            newVideo.paused
+          ) {
 
             newVideo.play();
 
@@ -1257,129 +1321,39 @@
       );
 
 
-      const likeButton =
+      setupLike(
         card.querySelector(
           ".like-btn"
-        );
-
-
-      likeButton.addEventListener(
-        "click",
-        function () {
-
-          likeButton.classList.toggle(
-            "active"
-          );
-
-          likeButton.querySelector(
-            ".count"
-          ).textContent =
-            likeButton.classList.contains(
-              "active"
-            )
-              ? "1"
-              : "0";
-
-        }
+        )
       );
 
 
-      const saveButton =
+      setupSave(
         card.querySelector(
           ".save-btn"
-        );
-
-
-      saveButton.addEventListener(
-        "click",
-        function () {
-
-          saveButton.classList.toggle(
-            "active"
-          );
-
-          saveButton.querySelector(
-            ".count"
-          ).textContent =
-            saveButton.classList.contains(
-              "active"
-            )
-              ? "1"
-              : "0";
-
-        }
+        )
       );
 
 
-      const followButton =
+      setupFollow(
         card.querySelector(
           ".profile-action"
-        );
-
-
-      followButton.addEventListener(
-        "click",
-        function () {
-
-          followButton.classList.toggle(
-            "following"
-          );
-
-          followButton.querySelector(
-            ".follow-plus"
-          ).textContent =
-            followButton.classList.contains(
-              "following"
-            )
-              ? "✓"
-              : "+";
-
-        }
+        )
       );
 
 
-      card
-        .querySelector(
-          ".share-btn"
-        )
-        .addEventListener(
-          "click",
-          async function () {
-
-            if (
-              navigator.share
-            ) {
-
-              try {
-
-                await navigator.share({
-                  title: "ZYLO",
-                  text:
-                    "Check this video on ZYLO",
-                  url: videoUrl
-                });
-
-              } catch (error) {}
-
-            }
-
-          }
-        );
-
-
-      card
-        .querySelector(
+      setupSound(
+        card.querySelector(
           ".sound-btn"
         )
-        ?.addEventListener(
-          "click",
-          function () {
+      );
 
-            newVideo.muted =
-              !newVideo.muted;
 
-          }
-        );
+      setupShare(
+        card.querySelector(
+          ".share-btn"
+        )
+      );
 
     }
 
