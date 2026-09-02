@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
 
 <meta charset="UTF-8">
@@ -8,32 +8,31 @@
       content="width=device-width,
       initial-scale=1.0,
       maximum-scale=1.0,
-      user-scalable=no,
-      viewport-fit=cover">
+      user-scalable=no">
 
 <title>ZYLO</title>
 
 <style>
 
-/* ==================================================
-   ZYLO - FULL SCREEN SHORT VIDEO FEED
-   ================================================== */
+/* =========================================
+   RESET
+========================================= */
 
 *{
   box-sizing:border-box;
-  margin:0;
-  padding:0;
   -webkit-tap-highlight-color:transparent;
 }
 
 html,
 body{
+  margin:0;
+  padding:0;
   width:100%;
   height:100%;
-  overflow:hidden;
   background:#000;
   color:#fff;
   font-family:Arial,Helvetica,sans-serif;
+  overflow:hidden;
 }
 
 body{
@@ -41,30 +40,31 @@ body{
   inset:0;
 }
 
-/* ==================================================
+
+/* =========================================
    APP
-   ================================================== */
+========================================= */
 
 #app{
   position:fixed;
   inset:0;
   width:100%;
-  height:100%;
   height:100dvh;
   background:#000;
   overflow:hidden;
 }
 
-/* ==================================================
+
+/* =========================================
    FEED
-   ================================================== */
+========================================= */
 
 #feed{
   position:absolute;
   inset:0;
+
   width:100%;
   height:100%;
-  height:100dvh;
 
   overflow-y:auto;
   overflow-x:hidden;
@@ -73,54 +73,43 @@ body{
   -webkit-overflow-scrolling:touch;
 
   background:#000;
-
-  overscroll-behavior-y:contain;
 }
 
 #feed::-webkit-scrollbar{
   display:none;
 }
 
-/* ==================================================
+
+/* =========================================
    VIDEO CARD
-   ================================================== */
+========================================= */
 
 .video-card{
   position:relative;
 
   width:100%;
-  height:100vh;
   height:100dvh;
-
-  min-height:100vh;
   min-height:100dvh;
-
-  flex:none;
 
   background:#000;
 
-  overflow:hidden;
-
   scroll-snap-align:start;
   scroll-snap-stop:always;
+
+  overflow:hidden;
 }
 
-/* ==================================================
-   VIDEO
-   ================================================== */
+
+/* =========================================
+   FULL SCREEN VIDEO
+========================================= */
 
 .video-card video{
   position:absolute;
-
   inset:0;
-
-  display:block;
 
   width:100%;
   height:100%;
-
-  min-width:100%;
-  min-height:100%;
 
   object-fit:cover;
   object-position:center center;
@@ -130,9 +119,10 @@ body{
   z-index:1;
 }
 
-/* ==================================================
+
+/* =========================================
    VIDEO DARK GRADIENT
-   ================================================== */
+========================================= */
 
 .video-card::after{
   content:"";
@@ -142,59 +132,64 @@ body{
 
   pointer-events:none;
 
-  z-index:2;
-
   background:
     linear-gradient(
       to bottom,
-      rgba(0,0,0,.35) 0%,
-      rgba(0,0,0,0) 22%,
-      rgba(0,0,0,0) 60%,
+      rgba(0,0,0,.35),
+      transparent 20%,
+      transparent 60%,
       rgba(0,0,0,.78) 100%
     );
+
+  z-index:2;
 }
 
-/* ==================================================
+
+/* =========================================
    VIDEO ERROR
-   ================================================== */
+========================================= */
 
 .video-error{
   position:absolute;
 
-  inset:0;
+  left:30px;
+  right:30px;
 
-  z-index:4;
+  top:50%;
 
-  display:none;
-
-  align-items:center;
-  justify-content:center;
-
-  flex-direction:column;
-
-  gap:10px;
+  transform:translateY(-50%);
 
   text-align:center;
 
-  background:#050505;
+  z-index:5;
 
   color:#fff;
 
-  padding:30px;
+  display:none;
 }
 
 .video-error strong{
-  font-size:20px;
+  display:block;
+
+  font-size:24px;
+
+  margin-bottom:10px;
 }
 
 .video-error span{
+  display:block;
+
   color:#aaa;
-  font-size:14px;
+
+  font-size:16px;
+
+  line-height:1.5;
 }
 
-/* ==================================================
+
+/* =========================================
    TOP BAR
-   ================================================== */
+========================================= */
 
 .top-bar{
   position:absolute;
@@ -203,13 +198,13 @@ body{
   left:0;
   right:0;
 
-  height:85px;
-
-  padding-top:env(safe-area-inset-top);
+  height:90px;
 
   display:flex;
   align-items:flex-end;
   justify-content:center;
+
+  padding-bottom:15px;
 
   z-index:20;
 }
@@ -221,28 +216,27 @@ body{
   justify-content:center;
 
   gap:30px;
-
-  padding-bottom:12px;
 }
 
 .tab{
-  position:relative;
-
   border:0;
-  outline:0;
 
   background:none;
 
   color:rgba(255,255,255,.65);
 
-  font-size:18px;
+  font-size:20px;
+
   font-weight:500;
 
-  padding:7px 0;
+  padding:6px 0;
+
+  position:relative;
 }
 
 .tab.active{
   color:#fff;
+
   font-weight:700;
 }
 
@@ -256,34 +250,37 @@ body{
 
   bottom:-7px;
 
-  height:3px;
+  height:4px;
 
-  border-radius:10px;
+  border-radius:5px;
 
   background:#fff;
 }
 
-/* ==================================================
+
+/* =========================================
    SEARCH
-   ================================================== */
+========================================= */
 
 .search-button{
   position:absolute;
 
-  top:calc(12px + env(safe-area-inset-top));
+  top:18px;
   right:12px;
 
-  width:50px;
-  height:50px;
+  width:52px;
+  height:52px;
 
-  border:0;
   border-radius:50%;
 
-  background:rgba(25,25,25,.85);
+  background:rgba(30,30,30,.9);
 
   display:flex;
+
   align-items:center;
   justify-content:center;
+
+  border:0;
 
   z-index:30;
 }
@@ -291,10 +288,10 @@ body{
 .search-icon{
   position:relative;
 
-  width:23px;
-  height:23px;
+  width:25px;
+  height:25px;
 
-  border:3px solid #fff;
+  border:4px solid #fff;
 
   border-radius:50%;
 }
@@ -304,36 +301,38 @@ body{
 
   position:absolute;
 
-  width:11px;
-  height:3px;
-
-  right:-8px;
-  bottom:-4px;
+  width:13px;
+  height:4px;
 
   background:#fff;
 
-  border-radius:5px;
+  right:-10px;
+  bottom:-5px;
 
-  transform:rotate(45deg);
+  transform:rotate(48deg);
+
+  border-radius:3px;
 }
 
-/* ==================================================
+
+/* =========================================
    RIGHT ACTIONS
-   ================================================== */
+========================================= */
 
 .video-actions{
   position:absolute;
 
   right:8px;
-
   top:50%;
 
-  transform:translateY(-36%);
+  transform:translateY(-18%);
 
-  width:64px;
+  width:65px;
 
   display:flex;
+
   flex-direction:column;
+
   align-items:center;
 
   gap:10px;
@@ -343,7 +342,7 @@ body{
 
 .action{
   width:58px;
-  min-height:55px;
+  min-height:58px;
 
   display:flex;
 
@@ -352,126 +351,125 @@ body{
   align-items:center;
   justify-content:center;
 
-  gap:3px;
-
   color:#fff;
 
   background:none;
 
   border:0;
-  outline:0;
+
+  padding:0;
 }
 
 .action-label{
+  margin-top:4px;
+
   color:#fff;
 
-  font-size:12px;
+  font-size:13px;
 
   line-height:15px;
-
-  text-shadow:
-    0 1px 3px #000;
 
   white-space:nowrap;
 }
 
-/* ==================================================
-   AVATAR
-   ================================================== */
+
+/* =========================================
+   PROFILE
+========================================= */
 
 .profile-action{
   margin-bottom:4px;
 }
 
 .avatar{
-  position:relative;
-
-  width:56px;
-  height:56px;
+  width:57px;
+  height:57px;
 
   border-radius:50%;
 
   border:2px solid #fff;
 
-  background:#111;
-
   display:flex;
+
   align-items:center;
   justify-content:center;
 
-  font-size:30px;
-  font-weight:bold;
+  background:#000;
 
-  box-shadow:
-    0 2px 8px rgba(0,0,0,.5);
+  font-size:33px;
+
+  position:relative;
 }
 
 .plus{
   position:absolute;
 
-  right:-7px;
+  right:-6px;
   bottom:-5px;
 
-  width:24px;
-  height:24px;
+  width:25px;
+  height:25px;
 
   border-radius:50%;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
 
   background:#ff1760;
 
   border:2px solid #fff;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  font-size:18px;
 
-  font-size:17px;
   font-weight:bold;
 }
 
-/* ==================================================
-   LIKE
-   ================================================== */
+
+/* =========================================
+   ACTION ICON
+========================================= */
 
 .action-icon{
   width:38px;
   height:38px;
 
   display:flex;
+
   align-items:center;
   justify-content:center;
 
-  font-size:34px;
-
   color:#fff;
 
-  text-shadow:
-    0 1px 4px #000;
+  font-size:35px;
+
+  line-height:1;
 }
 
+
+/* HEART */
+
 .heart-icon{
-  font-size:39px;
+  font-size:40px;
 
   font-family:Arial,sans-serif;
 }
 
-.like-button.liked .heart-icon{
-  color:#ff174f;
-}
 
-/* ==================================================
+/* =========================================
    COMMENT
-   ================================================== */
+========================================= */
 
 .comment-icon{
-  position:relative;
-
   width:34px;
   height:28px;
 
   border:3px solid #fff;
 
-  border-radius:8px;
+  border-radius:7px;
+
+  position:relative;
 }
 
 .comment-icon::after{
@@ -490,19 +488,20 @@ body{
   transform:skew(-25deg);
 }
 
-/* ==================================================
-   SAVE
-   ================================================== */
+
+/* =========================================
+   BOOKMARK
+========================================= */
 
 .bookmark-icon{
-  position:relative;
-
   width:29px;
   height:37px;
 
   border:3px solid #fff;
 
   border-bottom:0;
+
+  position:relative;
 }
 
 .bookmark-icon::after{
@@ -510,8 +509,8 @@ body{
 
   position:absolute;
 
-  left:2px;
-  right:2px;
+  left:3px;
+  right:3px;
 
   bottom:-6px;
 
@@ -525,71 +524,48 @@ body{
   transform:rotate(-45deg);
 }
 
-/* ==================================================
+
+/* =========================================
    SHARE
-   ================================================== */
+========================================= */
 
 .share-icon{
-  position:relative;
-
-  width:35px;
-  height:32px;
-}
-
-.share-icon::before{
-  content:"";
-
-  position:absolute;
-
-  left:3px;
-  top:9px;
-
-  width:25px;
-  height:15px;
-
-  border-top:3px solid #fff;
-
-  transform:rotate(-20deg);
-}
-
-.share-icon::after{
-  content:"";
-
-  position:absolute;
-
-  right:0;
-  top:1px;
-
   width:0;
   height:0;
 
-  border-top:13px solid transparent;
-  border-bottom:13px solid transparent;
-  border-left:22px solid #fff;
+  border-top:15px solid transparent;
+  border-bottom:15px solid transparent;
 
-  transform:rotate(-20deg);
+  border-left:34px solid #fff;
+
+  transform:rotate(-18deg);
 }
 
-/* ==================================================
+
+/* =========================================
    MUSIC
-   ================================================== */
+========================================= */
 
 .music-button{
-  width:52px;
-  height:52px;
+  width:55px;
+  height:55px;
 
   border-radius:50%;
 
   background:#111;
 
-  border:2px solid rgba(255,255,255,.45);
+  border:2px solid rgba(255,255,255,.35);
 
   display:flex;
+
   align-items:center;
   justify-content:center;
 
+  margin-top:2px;
+
   box-shadow:
-    0 0 0 5px rgba(255,255,255,.04);
+    0 0 0 5px rgba(255,255,255,.04),
+    0 0 0 9px rgba(255,255,255,.03);
 
   color:#fff;
 }
@@ -598,98 +574,100 @@ body{
   font-size:27px;
 }
 
-/* ==================================================
+
+/* =========================================
    VIDEO INFO
-   ================================================== */
+========================================= */
 
 .video-info{
   position:absolute;
 
-  left:18px;
-  right:90px;
+  left:22px;
+  right:92px;
 
-  bottom:86px;
+  bottom:88px;
 
   z-index:10;
 
-  text-shadow:
-    0 1px 3px rgba(0,0,0,.9);
+  color:#fff;
 }
 
 .username{
   display:flex;
+
   align-items:center;
 
   gap:7px;
 
-  font-size:19px;
+  font-size:21px;
+
   font-weight:700;
 
-  margin-bottom:9px;
+  margin-bottom:12px;
 }
 
 .verified{
-  width:23px;
-  height:23px;
+  width:29px;
+  height:29px;
 
   border-radius:50%;
 
-  background:#20c9e8;
+  background:#22c7e8;
 
   display:flex;
+
   align-items:center;
   justify-content:center;
 
-  font-size:14px;
+  font-size:18px;
+
   font-weight:bold;
 }
 
 .caption{
-  font-size:17px;
+  font-size:19px;
 
   line-height:1.35;
-
-  margin-bottom:6px;
-}
-
-.tagline{
-  font-size:16px;
-
-  margin-bottom:6px;
-}
-
-.hashtags{
-  color:#39d4f0;
-
-  font-size:15px;
-
-  line-height:1.4;
 
   margin-bottom:8px;
 }
 
+.tagline{
+  font-size:18px;
+
+  margin-bottom:10px;
+}
+
+.hashtags{
+  color:#25c7ed;
+
+  font-size:16px;
+
+  line-height:1.45;
+
+  margin-bottom:12px;
+}
+
 .sound{
   display:flex;
+
   align-items:center;
 
-  gap:7px;
+  gap:8px;
 
-  font-size:14px;
+  font-size:16px;
 
   white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
 }
 
 .sound-note{
-  font-size:20px;
+  font-size:21px;
 }
 
-/* ==================================================
-   BOTTOM NAVIGATION
-   ================================================== */
+
+/* =========================================
+   BOTTOM NAV
+========================================= */
 
 .bottom-nav{
   position:absolute;
@@ -698,17 +676,16 @@ body{
   right:0;
   bottom:0;
 
-  height:72px;
+  height:76px;
 
-  padding-bottom:env(safe-area-inset-bottom);
-
-  background:rgba(0,0,0,.94);
+  background:#000;
 
   border-top:1px solid rgba(255,255,255,.12);
 
   display:flex;
 
   align-items:center;
+
   justify-content:space-around;
 
   z-index:50;
@@ -716,6 +693,7 @@ body{
 
 .nav-item{
   width:20%;
+
   height:100%;
 
   display:flex;
@@ -725,40 +703,41 @@ body{
   align-items:center;
   justify-content:center;
 
-  gap:4px;
-
   color:#fff;
 
   background:none;
 
   border:0;
-  outline:0;
 
-  font-size:11px;
+  gap:5px;
+
+  font-size:13px;
 }
 
 .nav-icon{
-  width:28px;
-  height:28px;
+  width:29px;
+  height:29px;
 
   display:flex;
+
   align-items:center;
   justify-content:center;
+
+  color:#fff;
 }
+
 
 /* HOME */
 
 .home-icon{
-  position:relative;
-
-  width:25px;
-  height:22px;
+  width:27px;
+  height:24px;
 
   border:3px solid #fff;
 
   border-top:0;
 
-  margin-top:5px;
+  position:relative;
 }
 
 .home-icon::before{
@@ -766,8 +745,8 @@ body{
 
   position:absolute;
 
-  width:17px;
-  height:17px;
+  width:19px;
+  height:19px;
 
   border-left:3px solid #fff;
   border-top:3px solid #fff;
@@ -778,13 +757,14 @@ body{
   top:-9px;
 }
 
+
 /* DISCOVER */
 
 .nav-search{
   position:relative;
 
-  width:24px;
-  height:24px;
+  width:25px;
+  height:25px;
 
   border:3px solid #fff;
 
@@ -796,30 +776,29 @@ body{
 
   position:absolute;
 
-  width:10px;
+  width:11px;
   height:3px;
 
   background:#fff;
 
   right:-8px;
-  bottom:-4px;
+  bottom:-5px;
 
   transform:rotate(45deg);
 
-  border-radius:3px;
+  border-radius:2px;
 }
+
 
 /* INBOX */
 
 .inbox-icon{
-  position:relative;
-
   width:28px;
-  height:22px;
+  height:23px;
 
   border:3px solid #fff;
 
-  border-radius:4px;
+  position:relative;
 }
 
 .inbox-icon::after{
@@ -829,22 +808,23 @@ body{
 
   left:5px;
   right:5px;
-  bottom:2px;
+  bottom:3px;
 
   height:7px;
 
   border-bottom:3px solid #fff;
 
-  transform:skewY(-12deg);
+  transform:skewY(-15deg);
 }
+
 
 /* PROFILE */
 
 .profile-icon{
   position:relative;
 
-  width:28px;
-  height:29px;
+  width:29px;
+  height:30px;
 }
 
 .profile-icon::before{
@@ -852,24 +832,21 @@ body{
 
   position:absolute;
 
-  top:0;
-  left:6px;
-
-  width:12px;
-  height:12px;
+  width:13px;
+  height:13px;
 
   border:3px solid #fff;
 
   border-radius:50%;
+
+  top:0;
+  left:5px;
 }
 
 .profile-icon::after{
   content:"";
 
   position:absolute;
-
-  bottom:0;
-  left:0;
 
   width:25px;
   height:13px;
@@ -879,18 +856,21 @@ body{
   border-bottom:0;
 
   border-radius:20px 20px 0 0;
+
+  left:0;
+  bottom:0;
 }
 
-/* ==================================================
+
+/* =========================================
    CREATE BUTTON
-   ================================================== */
+========================================= */
 
 .create-wrap{
   width:20%;
 
-  height:100%;
-
   display:flex;
+
   align-items:center;
   justify-content:center;
 }
@@ -899,21 +879,22 @@ body{
   position:relative;
 
   width:70px;
-  height:44px;
-
-  border:0;
-  border-radius:11px;
+  height:46px;
 
   background:#fff;
 
+  border-radius:12px;
+
   color:#000;
 
-  font-size:30px;
-  font-weight:400;
+  font-size:31px;
 
   display:flex;
+
   align-items:center;
   justify-content:center;
+
+  border:0;
 }
 
 .create-button::before{
@@ -921,15 +902,15 @@ body{
 
   position:absolute;
 
-  left:-6px;
+  left:-8px;
   top:0;
 
-  width:12px;
-  height:44px;
+  width:16px;
+  height:46px;
 
   background:#20d9e5;
 
-  border-radius:10px 0 0 10px;
+  border-radius:12px 0 0 12px;
 
   z-index:-1;
 }
@@ -939,35 +920,36 @@ body{
 
   position:absolute;
 
-  right:-6px;
+  right:-8px;
   top:0;
 
-  width:12px;
-  height:44px;
+  width:16px;
+  height:46px;
 
   background:#ff1760;
 
-  border-radius:0 10px 10px 0;
+  border-radius:0 12px 12px 0;
 
   z-index:-1;
 }
 
-/* ==================================================
+
+/* =========================================
    CREATE SCREEN
-   ================================================== */
+========================================= */
 
 #createScreen{
   position:fixed;
 
   inset:0;
 
+  background:#000;
+
   z-index:200;
 
   display:none;
 
   overflow-y:auto;
-
-  background:#000;
 }
 
 #createScreen.open{
@@ -978,6 +960,7 @@ body{
   height:60px;
 
   display:flex;
+
   align-items:center;
   justify-content:space-between;
 
@@ -986,20 +969,18 @@ body{
   border-bottom:1px solid #222;
 
   font-size:20px;
+
   font-weight:bold;
 }
 
 .close-create{
-  width:40px;
-  height:40px;
-
-  border:0;
-
-  background:none;
+  font-size:30px;
 
   color:#fff;
 
-  font-size:32px;
+  background:none;
+
+  border:0;
 }
 
 .create-content{
@@ -1008,7 +989,7 @@ body{
 
 .upload-box{
   width:100%;
-  height:240px;
+  height:230px;
 
   border:2px dashed #555;
 
@@ -1027,7 +1008,7 @@ body{
 }
 
 .upload-icon{
-  font-size:50px;
+  font-size:55px;
 }
 
 .upload-text{
@@ -1057,12 +1038,6 @@ body{
 
   min-height:100px;
 
-  margin-top:15px;
-
-  padding:14px;
-
-  resize:none;
-
   background:#111;
 
   color:#fff;
@@ -1071,353 +1046,465 @@ body{
 
   border-radius:12px;
 
+  padding:14px;
+
   font-size:17px;
+
+  resize:none;
+
+  margin-top:15px;
 }
 
 .post-button{
   width:100%;
+
   height:52px;
 
   margin-top:15px;
-
-  border:0;
-  border-radius:10px;
 
   background:#fff;
 
   color:#000;
 
+  border:0;
+
+  border-radius:10px;
+
   font-size:18px;
+
   font-weight:bold;
 }
 
 .post-button:disabled{
-  opacity:.55;
+  opacity:.6;
 }
 
 .status{
-  margin-top:15px;
-
   text-align:center;
+
+  margin-top:15px;
 
   color:#aaa;
 
-  font-size:15px;
+  line-height:1.5;
 }
 
-/* ==================================================
+
+/* =========================================
    MOBILE
-   ================================================== */
+========================================= */
 
 @media(max-width:600px){
 
   .tabs{
-    gap:26px;
+    gap:27px;
   }
 
   .tab{
-    font-size:17px;
+    font-size:19px;
+  }
+
+  .search-button{
+    width:50px;
+    height:50px;
+
+    top:12px;
+    right:9px;
   }
 
   .video-actions{
-    right:5px;
-    transform:translateY(-35%);
-    gap:8px;
+    right:6px;
+    top:51%;
+
+    gap:9px;
+  }
+
+  .avatar{
+    width:55px;
+    height:55px;
+
+    font-size:31px;
+  }
+
+  .action-icon{
+    font-size:31px;
+  }
+
+  .heart-icon{
+    font-size:37px;
+  }
+
+  .action-label{
+    font-size:12px;
+  }
+
+  .music-button{
+    width:55px;
+    height:55px;
   }
 
   .video-info{
-    left:16px;
-    right:82px;
-    bottom:82px;
+    left:22px;
+    right:92px;
+    bottom:87px;
   }
 
   .username{
-    font-size:18px;
+    font-size:20px;
   }
 
   .caption{
-    font-size:16px;
+    font-size:19px;
   }
 
   .tagline{
-    font-size:15px;
+    font-size:18px;
   }
 
   .hashtags{
-    font-size:14px;
+    font-size:16px;
   }
 
   .sound{
-    font-size:13px;
+    font-size:16px;
   }
 
   .bottom-nav{
-    height:72px;
+    height:76px;
   }
 
-  .create-button{
-    width:68px;
-    height:43px;
-  }
-
-  .create-button::before,
-  .create-button::after{
-    height:43px;
-  }
 }
 
 </style>
 
 </head>
 
+
 <body>
+
 
 <div id="app">
 
-  <!-- ==================================================
-       FEED
-       ================================================== -->
 
-  <main id="feed">
+<!-- =====================================
+     VIDEO FEED
+===================================== -->
 
-    <!-- ================= FIRST VIDEO ================= -->
+<main id="feed">
 
-    <section class="video-card">
 
-      <video
-        class="video"
-        src="uploads/video1.mp4"
-        loop
-        muted
-        playsinline
-        webkit-playsinline
-        preload="auto">
-      </video>
+<section
+  class="video-card"
+  data-video-id="demo-video">
 
-      <div class="video-error">
-        <strong>ভিডিও পাওয়া যায়নি</strong>
-        <span>uploads/video1.mp4 ফাইলটি GitHub-এ আছে কিনা দেখুন।</span>
-      </div>
 
-      <!-- TOP -->
+  <!-- VIDEO -->
 
-      <div class="top-bar">
+  <video
+    class="video"
+    src="https://zylo-backend-ec5c.onrender.com/uploads/video1.mp4"
+    loop
+    muted
+    playsinline
+    autoplay
+    preload="auto">
+  </video>
 
-        <div class="tabs">
 
-          <button class="tab">
-            LIVE
-          </button>
+  <!-- VIDEO ERROR -->
 
-          <button class="tab">
-            Following
-          </button>
+  <div class="video-error">
 
-          <button class="tab active">
-            For You
-          </button>
+    <strong>
+      ভিডিও পাওয়া যায়নি
+    </strong>
 
-        </div>
+    <span>
+      Backend থেকে ভিডিওটি লোড করা যায়নি।
+    </span>
 
-        <button
-          class="search-button"
-          aria-label="Search">
+  </div>
 
-          <span class="search-icon"></span>
 
-        </button>
+  <!-- TOP -->
 
-      </div>
+  <div class="top-bar">
 
-      <!-- RIGHT ACTIONS -->
+    <div class="tabs">
 
-      <div class="video-actions">
+      <button class="tab">
+        LIVE
+      </button>
 
-        <button class="action profile-action">
+      <button class="tab">
+        Following
+      </button>
 
-          <div class="avatar">
-
-            Z
-
-            <span class="plus">+</span>
-
-          </div>
-
-          <span class="action-label">
-            Follow
-          </span>
-
-        </button>
-
-        <button class="action like-button">
-
-          <span class="action-icon heart-icon">
-            ♡
-          </span>
-
-          <span class="action-label like-count">
-            0
-          </span>
-
-        </button>
-
-        <button class="action comment-button">
-
-          <span class="comment-icon"></span>
-
-          <span class="action-label">
-            0
-          </span>
-
-        </button>
-
-        <button class="action save-button">
-
-          <span class="bookmark-icon"></span>
-
-          <span class="action-label">
-            Save
-          </span>
-
-        </button>
-
-        <button class="action share-button">
-
-          <span class="share-icon"></span>
-
-          <span class="action-label">
-            Share
-          </span>
-
-        </button>
-
-        <button class="music-button">
-
-          <span class="music-note">
-            ♪
-          </span>
-
-        </button>
-
-      </div>
-
-      <!-- INFO -->
-
-      <div class="video-info">
-
-        <div class="username">
-
-          @zylo_creator
-
-          <span class="verified">
-            ✓
-          </span>
-
-        </div>
-
-        <div class="caption">
-          Welcome to ZYLO 🌎
-        </div>
-
-        <div class="tagline">
-          Create • Connect • Grow
-        </div>
-
-        <div class="hashtags">
-          #ZYLO #Create #Connect #Grow #ForYou
-        </div>
-
-        <div class="sound">
-
-          <span class="sound-note">
-            ♪
-          </span>
-
-          <span>
-            Original sound - ZYLO
-          </span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-
-  <!-- ==================================================
-       BOTTOM NAVIGATION
-       ================================================== -->
-
-  <nav class="bottom-nav">
-
-    <button class="nav-item">
-
-      <span class="nav-icon">
-        <span class="home-icon"></span>
-      </span>
-
-      <span>Home</span>
-
-    </button>
-
-
-    <button class="nav-item">
-
-      <span class="nav-icon">
-        <span class="nav-search"></span>
-      </span>
-
-      <span>Discover</span>
-
-    </button>
-
-
-    <div class="create-wrap">
-
-      <button
-        id="createButton"
-        class="create-button">
-
-        +
-
+      <button class="tab active">
+        For You
       </button>
 
     </div>
 
 
-    <button class="nav-item">
+    <button
+      class="search-button"
+      aria-label="Search">
 
-      <span class="nav-icon">
-        <span class="inbox-icon"></span>
+      <span class="search-icon"></span>
+
+    </button>
+
+  </div>
+
+
+  <!-- RIGHT ACTIONS -->
+
+  <div class="video-actions">
+
+
+    <!-- PROFILE -->
+
+    <button class="action profile-action">
+
+      <div class="avatar">
+
+        Z
+
+        <span class="plus">
+          +
+        </span>
+
+      </div>
+
+      <span class="action-label">
+        Follow
       </span>
-
-      <span>Inbox</span>
 
     </button>
 
 
-    <button class="nav-item">
+    <!-- LIKE -->
 
-      <span class="nav-icon">
-        <span class="profile-icon"></span>
+    <button class="action like-button">
+
+      <span class="action-icon heart-icon">
+        ♡
       </span>
 
-      <span>Profile</span>
+      <span class="action-label like-count">
+        0
+      </span>
 
     </button>
 
-  </nav>
+
+    <!-- COMMENT -->
+
+    <button class="action comment-button">
+
+      <span class="comment-icon"></span>
+
+      <span class="action-label">
+        0
+      </span>
+
+    </button>
+
+
+    <!-- SAVE -->
+
+    <button class="action save-button">
+
+      <span class="bookmark-icon"></span>
+
+      <span class="action-label save-label">
+        Save
+      </span>
+
+    </button>
+
+
+    <!-- SHARE -->
+
+    <button class="action share-button">
+
+      <span class="share-icon"></span>
+
+      <span class="action-label">
+        Share
+      </span>
+
+    </button>
+
+
+    <!-- MUSIC -->
+
+    <button class="music-button">
+
+      <span class="music-note">
+        ♪
+      </span>
+
+    </button>
+
+
+  </div>
+
+
+  <!-- VIDEO INFO -->
+
+  <div class="video-info">
+
+    <div class="username">
+
+      @zylo_creator
+
+      <span class="verified">
+        ✓
+      </span>
+
+    </div>
+
+
+    <div class="caption">
+      Welcome to ZYLO 🌎
+    </div>
+
+
+    <div class="tagline">
+      Create • Connect • Grow
+    </div>
+
+
+    <div class="hashtags">
+      #ZYLO #Create #Connect #Grow #ForYou
+    </div>
+
+
+    <div class="sound">
+
+      <span class="sound-note">
+        ♪
+      </span>
+
+      <span>
+        Original sound - ZYLO
+      </span>
+
+    </div>
+
+  </div>
+
+
+</section>
+
+
+</main>
+
+
+<!-- =====================================
+     BOTTOM NAVIGATION
+===================================== -->
+
+<nav class="bottom-nav">
+
+
+  <!-- HOME -->
+
+  <button class="nav-item">
+
+    <span class="nav-icon">
+
+      <span class="home-icon"></span>
+
+    </span>
+
+    <span>
+      Home
+    </span>
+
+  </button>
+
+
+  <!-- DISCOVER -->
+
+  <button class="nav-item">
+
+    <span class="nav-icon">
+
+      <span class="nav-search"></span>
+
+    </span>
+
+    <span>
+      Discover
+    </span>
+
+  </button>
+
+
+  <!-- CREATE -->
+
+  <div class="create-wrap">
+
+    <button
+      id="createButton"
+      class="create-button">
+
+      +
+
+    </button>
+
+  </div>
+
+
+  <!-- INBOX -->
+
+  <button class="nav-item">
+
+    <span class="nav-icon">
+
+      <span class="inbox-icon"></span>
+
+    </span>
+
+    <span>
+      Inbox
+    </span>
+
+  </button>
+
+
+  <!-- PROFILE -->
+
+  <button class="nav-item">
+
+    <span class="nav-icon">
+
+      <span class="profile-icon"></span>
+
+    </span>
+
+    <span>
+      Profile
+    </span>
+
+  </button>
+
+
+</nav>
+
 
 </div>
 
 
-<!-- ==================================================
+<!-- =====================================
      CREATE / UPLOAD SCREEN
-     ================================================== -->
+===================================== -->
 
 <div id="createScreen">
+
 
   <div class="create-header">
 
@@ -1429,16 +1516,19 @@ body{
 
     </button>
 
+
     <span>
       Create
     </span>
 
-    <span style="width:40px;"></span>
+
+    <span style="width:30px;"></span>
 
   </div>
 
 
   <div class="create-content">
+
 
     <label
       class="upload-box"
@@ -1491,6 +1581,7 @@ body{
       class="status">
     </div>
 
+
   </div>
 
 </div>
@@ -1498,9 +1589,17 @@ body{
 
 <script>
 
-/* ==================================================
-   ZYLO FRONTEND
-   ================================================== */
+/* =========================================
+   ZYLO CONFIG
+========================================= */
+
+const BACKEND_URL =
+  "https://zylo-backend-ec5c.onrender.com";
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
 
 const feed =
   document.getElementById("feed");
@@ -1530,9 +1629,9 @@ const uploadStatus =
   document.getElementById("uploadStatus");
 
 
-/* ==================================================
+/* =========================================
    CREATE SCREEN
-   ================================================== */
+========================================= */
 
 createButton.addEventListener(
   "click",
@@ -1554,9 +1653,9 @@ closeCreate.addEventListener(
 );
 
 
-/* ==================================================
-   VIDEO SELECT
-   ================================================== */
+/* =========================================
+   SELECT VIDEO
+========================================= */
 
 let selectedVideo = null;
 
@@ -1568,15 +1667,19 @@ videoInput.addEventListener(
       videoInput.files[0];
 
     if(!file){
+
       return;
+
     }
 
-    selectedVideo = file;
+    selectedVideo =
+      file;
 
     const url =
       URL.createObjectURL(file);
 
-    previewVideo.src = url;
+    previewVideo.src =
+      url;
 
     previewVideo.style.display =
       "block";
@@ -1588,95 +1691,115 @@ videoInput.addEventListener(
 );
 
 
-/* ==================================================
-   HTML ESCAPE
-   ================================================== */
+/* =========================================
+   VIDEO ERROR HANDLER
+========================================= */
 
-function escapeHTML(value){
+function setupVideoError(card){
 
-  return String(value)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+  const video =
+    card.querySelector("video");
 
-}
+  const error =
+    card.querySelector(".video-error");
 
+  if(!video || !error){
 
-/* ==================================================
-   SAVE FEED VIDEOS
-   ================================================== */
+    return;
 
-function getSavedVideos(){
+  }
 
-  try{
+  video.addEventListener(
+    "error",
+    () => {
 
-    const saved =
-      localStorage.getItem(
-        "zylo_feed_videos"
-      );
+      error.style.display =
+        "block";
 
-    if(!saved){
-      return [];
     }
+  );
 
-    const parsed =
-      JSON.parse(saved);
+  video.addEventListener(
+    "loadeddata",
+    () => {
 
-    return Array.isArray(parsed)
-      ? parsed
-      : [];
+      error.style.display =
+        "none";
 
-  }catch(error){
-
-    return [];
-
-  }
+    }
+  );
 
 }
 
 
-function saveFeedVideos(videos){
+/* =========================================
+   VIDEO SETUP
+========================================= */
 
-  try{
+function setupVideo(card){
 
-    localStorage.setItem(
-      "zylo_feed_videos",
-      JSON.stringify(videos)
-    );
+  const video =
+    card.querySelector("video");
 
-  }catch(error){
+  if(!video){
 
-    console.log(
-      "Could not save feed"
-    );
+    return;
 
   }
+
+  setupVideoError(card);
+
+
+  /* TAP VIDEO = PLAY / PAUSE */
+
+  video.addEventListener(
+    "click",
+    () => {
+
+      if(video.paused){
+
+        video.play().catch(()=>{});
+
+      }else{
+
+        video.pause();
+
+      }
+
+    }
+  );
+
+
+  /* OBSERVE CARD */
+
+  observer.observe(card);
 
 }
 
 
-/* ==================================================
+/* =========================================
    ADD VIDEO TO FEED
-   ================================================== */
+========================================= */
 
 function addVideoToFeed(
   videoUrl,
-  caption,
-  username="@zylo_creator",
-  prepend=true
+  caption = "",
+  username = "@zylo_creator"
 ){
 
   if(!videoUrl){
-    return null;
+
+    return;
+
   }
+
 
   const card =
     document.createElement("section");
 
   card.className =
     "video-card";
+
 
   card.innerHTML = `
 
@@ -1686,18 +1809,17 @@ function addVideoToFeed(
       loop
       muted
       playsinline
-      webkit-playsinline
-      preload="metadata">
+      preload="auto">
     </video>
 
     <div class="video-error">
 
       <strong>
-        ভিডিও লোড হয়নি
+        ভিডিও পাওয়া যায়নি
       </strong>
 
       <span>
-        ভিডিও URL পরীক্ষা করুন।
+        ভিডিওটি লোড করা যায়নি।
       </span>
 
     </div>
@@ -1779,7 +1901,7 @@ function addVideoToFeed(
 
         <span class="bookmark-icon"></span>
 
-        <span class="action-label">
+        <span class="action-label save-label">
           Save
         </span>
 
@@ -1854,102 +1976,52 @@ function addVideoToFeed(
       </div>
 
     </div>
+
   `;
 
 
-  if(prepend){
-
-    feed.prepend(card);
-
-  }else{
-
-    feed.appendChild(card);
-
-  }
+  feed.prepend(card);
 
 
   setupVideo(card);
 
-  observer.observe(card);
 
+  /* SCROLL TO NEW VIDEO */
 
-  return card;
-
-}
-
-
-/* ==================================================
-   VIDEO ERROR
-   ================================================== */
-
-function setupVideo(card){
-
-  const video =
-    card.querySelector("video");
-
-  const errorBox =
-    card.querySelector(".video-error");
-
-  if(!video){
-    return;
-  }
-
-
-  video.addEventListener(
-    "error",
+  setTimeout(
     () => {
 
-      if(errorBox){
+      feed.scrollTo({
+        top:0,
+        behavior:"smooth"
+      });
 
-        errorBox.style.display =
-          "flex";
-
-      }
-
-    }
-  );
-
-
-  video.addEventListener(
-    "loadeddata",
-    () => {
-
-      if(errorBox){
-
-        errorBox.style.display =
-          "none";
-
-      }
-
-    }
-  );
-
-
-  /* TAP VIDEO = PLAY / PAUSE */
-
-  video.addEventListener(
-    "click",
-    () => {
-
-      if(video.paused){
-
-        video.play().catch(()=>{});
-
-      }else{
-
-        video.pause();
-
-      }
-
-    }
+    },
+    100
   );
 
 }
 
 
-/* ==================================================
+/* =========================================
+   HTML ESCAPE
+========================================= */
+
+function escapeHTML(value){
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* =========================================
    INTERSECTION OBSERVER
-   ================================================== */
+========================================= */
 
 const observer =
   new IntersectionObserver(
@@ -1958,22 +2030,24 @@ const observer =
       entries.forEach(
         entry => {
 
-          const card =
-            entry.target;
-
           const video =
-            card.querySelector(
+            entry.target.querySelector(
               "video"
             );
 
           if(!video){
+
             return;
+
           }
 
 
-          if(entry.isIntersecting){
+          if(
+            entry.isIntersecting &&
+            entry.intersectionRatio >= 0.65
+          ){
 
-            /* Pause every other video */
+            /* Pause all other videos */
 
             document
               .querySelectorAll(
@@ -2012,33 +2086,29 @@ const observer =
 
     },
     {
-      threshold:0.70
+      threshold:[0.65]
     }
   );
 
 
-/* ==================================================
-   INITIAL VIDEO SETUP
-   ================================================== */
+/* =========================================
+   INITIAL VIDEOS
+========================================= */
 
 document
-  .querySelectorAll(
-    ".video-card"
-  )
+  .querySelectorAll(".video-card")
   .forEach(
     card => {
 
       setupVideo(card);
 
-      observer.observe(card);
-
     }
   );
 
 
-/* ==================================================
+/* =========================================
    LIKE
-   ================================================== */
+========================================= */
 
 document.addEventListener(
   "click",
@@ -2050,67 +2120,61 @@ document.addEventListener(
       );
 
     if(!button){
-      return;
-    }
 
+      return;
+
+    }
 
     const count =
       button.querySelector(
         ".like-count"
       );
 
-    let number =
-      Number(
-        count.textContent
-      ) || 0;
+    const heart =
+      button.querySelector(
+        ".heart-icon"
+      );
 
+    let number =
+      Number(count.textContent) || 0;
 
     const liked =
-      button.classList.contains(
-        "liked"
-      );
+      button.dataset.liked === "true";
 
 
     if(liked){
 
       number--;
 
-      button.classList.remove(
-        "liked"
-      );
+      button.dataset.liked =
+        "false";
 
-      button.querySelector(
-        ".heart-icon"
-      ).textContent = "♡";
+      heart.textContent =
+        "♡";
 
     }else{
 
       number++;
 
-      button.classList.add(
-        "liked"
-      );
+      button.dataset.liked =
+        "true";
 
-      button.querySelector(
-        ".heart-icon"
-      ).textContent = "♥";
+      heart.textContent =
+        "♥";
 
     }
 
 
     count.textContent =
-      Math.max(
-        0,
-        number
-      );
+      Math.max(0,number);
 
   }
 );
 
 
-/* ==================================================
-   SAVE BUTTON
-   ================================================== */
+/* =========================================
+   SAVE
+========================================= */
 
 document.addEventListener(
   "click",
@@ -2122,20 +2186,22 @@ document.addEventListener(
       );
 
     if(!button){
-      return;
-    }
 
+      return;
+
+    }
 
     const label =
       button.querySelector(
-        ".action-label"
+        ".save-label"
       );
 
 
-    if(
-      button.dataset.saved ===
-      "true"
-    ){
+    const saved =
+      button.dataset.saved === "true";
+
+
+    if(saved){
 
       button.dataset.saved =
         "false";
@@ -2149,7 +2215,7 @@ document.addEventListener(
         "true";
 
       label.textContent =
-        "Saved";
+        "Saved ✓";
 
     }
 
@@ -2157,9 +2223,9 @@ document.addEventListener(
 );
 
 
-/* ==================================================
-   SHARE BUTTON
-   ================================================== */
+/* =========================================
+   SHARE
+========================================= */
 
 document.addEventListener(
   "click",
@@ -2171,7 +2237,9 @@ document.addEventListener(
       );
 
     if(!button){
+
       return;
+
     }
 
 
@@ -2182,9 +2250,15 @@ document.addEventListener(
       ){
 
         await navigator.share({
+
           title:"ZYLO",
-          text:"Check out this video on ZYLO 🌎",
-          url:window.location.href
+
+          text:
+            "Watch this video on ZYLO",
+
+          url:
+            window.location.href
+
         });
 
       }else{
@@ -2193,22 +2267,8 @@ document.addEventListener(
           window.location.href
         );
 
-        const label =
-          button.querySelector(
-            ".action-label"
-          );
-
-        label.textContent =
-          "Copied";
-
-        setTimeout(
-          () => {
-
-            label.textContent =
-              "Share";
-
-          },
-          1500
+        alert(
+          "ZYLO link copied!"
         );
 
       }
@@ -2225,62 +2285,9 @@ document.addEventListener(
 );
 
 
-/* ==================================================
-   MUSIC BUTTON
-   ================================================== */
-
-document.addEventListener(
-  "click",
-  event => {
-
-    const button =
-      event.target.closest(
-        ".music-button"
-      );
-
-    if(!button){
-      return;
-    }
-
-
-    const card =
-      button.closest(
-        ".video-card"
-      );
-
-    if(!card){
-      return;
-    }
-
-
-    const video =
-      card.querySelector(
-        "video"
-      );
-
-    if(!video){
-      return;
-    }
-
-
-    video.muted =
-      !video.muted;
-
-
-    button.querySelector(
-      ".music-note"
-    ).textContent =
-      video.muted
-        ? "♪"
-        : "🔊";
-
-  }
-);
-
-
-/* ==================================================
-   POST / UPLOAD
-   ================================================== */
+/* =========================================
+   UPLOAD VIDEO
+========================================= */
 
 postButton.addEventListener(
   "click",
@@ -2302,6 +2309,7 @@ postButton.addEventListener(
     postButton.textContent =
       "Uploading...";
 
+
     uploadStatus.textContent =
       "ভিডিও আপলোড হচ্ছে...";
 
@@ -2320,7 +2328,8 @@ postButton.addEventListener(
 
       const response =
         await fetch(
-          "https://zylo-backend-ec5c.onrender.com/api/upload",
+          BACKEND_URL +
+          "/api/upload",
           {
             method:"POST",
             body:formData
@@ -2345,49 +2354,28 @@ postButton.addEventListener(
       }
 
 
+      /* VIDEO DATA */
+
       const uploadedVideo =
         data.video;
 
 
-      if(
-        !uploadedVideo ||
-        !uploadedVideo.url
-      ){
-
-        throw new Error(
-          "Backend did not return video URL"
-        );
-
-      }
-
-
       /* SAVE */
 
-      const videos =
-        getSavedVideos();
-
-
-      videos.unshift({
-        url:uploadedVideo.url,
-        caption:captionInput.value,
-        username:"@zylo_creator"
-      });
-
-
-      saveFeedVideos(
-        videos.slice(0,20)
+      localStorage.setItem(
+        "zylo_last_video",
+        JSON.stringify(
+          uploadedVideo
+        )
       );
 
 
       /* ADD TO FEED */
 
-      const card =
-        addVideoToFeed(
-          uploadedVideo.url,
-          captionInput.value,
-          "@zylo_creator",
-          true
-        );
+      addVideoToFeed(
+        uploadedVideo.url,
+        captionInput.value
+      );
 
 
       uploadStatus.textContent =
@@ -2398,53 +2386,41 @@ postButton.addEventListener(
         "Posted ✓";
 
 
-      /* Scroll to uploaded video */
-
-      if(card){
-
-        setTimeout(
-          () => {
-
-            card.scrollIntoView({
-              behavior:"smooth"
-            });
-
-          },
-          200
-        );
-
-      }
-
-
-      /* RESET */
-
       setTimeout(
         () => {
 
-          createScreen.classList.remove(
-            "open"
-          );
+          createScreen
+            .classList
+            .remove("open");
+
 
           postButton.disabled =
             false;
 
+
           postButton.textContent =
             "Post";
+
 
           uploadStatus.textContent =
             "";
 
+
           captionInput.value =
             "";
+
 
           videoInput.value =
             "";
 
+
           previewVideo.src =
             "";
 
+
           previewVideo.style.display =
             "none";
+
 
           selectedVideo =
             null;
@@ -2458,6 +2434,7 @@ postButton.addEventListener(
 
       console.error(error);
 
+
       uploadStatus.textContent =
         "আপলোড ব্যর্থ হয়েছে: " +
         error.message;
@@ -2465,6 +2442,7 @@ postButton.addEventListener(
 
       postButton.disabled =
         false;
+
 
       postButton.textContent =
         "Post";
@@ -2475,57 +2453,50 @@ postButton.addEventListener(
 );
 
 
-/* ==================================================
-   RESTORE SAVED FEED
-   ================================================== */
+/* =========================================
+   RESTORE LAST UPLOADED VIDEO
+========================================= */
 
-function restoreSavedVideos(){
+try{
 
-  const videos =
-    getSavedVideos();
+  const saved =
+    localStorage.getItem(
+      "zylo_last_video"
+    );
 
 
-  /*
-    Reverse loop so newest
-    video stays at the top.
-  */
+  if(saved){
 
-  for(
-    let i=videos.length-1;
-    i>=0;
-    i--
-  ){
-
-    const item =
-      videos[i];
+    const video =
+      JSON.parse(saved);
 
 
     if(
-      item &&
-      item.url
+      video &&
+      video.url
     ){
 
       addVideoToFeed(
-        item.url,
-        item.caption || "",
-        item.username ||
-        "@zylo_creator",
-        false
+        video.url,
+        ""
       );
 
     }
 
   }
 
+}catch(error){
+
+  console.log(
+    "No saved video"
+  );
+
 }
 
 
-restoreSavedVideos();
-
-
-/* ==================================================
-   START FIRST VISIBLE VIDEO
-   ================================================== */
+/* =========================================
+   START CURRENT VIDEO
+========================================= */
 
 window.addEventListener(
   "load",
@@ -2533,7 +2504,7 @@ window.addEventListener(
 
     const firstVideo =
       document.querySelector(
-        "#feed .video-card video"
+        ".video-card video"
       );
 
 
@@ -2542,66 +2513,8 @@ window.addEventListener(
       firstVideo
         .play()
         .catch(
-          () => {
-
-            /*
-              Browser autoplay
-              restrictions handled.
-            */
-
-          }
+          () => {}
         );
-
-    }
-
-  }
-);
-
-
-/* ==================================================
-   VISIBILITY CHANGE
-   ================================================== */
-
-document.addEventListener(
-  "visibilitychange",
-  () => {
-
-    if(
-      document.hidden
-    ){
-
-      document
-        .querySelectorAll(
-          "#feed video"
-        )
-        .forEach(
-          video => video.pause()
-        );
-
-    }else{
-
-      const visibleCard =
-        document.querySelector(
-          ".video-card"
-        );
-
-
-      if(visibleCard){
-
-        const video =
-          visibleCard.querySelector(
-            "video"
-          );
-
-        if(video){
-
-          video
-            .play()
-            .catch(()=>{});
-
-        }
-
-      }
 
     }
 
