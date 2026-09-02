@@ -41,8 +41,6 @@ body {
   );
 }
 
-/* LIVE */
-
 .live-button {
   position: absolute;
 
@@ -59,8 +57,6 @@ body {
 
   cursor: pointer;
 }
-
-/* TOP TABS */
 
 .top-tabs {
   display: flex;
@@ -89,7 +85,7 @@ body {
   border-bottom: 3px solid #fff;
 }
 
-/* SEARCH - TOP RIGHT */
+/* ================= TOP SEARCH ================= */
 
 .top-search {
   position: absolute;
@@ -164,7 +160,7 @@ body {
   background: #111;
 }
 
-/* VIDEO OVERLAY */
+/* VIDEO GRADIENT */
 
 .video-gradient {
   position: absolute;
@@ -185,6 +181,67 @@ body {
       rgba(0, 0, 0, 0.30),
       transparent 28%
     );
+}
+
+/* ================= VIDEO INFO ================= */
+
+/*
+  Username
+  Caption
+  Sound
+
+  সবকিছু Bottom Navigation-এর ওপরে থাকবে।
+*/
+
+.video-info {
+  position: absolute;
+
+  left: 14px;
+  right: 90px;
+
+  bottom: 120px;
+
+  z-index: 25;
+
+  text-align: left;
+
+  text-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.9);
+}
+
+.username {
+  font-size: 18px;
+  font-weight: 700;
+
+  margin-bottom: 8px;
+}
+
+.caption {
+  font-size: 16px;
+
+  line-height: 1.35;
+
+  margin-bottom: 5px;
+}
+
+.music {
+  display: block;
+
+  margin-top: 8px;
+
+  font-size: 14px;
+
+  line-height: 20px;
+
+  color: #fff;
+
+  opacity: 1;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
 }
 
 /* ================= RIGHT ACTIONS ================= */
@@ -260,8 +317,6 @@ body {
   font-weight: 600;
 }
 
-/* LIKE */
-
 .like-btn.active {
   color: #ff2d55;
 }
@@ -270,8 +325,6 @@ body {
   fill: #ff2d55;
 }
 
-/* SAVE */
-
 .save-btn.active {
   color: #ffd60a;
 }
@@ -279,8 +332,6 @@ body {
 .save-btn.active svg {
   fill: #ffd60a;
 }
-
-/* SOUND */
 
 .sound-btn.active {
   color: #00d4ff;
@@ -336,52 +387,8 @@ body {
 
 .profile-action.following .follow-plus {
   background: #25d366;
-  font-size: 14px;
-}
-
-/* ================= VIDEO INFO ================= */
-
-/*
-  Caption এখন একদম নিচের দিকে,
-  কিন্তু Bottom Navigation-এর ওপরে থাকবে।
-*/
-
-.video-info {
-  position: absolute;
-
-  left: 14px;
-  right: 90px;
-
-  bottom: 105px;
-
-  z-index: 25;
-
-  text-align: left;
-
-  text-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.9);
-}
-
-.username {
-  font-size: 18px;
-  font-weight: 700;
-
-  margin-bottom: 8px;
-}
-
-.caption {
-  font-size: 16px;
-  line-height: 1.35;
-
-  margin-bottom: 5px;
-}
-
-.music {
-  margin-top: 7px;
 
   font-size: 14px;
-
-  opacity: 0.95;
 }
 
 /* ================= BOTTOM NAV ================= */
@@ -457,6 +464,7 @@ body {
   border-radius: 10px;
 
   background: #fff;
+
   color: #000;
 }
 
@@ -501,6 +509,7 @@ body {
   border-radius: 18px;
 
   background: #fff;
+
   color: #111;
 
   box-shadow:
@@ -553,6 +562,7 @@ body {
   border-radius: 10px;
 
   background: #fe2c55;
+
   color: #fff;
 
   font-size: 16px;
@@ -606,8 +616,40 @@ body {
     height: 29px;
   }
 
+  /* VIDEO INFO */
+
+  .video-info {
+    left: 12px;
+    right: 72px;
+
+    bottom: 105px;
+  }
+
+  .username {
+    font-size: 17px;
+  }
+
+  .caption {
+    font-size: 15px;
+
+    line-height: 1.35;
+
+    margin-bottom: 4px;
+  }
+
+  .music {
+    margin-top: 8px;
+
+    font-size: 13px;
+
+    line-height: 19px;
+  }
+
+  /* RIGHT ACTIONS */
+
   .right-actions {
     right: 7px;
+
     bottom: 90px;
 
     gap: 12px;
@@ -615,6 +657,7 @@ body {
 
   .action-btn {
     width: 48px;
+
     min-height: 48px;
   }
 
@@ -628,23 +671,7 @@ body {
     height: 45px;
   }
 
-  .video-info {
-    left: 12px;
-    right: 72px;
-    bottom: 88px;
-  }
-
-  .username {
-    font-size: 17px;
-  }
-
-  .caption {
-    font-size: 15px;
-  }
-
-  .music {
-    font-size: 13px;
-  }
+  /* BOTTOM */
 
   .bottom-nav {
     height: 64px;
