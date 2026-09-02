@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZYLO</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .app {
+      height: 100vh;
+      width: 100%;
+      position: relative;
+      background: #000;
+    }
+
+    /* Video */
+    .video-feed {
+      height: 100vh;
+      width: 100%;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+    }
+
+    .video-card {
+      height: 100vh;
+      width: 100%;
+      position: relative;
+      scroll-snap-align: start;
+      background: #111;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Top buttons */
+    .top-bar {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      z-index: 10;
+    }
+
+    .top-btn {
+      background: transparent;
+      border: 0;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    /* Right buttons */
+    .right-buttons {
+      position: absolute;
+      right: 12px;
+      bottom: 110px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      z-index: 10;
+    }
+
+    .action {
+      border: 0;
+      background: transparent;
+      color: white;
+      text-align: center;
+      font-size: 28px;
+    }
+
+    .action span {
+      display: block;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    /* User information */
+    .info {
+      position: absolute;
+      left: 15px;
+      bottom: 90px;
+      width: 75%;
+      z-index: 10;
+      text-shadow: 0 1px 4px #000;
+    }
+
+    .username {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .caption {
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    /* Bottom navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 65px;
+      background: rgba(0,0,0,.85);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 20;
+    }
+
+    .nav-btn {
+      color: white;
+      background: none;
+      border: 0;
+      font-size: 12px;
+    }
+
+    .nav-btn div {
+      font-size: 23px;
+      margin-bottom: 2px;
+    }
+
+    .upload {
+      background: white;
+      color: black;
+      border-radius: 10px;
+      padding: 7px 15px;
+      font-size: 25px;
+    }
+
+    /* Upload screen */
+    #uploadBox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #111;
+      z-index: 50;
+      padding: 25px;
+    }
+
+    #uploadBox h2 {
+      margin-bottom: 25px;
+    }
+
+    #videoInput {
+      width: 100%;
+      margin: 20px 0;
+    }
+
+    .upload-btn {
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 8px;
+      background: white;
+      color: black;
+      font-weight: bold;
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: none;
+      border: 0;
+      color: white;
+      font-size: 28px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="video-feed" id="feed">
+
+    <!-- Video 1 -->
+    <div class="video-card">
+      <video
+        src="uploads/video1.mp4"
+        loop
+        playsinline
+        muted>
+      </video>
+
+      <div class="top-bar">
+        <button class="top-btn">Following</button>
+        <button class="top-btn">For You</button>
+      </div>
+
+      <div class="right-buttons">
+        <button class="action">❤️<span>0</span></button>
+        <button class="action">💬<span>0</span></button>
+        <button class="action">🔖<span>Save</span></button>
+        <button class="action">↗️<span>Share</span></button>
+      </div>
+
+      <div class="info">
+        <div class="username">@ZYLO</div>
+        <div class="caption">
+          Welcome to ZYLO 🎬<br>
+          Create • Connect • Grow
+        </div>
+      </div>
+    </div>
+
+    <!-- Video 2 -->
+    <div class="video-card">
+      <video
+        src="uploads/video2.mp4"
+        loop
+        playsinline
+        muted>
+      </video>
+
+      <div class="right-buttons">
+        <button class="action">❤️<span>0</span></button>
+        <button class="action">💬<span>0</span></button>
+        <button class="action">🔖<span>Save</span></button>
+        <button class="action">↗️<span>Share</span></button>
+      </div>
+
+      <div class="info">
+        <div class="username">@creator</div>
+        <div class="caption">
+          Your short-video journey starts here 🚀
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom navigation -->
+  <div class="bottom-nav">
+
+    <button class="nav-btn">
+      <div>⌂</div>
+      Home
+    </button>
+
+    <button class="nav-btn">
+      <div>🔍</div>
+      Search
+    </button>
+
+    <button
+      class="nav-btn upload"
+      onclick="openUpload()">
+      +
+    </button>
+
+    <button class="nav-btn">
+      <div>💬</div>
+      Inbox
+    </button>
+
+    <button class="nav-btn">
+      <div>👤</div>
+      Profile
+    </button>
+
+  </div>
+
+</div>
+
+<!-- Upload box -->
+<div id="uploadBox">
+
+  <button class="close-btn" onclick="closeUpload()">✕</button>
+
+  <h2>Upload Video</h2>
+
+  <input
+    id="videoInput"
+    type="file"
+    accept="video/*">
+
+  <br><br>
+
+  <button
+    class="upload-btn"
+    onclick="uploadVideo()">
+    Upload
+  </button>
+
+  <p id="uploadStatus"></p>
+
+</div>
+
+<script>
+
+  const videos = document.querySelectorAll("video");
+
+  // Auto play / pause
+  const observer = new IntersectionObserver(
+    (entries) => {
+
+      entries.forEach(entry => {
+
+        const video = entry.target;
+
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+
+      });
+
+    },
+    {
+      threshold: 0.7
+    }
+  );
+
+  videos.forEach(video => {
+    observer.observe(video);
+
+    video.addEventListener("click", () => {
+
+      if (video.paused) {
+        video.play();
+      } else {
+        video.pause();
+      }
+
+    });
+
+  });
+
+  // Open upload
+  function openUpload() {
+    document.getElementById("uploadBox").style.display = "block";
+  }
+
+  // Close upload
+  function closeUpload() {
+    document.getElementById("uploadBox").style.display = "none";
+  }
+
+  // Upload video to backend
+  async function uploadVideo() {
+
+    const input = document.getElementById("videoInput");
+    const status = document.getElementById("uploadStatus");
+
+    if (!input.files.length) {
+      status.innerText = "আগে একটি ভিডিও নির্বাচন করুন।";
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("video", input.files[0]);
+
+    status.innerText = "ভিডিও আপলোড হচ্ছে...";
+
+    try {
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        status.innerText = "ভিডিও সফলভাবে আপলোড হয়েছে ✅";
+      } else {
+        status.innerText =
+          data.message || "আপলোড ব্যর্থ হয়েছে।";
+      }
+
+    } catch (error) {
+
+      status.innerText =
+        "Backend সংযোগ পাওয়া যাচ্ছে না।";
+
+    }
+
+  }
+
+</script>
+
+</body>
+</html>
