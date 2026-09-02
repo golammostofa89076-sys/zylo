@@ -752,3 +752,209 @@ body {
     gap: 8px;
   }
 }
+/* =========================================
+   ZYLO - TikTok Style Right Side Actions
+   ========================================= */
+
+.video-actions {
+  position: absolute;
+  right: 18px;
+  bottom: 118px;
+
+  width: 72px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 18px;
+
+  z-index: 20;
+}
+
+/* প্রতিটি Action */
+.video-actions .action,
+.video-actions .action-btn {
+  width: 64px;
+  min-height: 64px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: 0;
+  padding: 0;
+
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+/* Icon */
+.video-actions .action-icon,
+.video-actions .action span:first-child,
+.video-actions .action-btn span:first-child {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 38px;
+  line-height: 1;
+
+  color: #fff;
+}
+
+/* Count / Label */
+.video-actions .count,
+.video-actions .label,
+.video-actions .action span:last-child,
+.video-actions .action-btn span:last-child {
+  margin-top: 5px;
+
+  color: #fff;
+  font-size: 15px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+/* Profile */
+.video-actions .profile-action {
+  margin-bottom: 2px;
+}
+
+.video-actions .profile-action img,
+.video-actions .profile-action .avatar {
+  width: 58px;
+  height: 58px;
+
+  border-radius: 50%;
+  border: 2px solid #fff;
+
+  object-fit: cover;
+}
+
+/* Follow + button */
+.video-actions .follow-plus {
+  position: absolute;
+  right: 5px;
+  top: 42px;
+
+  width: 25px;
+  height: 25px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #fe2c55;
+  color: #fff;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  border: 2px solid #000;
+}
+
+/* Like */
+.video-actions .like-icon {
+  font-size: 43px;
+}
+
+/* Comment */
+.video-actions .comment-icon {
+  font-size: 40px;
+}
+
+/* Save */
+.video-actions .save-icon {
+  font-size: 39px;
+}
+
+/* Share */
+.video-actions .share-icon {
+  font-size: 39px;
+}
+
+/* Music disc */
+.video-actions .music-disc {
+  width: 58px;
+  height: 58px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #111;
+  border: 2px solid #444;
+
+  font-size: 28px;
+
+  animation: zyloSpin 5s linear infinite;
+}
+
+@keyframes zyloSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+
+  .video-actions {
+    right: 12px;
+    bottom: 112px;
+
+    width: 68px;
+    gap: 14px;
+  }
+
+  .video-actions .action,
+  .video-actions .action-btn {
+    width: 60px;
+    min-height: 60px;
+  }
+
+  .video-actions .action-icon,
+  .video-actions .action span:first-child,
+  .video-actions .action-btn span:first-child {
+    width: 44px;
+    height: 44px;
+
+    font-size: 34px;
+  }
+
+  .video-actions .count,
+  .video-actions .label,
+  .video-actions .action span:last-child,
+  .video-actions .action-btn span:last-child {
+    font-size: 14px;
+  }
+
+  .video-actions .profile-action img,
+  .video-actions .profile-action .avatar {
+    width: 54px;
+    height: 54px;
+  }
+
+  .video-actions .music-disc {
+    width: 54px;
+    height: 54px;
+    font-size: 25px;
+  }
+}
