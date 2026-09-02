@@ -2,10 +2,14 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
+
   <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        content="width=device-width, initial-scale=1.0,
+        maximum-scale=1.0, user-scalable=no,
+        viewport-fit=cover">
 
   <title>ZYLO</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,7 +17,7 @@
 
 <div id="app">
 
-  <!-- TOP BAR -->
+  <!-- TOP -->
   <header class="top-bar">
 
     <div class="logo">ZYLO</div>
@@ -28,22 +32,26 @@
   </header>
 
 
-  <!-- VIDEO FEED -->
+  <!-- VIDEO -->
   <main id="feed">
 
     <section class="video-item">
 
+      <!-- IMPORTANT:
+           Raw GitHub URL ব্যবহার করা হয়নি -->
       <video
         class="video"
-        src="https://raw.githubusercontent.com/golammostofa89076-sys/zylo/main/backend/uploads/video1.mp4"
+        src="/backend/uploads/video1.mp4"
         loop
         muted
         playsinline
+        webkit-playsinline
         preload="auto">
       </video>
 
 
-      <!-- RIGHT SIDE -->
+      <!-- RIGHT BUTTONS -->
+
       <div class="right-buttons">
 
         <button class="action-btn like-btn">
@@ -51,7 +59,7 @@
           <span>0</span>
         </button>
 
-        <button class="action-btn">
+        <button class="action-btn comment-btn">
           <strong>💬</strong>
           <span>0</span>
         </button>
@@ -74,7 +82,8 @@
       </div>
 
 
-      <!-- VIDEO INFORMATION -->
+      <!-- VIDEO INFO -->
+
       <div class="video-info">
 
         <h3>@zylo_creator</h3>
@@ -88,15 +97,22 @@
       </div>
 
 
-      <!-- PLAY/PAUSE -->
+      <!-- PLAY -->
+
       <div class="play-icon">▶</div>
+
+
+      <!-- FULLSCREEN -->
+
+      <button class="fullscreen-btn">⛶</button>
 
     </section>
 
   </main>
 
 
-  <!-- BOTTOM NAVIGATION -->
+  <!-- BOTTOM NAV -->
+
   <nav class="bottom-nav">
 
     <button>
@@ -109,9 +125,7 @@
       <span>Discover</span>
     </button>
 
-    <button class="upload-btn">
-      +
-    </button>
+    <button class="upload-btn">+</button>
 
     <button>
       <b>💬</b>
