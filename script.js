@@ -1,9 +1,7 @@
 const videos = document.querySelectorAll(".video");
 
 
-/* =========================
-   AUTO PLAY / PAUSE
-========================= */
+/* AUTO PLAY / PAUSE */
 
 const observer = new IntersectionObserver(
   (entries) => {
@@ -49,9 +47,7 @@ videos.forEach((video) => {
   observer.observe(video);
 
 
-  /* =========================
-     TAP PLAY / PAUSE
-  ========================= */
+  /* PLAY / PAUSE */
 
   video.addEventListener("click", () => {
 
@@ -84,9 +80,7 @@ videos.forEach((video) => {
 });
 
 
-/* =========================
-   LIKE
-========================= */
+/* LIKE */
 
 document.querySelectorAll(".like-btn").forEach((button) => {
 
@@ -119,9 +113,7 @@ document.querySelectorAll(".like-btn").forEach((button) => {
 });
 
 
-/* =========================
-   SAVE
-========================= */
+/* SAVE */
 
 document.querySelectorAll(".save-btn").forEach((button) => {
 
@@ -150,9 +142,7 @@ document.querySelectorAll(".save-btn").forEach((button) => {
 });
 
 
-/* =========================
-   SHARE
-========================= */
+/* SHARE */
 
 document.querySelectorAll(".share-btn").forEach((button) => {
 
@@ -195,9 +185,7 @@ document.querySelectorAll(".share-btn").forEach((button) => {
 });
 
 
-/* =========================
-   MUSIC
-========================= */
+/* MUSIC */
 
 document.querySelectorAll(".music-btn").forEach((button) => {
 
@@ -212,9 +200,7 @@ document.querySelectorAll(".music-btn").forEach((button) => {
 });
 
 
-/* =========================
-   FULLSCREEN
-========================= */
+/* FULLSCREEN */
 
 document.querySelectorAll(".fullscreen-btn").forEach((button) => {
 
@@ -244,7 +230,7 @@ document.querySelectorAll(".fullscreen-btn").forEach((button) => {
 
     } catch (error) {
 
-      console.log("Fullscreen error:", error);
+      console.log(error);
 
     }
 
@@ -253,9 +239,22 @@ document.querySelectorAll(".fullscreen-btn").forEach((button) => {
 });
 
 
-/* =========================
-   FIRST VIDEO
-========================= */
+/* VIDEO ERROR CHECK */
+
+videos.forEach((video) => {
+
+  video.addEventListener("error", () => {
+
+    console.log(
+      "Video load failed:",
+      video.currentSrc
+    );
+  });
+
+});
+
+
+/* FIRST VIDEO */
 
 window.addEventListener("load", () => {
 
