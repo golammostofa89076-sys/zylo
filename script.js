@@ -50,7 +50,7 @@ videos.forEach((video) => {
 
 
   /* =========================
-     VIDEO TAP PLAY / PAUSE
+     TAP PLAY / PAUSE
   ========================= */
 
   video.addEventListener("click", () => {
@@ -61,7 +61,7 @@ videos.forEach((video) => {
 
     if (video.paused) {
 
-      video.play();
+      video.play().catch(() => {});
 
       icon.textContent = "▶";
 
@@ -76,9 +76,7 @@ videos.forEach((video) => {
     icon.classList.add("show");
 
     setTimeout(() => {
-
       icon.classList.remove("show");
-
     }, 600);
 
   });
@@ -182,11 +180,11 @@ document.querySelectorAll(".share-btn").forEach((button) => {
 
         await navigator.clipboard.writeText(url);
 
-        alert("Video link copied!");
+        alert("ZYLO video link copied!");
 
       } catch (error) {
 
-        alert("Share link: " + url);
+        alert(url);
 
       }
 
@@ -208,6 +206,47 @@ document.querySelectorAll(".music-btn").forEach((button) => {
     e.stopPropagation();
 
     alert("🎵 Original sound");
+
+  });
+
+});
+
+
+/* =========================
+   FULLSCREEN
+========================= */
+
+document.querySelectorAll(".fullscreen-btn").forEach((button) => {
+
+  button.addEventListener("click", async (e) => {
+
+    e.stopPropagation();
+
+    const item = button.closest(".video-item");
+
+    const video = item.querySelector(".video");
+
+    try {
+
+      if (document.fullscreenElement) {
+
+        await document.exitFullscreen();
+
+      } else if (video.requestFullscreen) {
+
+        await video.requestFullscreen();
+
+      } else if (video.webkitEnterFullscreen) {
+
+        video.webkitEnterFullscreen();
+
+      }
+
+    } catch (error) {
+
+      console.log("Fullscreen error:", error);
+
+    }
 
   });
 
