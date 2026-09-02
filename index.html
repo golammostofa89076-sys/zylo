@@ -1,2245 +1,1238 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0,
-      maximum-scale=1.0, user-scalable=no">
-
-<title>ZYLO</title>
-
-<style>
-/* =====================================================
-   ZYLO — FULL TIKTOK STYLE UI
-   ===================================================== */
-
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
-html,
-body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#000;
-  color:#fff;
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-button,
-input,
-textarea,
-select{
-  font:inherit;
-}
-
-button{
-  border:0;
-  outline:0;
-  background:none;
-  color:#fff;
-}
-
-#app{
-  width:100%;
-  height:100dvh;
-  background:#000;
-  position:relative;
-  overflow:hidden;
-}
-
-/* =====================================================
-   FEED
-   ===================================================== */
-
-#feed{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  overflow-y:auto;
-  overflow-x:hidden;
-  scroll-snap-type:y mandatory;
-  scrollbar-width:none;
-}
-
-#feed::-webkit-scrollbar{
-  display:none;
-}
-
-.video-card{
-  position:relative;
-  width:100%;
-  height:100dvh;
-  min-height:100dvh;
-  scroll-snap-align:start;
-  overflow:hidden;
-  background:#000;
-}
-
-/* Video */
-
-.video{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  background:#000;
-}
-
-/* Dark gradient */
-
-.video-card::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(0,0,0,.35) 0%,
-      transparent 18%,
-      transparent 58%,
-      rgba(0,0,0,.08) 72%,
-      rgba(0,0,0,.72) 100%
-    );
-}
-
-/* =====================================================
-   TOP BAR
-   ===================================================== */
-
-.top-bar{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  height:74px;
-  z-index:1000;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  pointer-events:none;
-}
-
-.tabs{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:38px;
-  height:100%;
-}
-
-.tab{
-  position:relative;
-  color:rgba(255,255,255,.75);
-  font-size:19px;
-  font-weight:500;
-  padding:12px 0;
-  pointer-events:auto;
-}
-
-.tab.active{
-  color:#fff;
-  font-weight:700;
-}
-
-.tab.active::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  bottom:0;
-  transform:translateX(-50%);
-  width:92%;
-  height:4px;
-  border-radius:4px;
-  background:#fff;
-}
-
-/* Search */
-
-.search-button{
-  position:absolute;
-  right:14px;
-  top:16px;
-
-  width:48px;
-  height:48px;
-
-  border-radius:50%;
-  background:rgba(30,30,30,.92);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  pointer-events:auto;
-}
-
-.search-button svg{
-  width:29px;
-  height:29px;
-  stroke:#fff;
-  stroke-width:2.8;
-  fill:none;
-}
-
-/* =====================================================
-   RIGHT ACTIONS
-   ===================================================== */
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>ZYLO</title>
+
+  <style>
+    /* =========================================
+       ZYLO FULL SCREEN VIDEO
+       ========================================= */
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      overscroll-behavior: none;
+    }
 
-.video-actions{
-  position:absolute;
+    button {
+      border: 0;
+      outline: 0;
+      background: none;
+      color: #fff;
+      padding: 0;
+    }
+
+    /* =========================================
+       FULL SCREEN APP
+       ========================================= */
+
+    #app {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100dvh;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* =========================================
+       VIDEO FEED
+       ========================================= */
 
-  right:12px;
+    #feed {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100dvh;
+
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
 
-  /* IMPORTANT:
-     keeps buttons lower and above bottom navigation */
-  bottom:158px;
+      background: #000;
+    }
 
-  width:62px;
+    #feed::-webkit-scrollbar {
+      display: none;
+    }
 
-  z-index:500;
+    /* =========================================
+       VIDEO CARD
+       ========================================= */
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:16px;
-}
+    .video-card {
+      position: relative;
 
-/* Each action */
+      width: 100%;
+      height: 100dvh;
+      min-height: 100dvh;
 
-.action{
-  width:58px;
-  min-height:54px;
+      background: #000;
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+      overflow: hidden;
 
-  color:#fff;
-  cursor:pointer;
-}
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
 
-/* SVG */
+    /* =========================================
+       FULL SCREEN VIDEO
+       ========================================= */
 
-.action svg{
-  width:34px;
-  height:34px;
+    .video {
+      position: absolute;
 
-  stroke:#fff;
-  fill:none;
+      top: 0;
+      left: 0;
 
-  stroke-width:2.5;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-}
+      width: 100%;
+      height: 100%;
 
-.action span{
-  margin-top:4px;
+      min-width: 100%;
+      min-height: 100%;
 
-  color:#fff;
+      object-fit: cover;
 
-  font-size:13px;
-  line-height:16px;
+      background: #000;
 
-  text-align:center;
+      display: block;
+    }
 
-  text-shadow:0 1px 3px #000;
-}
+    /* =========================================
+       VIDEO DARK OVERLAYS
+       ========================================= */
 
-/* Profile */
+    .video-card::before {
+      content: "";
 
-.profile-action{
-  min-height:74px;
-}
+      position: absolute;
+      inset: 0;
 
-.avatar{
-  position:relative;
+      z-index: 2;
+      pointer-events: none;
 
-  width:56px;
-  height:56px;
+      background:
+        linear-gradient(
+          to bottom,
+          rgba(0,0,0,.55) 0%,
+          transparent 18%,
+          transparent 65%,
+          rgba(0,0,0,.68) 100%
+        );
+    }
 
-  border-radius:50%;
+    /* =========================================
+       TOP BAR
+       ========================================= */
 
-  border:2px solid #fff;
+    .top-bar {
+      position: absolute;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+      top: 0;
+      left: 0;
+      right: 0;
 
-  font-size:27px;
-  font-weight:400;
+      height: 75px;
 
-  background:#000;
-}
+      z-index: 20;
 
-.follow-plus{
-  position:absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-  right:-5px;
-  bottom:-5px;
+      padding-top: env(safe-area-inset-top);
+    }
 
-  width:24px;
-  height:24px;
+    .tabs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-  border-radius:50%;
+      gap: 34px;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+      height: 60px;
+    }
 
-  background:#ff2456;
+    .tab {
+      position: relative;
 
-  border:2px solid #fff;
+      color: rgba(255,255,255,.72);
 
-  font-size:17px;
-  font-weight:bold;
-}
+      font-size: 18px;
+      font-weight: 500;
 
-.profile-action .follow-text{
-  margin-top:6px;
-}
+      white-space: nowrap;
+    }
 
-/* Like */
+    .tab.active {
+      color: #fff;
+      font-weight: 700;
+    }
 
-.like-button.liked svg{
-  fill:#ff2d55;
-  stroke:#ff2d55;
-}
+    .tab.active::after {
+      content: "";
 
-/* Save */
+      position: absolute;
 
-.save-button.saved svg{
-  fill:#fff;
-}
+      left: 50%;
+      bottom: -13px;
 
-/* =====================================================
-   MUSIC BUTTON
-   ===================================================== */
+      width: 105px;
+      height: 5px;
 
-.music-button{
-  position:absolute;
+      transform: translateX(-50%);
 
-  right:14px;
+      border-radius: 10px;
 
-  /* NEVER place it inside the bottom nav */
-  bottom:88px;
+      background: #fff;
+    }
 
-  width:54px;
-  height:54px;
+    /* =========================================
+       SEARCH
+       ========================================= */
 
-  border-radius:50%;
+    .search-button {
+      position: absolute;
 
-  z-index:550;
+      top: 16px;
+      right: 14px;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+      width: 58px;
+      height: 58px;
 
-  background:#111;
+      border-radius: 50%;
 
-  border:2px solid rgba(255,255,255,.25);
+      background: rgba(30,30,30,.9);
 
-  box-shadow:
-    0 0 0 4px rgba(255,255,255,.06),
-    0 0 0 7px rgba(255,255,255,.035);
-}
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-.music-button svg{
-  width:25px;
-  height:25px;
+      z-index: 30;
+    }
 
-  stroke:#fff;
-  fill:none;
+    .search-icon {
+      position: relative;
 
-  stroke-width:2.2;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-}
+      width: 29px;
+      height: 29px;
 
-/* =====================================================
-   VIDEO INFORMATION
-   ===================================================== */
+      border: 4px solid #fff;
+      border-radius: 50%;
+    }
 
-.video-info{
-  position:absolute;
+    .search-icon::after {
+      content: "";
 
-  left:24px;
-  right:88px;
+      position: absolute;
 
-  bottom:124px;
+      width: 15px;
+      height: 4px;
 
-  z-index:400;
-}
+      background: #fff;
 
-.username{
-  display:flex;
-  align-items:center;
+      right: -12px;
+      bottom: -7px;
 
-  font-size:22px;
-  font-weight:700;
+      transform: rotate(48deg);
 
-  margin-bottom:18px;
-}
+      border-radius: 5px;
+    }
 
-.verified{
-  width:25px;
-  height:25px;
+    /* =========================================
+       RIGHT ACTIONS
+       ========================================= */
 
-  margin-left:8px;
+    .video-actions {
+      position: absolute;
 
-  border-radius:50%;
+      right: 12px;
 
-  background:#22bde8;
+      top: 53%;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+      transform: translateY(-50%);
 
-  font-size:16px;
-  font-weight:bold;
-}
+      width: 62px;
 
-.caption{
-  font-size:20px;
-  line-height:1.35;
-  margin-bottom:8px;
-}
+      z-index: 25;
 
-.tagline{
-  font-size:20px;
-  line-height:1.35;
-  margin-bottom:10px;
-}
+      display: flex;
+      flex-direction: column;
 
-.hashtags{
-  color:#25c9f4;
+      align-items: center;
 
-  font-size:18px;
-  line-height:1.45;
+      gap: 19px;
+    }
 
-  margin-bottom:12px;
-}
+    .action-button {
+      width: 54px;
 
-.sound-text{
-  display:flex;
-  align-items:center;
+      display: flex;
+      flex-direction: column;
 
-  font-size:17px;
-  line-height:1.3;
-}
+      align-items: center;
+      justify-content: center;
 
-.sound-text svg{
-  width:18px;
-  height:18px;
+      color: #fff;
+    }
 
-  margin-right:8px;
+    .action-icon {
+      width: 40px;
+      height: 40px;
 
-  stroke:#fff;
-  fill:none;
-}
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-/* =====================================================
-   BOTTOM NAVIGATION
-   ===================================================== */
+      color: #fff;
 
-.bottom-nav{
-  position:fixed;
+      font-size: 35px;
+      line-height: 1;
+    }
 
-  left:0;
-  right:0;
-  bottom:0;
+    .action-label {
+      margin-top: 4px;
 
-  height:76px;
+      color: #fff;
 
-  z-index:2000;
+      font-size: 13px;
+      line-height: 15px;
 
-  display:grid;
+      text-align: center;
+    }
 
-  grid-template-columns:
-    1fr
-    1fr
-    1.2fr
-    1fr
-    1fr;
+    /* =========================================
+       PROFILE
+       ========================================= */
 
-  align-items:center;
+    .profile-action {
+      position: relative;
+    }
 
-  background:#000;
+    .avatar {
+      width: 58px;
+      height: 58px;
 
-  border-top:1px solid rgba(255,255,255,.12);
+      border: 2px solid #fff;
 
-  padding:
-    4px 6px
-    env(safe-area-inset-bottom);
-}
+      border-radius: 50%;
 
-/* Nav item */
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-.nav-item{
-  height:70px;
+      font-size: 32px;
+      font-weight: 400;
 
-  display:flex;
-  flex-direction:column;
+      background: #050505;
+    }
 
-  align-items:center;
-  justify-content:center;
+    .follow-plus {
+      position: absolute;
 
-  color:#fff;
+      right: -2px;
+      bottom: 20px;
 
-  cursor:pointer;
-}
+      width: 24px;
+      height: 24px;
 
-.nav-item svg{
-  width:29px;
-  height:29px;
+      border-radius: 50%;
 
-  stroke:#fff;
-  fill:none;
+      background: #ff1767;
 
-  stroke-width:2.4;
-  stroke-linecap:round;
-  stroke-linejoin:round;
+      border: 2px solid #fff;
 
-  margin-bottom:4px;
-}
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-.nav-item span{
-  font-size:14px;
-  line-height:17px;
-}
+      font-size: 18px;
+      font-weight: 700;
+    }
 
-/* Create */
+    /* =========================================
+       LIKE
+       ========================================= */
 
-.create-wrap{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+    .heart-icon {
+      font-size: 39px;
+      font-family: Arial, sans-serif;
+    }
 
-.create-button{
-  position:relative;
+    /* =========================================
+       COMMENT
+       ========================================= */
 
-  width:70px;
-  height:52px;
+    .comment-icon {
+      width: 36px;
+      height: 30px;
 
-  border-radius:13px;
+      border: 4px solid #fff;
 
-  background:#fff;
+      border-radius: 7px;
 
-  color:#000;
+      position: relative;
+    }
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+    .comment-icon::after {
+      content: "";
 
-  font-size:31px;
-  font-weight:400;
+      position: absolute;
 
-  box-shadow:
-    -6px 0 0 #19d7df,
-    6px 0 0 #ff2456;
+      left: 4px;
+      bottom: -9px;
 
-  cursor:pointer;
-}
+      width: 10px;
+      height: 10px;
 
-.create-button::before{
-  content:"";
-  position:absolute;
-  inset:0;
+      border-left: 4px solid #fff;
 
-  border-radius:13px;
+      transform: skewY(-35deg);
+    }
 
-  box-shadow:
-    inset 0 0 0 1px rgba(0,0,0,.05);
-}
+    /* =========================================
+       SAVE
+       ========================================= */
 
-/* =====================================================
-   CREATE MODAL
-   ===================================================== */
+    .save-icon {
+      width: 31px;
+      height: 39px;
 
-#createModal{
-  position:fixed;
+      border: 4px solid #fff;
 
-  inset:0;
+      position: relative;
+    }
 
-  z-index:5000;
+    .save-icon::after {
+      content: "";
 
-  display:none;
+      position: absolute;
 
-  background:#000;
-}
+      left: 3px;
+      right: 3px;
+      bottom: -2px;
 
-#createModal.show{
-  display:flex;
-  flex-direction:column;
-}
+      height: 15px;
 
-.create-header{
-  height:64px;
+      background: #000;
 
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+      border-left: 4px solid #fff;
+      border-top: 4px solid #fff;
 
-  padding:0 18px;
+      transform: rotate(45deg) scale(.7);
+    }
 
-  border-bottom:1px solid #222;
-}
+    /* =========================================
+       SHARE
+       ========================================= */
 
-.create-header h2{
-  margin:0;
+    .share-icon {
+      width: 35px;
+      height: 35px;
 
-  font-size:20px;
-}
+      position: relative;
 
-.close-create{
-  font-size:28px;
-  cursor:pointer;
-}
+      transform: rotate(-18deg);
+    }
 
-.create-body{
-  flex:1;
+    .share-icon::before {
+      content: "";
 
-  overflow-y:auto;
+      position: absolute;
 
-  padding:18px;
-}
+      width: 0;
+      height: 0;
 
-.upload-box{
-  width:100%;
+      border-top: 17px solid transparent;
+      border-bottom: 17px solid transparent;
+      border-left: 35px solid #fff;
 
-  min-height:210px;
+      top: 0;
+      left: 0;
+    }
 
-  border:1px dashed #555;
-  border-radius:14px;
+    .share-icon::after {
+      content: "";
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+      position: absolute;
 
-  text-align:center;
+      width: 23px;
+      height: 4px;
 
-  margin-bottom:18px;
-}
+      background: #000;
 
-.upload-box svg{
-  width:48px;
-  height:48px;
+      left: 4px;
+      top: 16px;
 
-  stroke:#fff;
-  fill:none;
+      transform: rotate(-24deg);
+    }
 
-  stroke-width:2;
+    /* =========================================
+       MUSIC BUTTON
+       ========================================= */
 
-  margin-bottom:12px;
-}
+    .music-button {
+      position: absolute;
 
-.upload-box h3{
-  margin:0 0 7px;
-}
+      right: 13px;
+      bottom: 96px;
 
-.upload-box p{
-  margin:0;
+      width: 56px;
+      height: 56px;
 
-  color:#aaa;
-  font-size:14px;
-}
+      border-radius: 50%;
 
-.upload-actions{
-  display:flex;
-  gap:10px;
+      background: #111;
 
-  width:100%;
+      border: 2px solid rgba(255,255,255,.28);
 
-  margin-bottom:18px;
-}
+      z-index: 28;
 
-.upload-actions button{
-  flex:1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-  height:46px;
+      box-shadow:
+        0 0 0 5px rgba(255,255,255,.04),
+        0 0 0 9px rgba(255,255,255,.03);
+    }
 
-  border-radius:10px;
+    .music-note {
+      font-size: 27px;
+      color: #fff;
+    }
 
-  background:#222;
+    /* =========================================
+       VIDEO INFORMATION
+       ========================================= */
 
-  cursor:pointer;
-}
+    .video-info {
+      position: absolute;
 
-.upload-actions button.primary{
-  background:#fff;
-  color:#000;
-}
+      left: 24px;
+      right: 92px;
 
-/* URL input */
+      bottom: 118px;
 
-.url-input{
-  width:100%;
+      z-index: 15;
 
-  height:46px;
+      color: #fff;
+    }
 
-  border-radius:9px;
+    .username {
+      display: flex;
+      align-items: center;
 
-  border:1px solid #444;
+      gap: 8px;
 
-  background:#111;
+      font-size: 24px;
+      font-weight: 700;
 
-  color:#fff;
+      margin-bottom: 18px;
+    }
 
-  padding:0 13px;
+    .verified {
+      width: 30px;
+      height: 30px;
 
-  outline:none;
+      border-radius: 50%;
 
-  margin-bottom:14px;
-}
+      background: #20bfe8;
 
-.preview{
-  display:none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
 
-  width:100%;
+      font-size: 19px;
+    }
 
-  max-height:360px;
+    .caption {
+      font-size: 20px;
+      line-height: 1.45;
 
-  object-fit:contain;
+      margin-bottom: 5px;
+    }
 
-  border-radius:12px;
+    .tagline {
+      font-size: 20px;
+      line-height: 1.45;
 
-  background:#111;
+      margin-bottom: 8px;
+    }
 
-  margin-bottom:15px;
-}
+    .hashtags {
+      color: #20bfe8;
 
-.preview.show{
-  display:block;
-}
+      font-size: 18px;
+      line-height: 1.5;
 
-.caption-input{
-  width:100%;
+      margin-bottom: 14px;
+    }
 
-  min-height:90px;
+    .sound {
+      display: flex;
+      align-items: center;
 
-  resize:none;
+      gap: 9px;
 
-  border:1px solid #333;
+      font-size: 17px;
 
-  border-radius:10px;
+      white-space: nowrap;
 
-  background:#111;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-  color:#fff;
+    .sound-note {
+      font-size: 21px;
+    }
 
-  padding:12px;
+    /* =========================================
+       BOTTOM NAVIGATION
+       ========================================= */
 
-  outline:none;
+    .bottom-nav {
+      position: absolute;
 
-  margin-bottom:12px;
-}
+      left: 0;
+      right: 0;
+      bottom: 0;
 
-.privacy{
-  width:100%;
+      height: 78px;
 
-  height:46px;
+      padding-bottom: env(safe-area-inset-bottom);
 
-  background:#111;
+      background: rgba(0,0,0,.92);
 
-  color:#fff;
+      border-top: 1px solid rgba(255,255,255,.12);
 
-  border:1px solid #333;
+      z-index: 40;
 
-  border-radius:10px;
+      display: grid;
 
-  padding:0 10px;
+      grid-template-columns:
+        1fr
+        1fr
+        1.25fr
+        1fr
+        1fr;
 
-  margin-bottom:12px;
-}
+      align-items: center;
+    }
 
-.post-button{
-  width:100%;
+    .nav-button {
+      height: 100%;
 
-  height:50px;
+      display: flex;
+      flex-direction: column;
 
-  border-radius:10px;
+      align-items: center;
+      justify-content: center;
 
-  background:#fff;
+      gap: 4px;
 
-  color:#000;
+      color: #fff;
+    }
 
-  font-weight:bold;
+    .nav-icon {
+      width: 30px;
+      height: 30px;
 
-  cursor:pointer;
-}
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-.post-button:disabled{
-  opacity:.45;
-}
+      font-size: 29px;
 
-.upload-status{
-  text-align:center;
+      color: #fff;
+    }
 
-  margin-top:12px;
+    .nav-label {
+      font-size: 13px;
+      color: #fff;
+    }
 
-  color:#aaa;
+    /* =========================================
+       CREATE BUTTON
+       ========================================= */
 
-  font-size:14px;
-}
+    .create-button {
+      position: relative;
 
-/* =====================================================
-   MOBILE
-   ===================================================== */
+      width: 145px;
+      height: 48px;
 
-@media(max-width:600px){
+      justify-self: center;
 
-  .top-bar{
-    height:70px;
-  }
+      border-radius: 14px;
 
-  .tabs{
-    gap:29px;
-  }
+      background:
+        linear-gradient(
+          90deg,
+          #20dce5 0%,
+          #fff 17%,
+          #fff 83%,
+          #ff1767 100%
+        );
 
-  .tab{
-    font-size:18px;
-  }
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-  .search-button{
-    right:10px;
-    top:12px;
+    .create-inner {
+      width: 115px;
+      height: 44px;
 
-    width:48px;
-    height:48px;
-  }
+      background: #fff;
 
-  .search-button svg{
-    width:28px;
-    height:28px;
-  }
+      color: #000;
 
-  /* RIGHT BUTTONS */
+      border-radius: 11px;
 
-  .video-actions{
-    right:8px;
-    bottom:160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-    width:58px;
+      font-size: 32px;
+      font-weight: 400;
+    }
 
-    gap:13px;
-  }
+    /* =========================================
+       HIDDEN UPLOAD
+       ========================================= */
 
-  .action{
-    width:56px;
-    min-height:49px;
-  }
+    #videoInput {
+      display: none;
+    }
 
-  .action svg{
-    width:31px;
-    height:31px;
-  }
+    /* =========================================
+       MOBILE
+       ========================================= */
 
-  .action span{
-    font-size:12px;
-    margin-top:3px;
-  }
+    @media (max-width: 600px) {
 
-  .profile-action{
-    min-height:69px;
-  }
+      .tabs {
+        gap: 28px;
+      }
 
-  .avatar{
-    width:54px;
-    height:54px;
+      .tab {
+        font-size: 17px;
+      }
 
-    font-size:25px;
-  }
+      .search-button {
+        width: 56px;
+        height: 56px;
 
-  .follow-plus{
-    width:23px;
-    height:23px;
-  }
+        top: 12px;
+        right: 10px;
+      }
 
-  /* MUSIC */
+      .video-actions {
+        right: 9px;
 
-  .music-button{
-    right:10px;
-    bottom:86px;
+        top: 53%;
 
-    width:52px;
-    height:52px;
-  }
+        gap: 17px;
+      }
 
-  .music-button svg{
-    width:23px;
-    height:23px;
-  }
+      .action-icon {
+        font-size: 33px;
+      }
 
-  /* INFO */
+      .avatar {
+        width: 55px;
+        height: 55px;
 
-  .video-info{
-    left:24px;
-    right:82px;
-    bottom:105px;
-  }
+        font-size: 30px;
+      }
 
-  .username{
-    font-size:20px;
-    margin-bottom:13px;
-  }
+      .video-info {
+        left: 24px;
+        right: 88px;
 
-  .verified{
-    width:24px;
-    height:24px;
-  }
+        bottom: 116px;
+      }
 
-  .caption,
-  .tagline{
-    font-size:19px;
-  }
+      .username {
+        font-size: 23px;
+      }
 
-  .hashtags{
-    font-size:17px;
-  }
+      .caption,
+      .tagline {
+        font-size: 19px;
+      }
 
-  .sound-text{
-    font-size:16px;
-  }
+      .hashtags {
+        font-size: 17px;
+      }
 
-  /* NAV */
+      .music-button {
+        right: 10px;
+        bottom: 91px;
 
-  .bottom-nav{
-    height:76px;
-  }
+        width: 54px;
+        height: 54px;
+      }
 
-  .nav-item{
-    height:70px;
-  }
+      .bottom-nav {
+        height: 76px;
+      }
 
-  .nav-item svg{
-    width:28px;
-    height:28px;
-  }
+      .create-button {
+        width: 142px;
+      }
 
-  .nav-item span{
-    font-size:13px;
-  }
+      .create-inner {
+        width: 112px;
+      }
+    }
 
-  .create-button{
-    width:68px;
-    height:51px;
-    font-size:30px;
-  }
-}
-
-/* Very small screens */
-
-@media(max-height:650px){
-
-  .video-actions{
-    bottom:145px;
-    gap:8px;
-  }
-
-  .music-button{
-    bottom:84px;
-  }
-
-  .video-info{
-    bottom:98px;
-  }
-}
-</style>
+  </style>
 </head>
 
 <body>
 
 <div id="app">
 
-<!-- ===================================================
-     FEED
-     =================================================== -->
+  <!-- =====================================
+       FEED
+       ===================================== -->
 
-<main id="feed">
+  <main id="feed">
 
-  <section class="video-card">
+    <!-- VIDEO 1 -->
 
-    <video
-      class="video"
-      src="uploads/video1.mp4"
-      loop
-      muted
-      playsinline
-      preload="metadata">
-    </video>
+    <section class="video-card">
 
-    <!-- TOP -->
+      <video
+        class="video"
+        src=""
+        loop
+        muted
+        playsinline
+        preload="metadata">
+      </video>
 
-    <div class="top-bar">
+      <!-- TOP -->
 
-      <div class="tabs">
+      <div class="top-bar">
 
-        <button class="tab">
-          LIVE
-        </button>
+        <div class="tabs">
 
-        <button class="tab">
-          Following
-        </button>
+          <button class="tab">
+            LIVE
+          </button>
 
-        <button class="tab active">
-          For You
+          <button class="tab">
+            Following
+          </button>
+
+          <button class="tab active">
+            For You
+          </button>
+
+        </div>
+
+        <button class="search-button">
+          <span class="search-icon"></span>
         </button>
 
       </div>
 
-      <button
-        class="search-button"
-        aria-label="Search">
 
-        <svg viewBox="0 0 24 24">
-          <circle cx="10.8" cy="10.8" r="6.8"></circle>
-          <path d="M16 16l5 5"></path>
-        </svg>
+      <!-- RIGHT ACTIONS -->
+
+      <div class="video-actions">
+
+        <button class="action-button profile-action">
+
+          <div class="avatar">
+            Z
+          </div>
+
+          <div class="follow-plus">
+            +
+          </div>
+
+          <span class="action-label">
+            Follow
+          </span>
+
+        </button>
+
+
+        <button class="action-button like-button">
+
+          <div class="action-icon heart-icon">
+            ♡
+          </div>
+
+          <span class="action-label">
+            0
+          </span>
+
+        </button>
+
+
+        <button class="action-button">
+
+          <div class="action-icon comment-icon"></div>
+
+          <span class="action-label">
+            0
+          </span>
+
+        </button>
+
+
+        <button class="action-button">
+
+          <div class="action-icon save-icon"></div>
+
+          <span class="action-label">
+            Save
+          </span>
+
+        </button>
+
+
+        <button class="action-button">
+
+          <div class="action-icon share-icon"></div>
+
+          <span class="action-label">
+            Share
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- MUSIC -->
+
+      <button class="music-button">
+
+        <span class="music-note">
+          ♪
+        </span>
 
       </button>
 
-    </div>
 
+      <!-- VIDEO INFO -->
 
-    <!-- =================================================
-         RIGHT ACTIONS
-         ================================================= -->
+      <div class="video-info">
 
-    <div class="video-actions">
+        <div class="username">
 
-      <!-- PROFILE -->
+          @zylo_creator
 
-      <button class="action profile-action">
-
-        <div class="avatar">
-
-          Z
-
-          <span class="follow-plus">
-            +
+          <span class="verified">
+            ✓
           </span>
 
         </div>
 
-        <span class="follow-text">
-          Follow
-        </span>
 
-      </button>
-
-
-      <!-- LIKE -->
-
-      <button class="action like-button">
-
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M20.8 8.7
-               c0 5.5-8.8 10.3-8.8 10.3
-               S3.2 14.2 3.2 8.7
-               C3.2 6 5.1 4 7.6 4
-               c1.5 0 2.9.8 3.6 2
-               .8-1.2 2.1-2 3.6-2
-               2.5 0 4.4 2 4.4 4.7z">
-          </path>
-        </svg>
-
-        <span>
-          0
-        </span>
-
-      </button>
+        <div class="caption">
+          Welcome to ZYLO 🌎
+        </div>
 
 
-      <!-- COMMENT -->
-
-      <button class="action">
-
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M20 11.5
-               a7.5 7.5 0 0 1-7.5 7.5
-               H7l-4 3v-10
-               A7.5 7.5 0 0 1 10.5 4H12.5
-               A7.5 7.5 0 0 1 20 11.5z">
-          </path>
-        </svg>
-
-        <span>
-          0
-        </span>
-
-      </button>
+        <div class="tagline">
+          Create • Connect • Grow
+        </div>
 
 
-      <!-- SAVE -->
-
-      <button class="action save-button">
-
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M6 4
-               a2 2 0 0 1 2-2
-               h8
-               a2 2 0 0 1 2 2
-               v18
-               l-6-4-6 4z">
-          </path>
-        </svg>
-
-        <span>
-          Save
-        </span>
-
-      </button>
+        <div class="hashtags">
+          #ZYLO #Create #Connect #Grow #ForYou
+        </div>
 
 
-      <!-- SHARE -->
+        <div class="sound">
 
-      <button class="action">
+          <span class="sound-note">
+            ♪
+          </span>
 
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M22 2
-               L11 13">
-          </path>
+          <span>
+            Original sound - ZYLO
+          </span>
 
-          <path
-            d="M22 2
-               L15 22
-               L11 13
-               L2 9
-               Z">
-          </path>
-        </svg>
+        </div>
 
-        <span>
-          Share
-        </span>
+      </div>
 
-      </button>
+    </section>
 
-    </div>
+  </main>
 
 
-    <!-- =================================================
-         MUSIC
-         ================================================= -->
+  <!-- =====================================
+       BOTTOM NAVIGATION
+       ===================================== -->
 
-    <button
-      class="music-button"
-      aria-label="Original sound">
+  <nav class="bottom-nav">
 
-      <svg viewBox="0 0 24 24">
+    <button class="nav-button">
 
-        <path d="M9 18V5"></path>
+      <span class="nav-icon">
+        ⌂
+      </span>
 
-        <path d="M9 5l10-2v12"></path>
-
-        <circle cx="6" cy="18" r="3"></circle>
-
-        <circle cx="16" cy="15" r="3"></circle>
-
-      </svg>
+      <span class="nav-label">
+        Home
+      </span>
 
     </button>
 
 
-    <!-- =================================================
-         VIDEO INFO
-         ================================================= -->
+    <button class="nav-button">
 
-    <div class="video-info">
+      <span class="nav-icon">
+        ⌕
+      </span>
 
-      <div class="username">
+      <span class="nav-label">
+        Discover
+      </span>
 
-        @zylo_creator
+    </button>
 
-        <span class="verified">
-          ✓
-        </span>
-
-      </div>
-
-      <div class="caption">
-        Welcome to ZYLO 🌎
-      </div>
-
-      <div class="tagline">
-        Create • Connect • Grow
-      </div>
-
-      <div class="hashtags">
-        #ZYLO #Create #Connect #Grow #ForYou
-      </div>
-
-      <div class="sound-text">
-
-        <svg viewBox="0 0 24 24">
-
-          <path d="M9 18V5"></path>
-
-          <path d="M9 5l9-2v11"></path>
-
-          <circle cx="6" cy="18" r="3"></circle>
-
-          <circle cx="15" cy="15" r="3"></circle>
-
-        </svg>
-
-        Original sound - ZYLO
-
-      </div>
-
-    </div>
-
-  </section>
-
-</main>
-
-
-<!-- ===================================================
-     BOTTOM NAV
-     =================================================== -->
-
-<nav class="bottom-nav">
-
-  <!-- HOME -->
-
-  <button class="nav-item">
-
-    <svg viewBox="0 0 24 24">
-
-      <path
-        d="M3 10.5
-           L12 3
-           L21 10.5
-           V21
-           H14
-           V15
-           H10
-           V21
-           H3
-           Z">
-      </path>
-
-    </svg>
-
-    <span>
-      Home
-    </span>
-
-  </button>
-
-
-  <!-- DISCOVER -->
-
-  <button class="nav-item">
-
-    <svg viewBox="0 0 24 24">
-
-      <circle
-        cx="10.5"
-        cy="10.5"
-        r="6.5">
-      </circle>
-
-      <path d="M16 16l5 5"></path>
-
-    </svg>
-
-    <span>
-      Discover
-    </span>
-
-  </button>
-
-
-  <!-- CREATE -->
-
-  <div class="create-wrap">
 
     <button
       class="create-button"
-      id="openCreate">
-
-      +
-
-    </button>
-
-  </div>
-
-
-  <!-- INBOX -->
-
-  <button class="nav-item">
-
-    <svg viewBox="0 0 24 24">
-
-      <path
-        d="M3 5
-           h18
-           v14
-           H3
-           Z">
-      </path>
-
-      <path
-        d="M3 15
-           h5
-           l2 3
-           h4
-           l2-3
-           h5">
-      </path>
-
-    </svg>
-
-    <span>
-      Inbox
-    </span>
-
-  </button>
-
-
-  <!-- PROFILE -->
-
-  <button class="nav-item">
-
-    <svg viewBox="0 0 24 24">
-
-      <circle
-        cx="12"
-        cy="7"
-        r="4">
-      </circle>
-
-      <path
-        d="M4 21
-           c0-4.5 3.5-7 8-7
-           s8 2.5 8 7">
-      </path>
-
-    </svg>
-
-    <span>
-      Profile
-    </span>
-
-  </button>
-
-</nav>
-
-
-<!-- ===================================================
-     CREATE / UPLOAD MODAL
-     =================================================== -->
-
-<section id="createModal">
-
-  <header class="create-header">
-
-    <button
-      class="close-create"
-      id="closeCreate">
-      ×
-    </button>
-
-    <h2>
-      Create
-    </h2>
-
-    <div style="width:28px;"></div>
-
-  </header>
-
-
-  <div class="create-body">
-
-    <div class="upload-box">
-
-      <svg viewBox="0 0 24 24">
-
-        <rect
-          x="3"
-          y="4"
-          width="18"
-          height="16"
-          rx="2">
-        </rect>
-
-        <path d="M8 12l3-3 5 5 2-2 3 3"></path>
-
-      </svg>
-
-      <h3>
-        Add a video
-      </h3>
-
-      <p>
-        Upload a video from your phone
-      </p>
-
-    </div>
-
-
-    <div class="upload-actions">
-
-      <button
-        class="primary"
-        id="chooseVideo">
-        Choose Video
-      </button>
-
-      <button id="clearVideo">
-        Clear
-      </button>
-
-    </div>
-
-
-    <!-- VIDEO URL -->
-
-    <input
-      id="videoUrl"
-      class="url-input"
-      type="url"
-      placeholder="Or paste video URL here">
-
-
-    <!-- PREVIEW -->
-
-    <video
-      id="preview"
-      class="preview"
-      controls
-      playsinline>
-    </video>
-
-
-    <!-- CAPTION -->
-
-    <textarea
-      id="captionInput"
-      class="caption-input"
-      placeholder="Write a caption..."></textarea>
-
-
-    <!-- PRIVACY -->
-
-    <select
-      id="privacy"
-      class="privacy">
-
-      <option>
-        Everyone
-      </option>
-
-      <option>
-        Friends
-      </option>
-
-      <option>
-        Only me
-      </option>
-
-    </select>
-
-
-    <!-- POST -->
-
-    <button
-      id="postButton"
-      class="post-button"
-      disabled>
-
-      Post
+      id="createButton">
+
+      <span class="create-inner">
+        +
+      </span>
 
     </button>
 
 
-    <div
-      id="uploadStatus"
-      class="upload-status">
-    </div>
+    <button class="nav-button">
 
-  </div>
+      <span class="nav-icon">
+        ▱
+      </span>
 
-</section>
+      <span class="nav-label">
+        Inbox
+      </span>
+
+    </button>
 
 
-<!-- HIDDEN FILE INPUT -->
+    <button class="nav-button">
 
-<input
-  id="videoInput"
-  type="file"
-  accept="video/*"
-  hidden>
+      <span class="nav-icon">
+        ♙
+      </span>
 
+      <span class="nav-label">
+        Profile
+      </span>
+
+    </button>
+
+  </nav>
+
+
+  <!-- Hidden upload -->
+
+  <input
+    type="file"
+    id="videoInput"
+    accept="video/*">
 
 </div>
 
 
 <script>
-/* =====================================================
-   ZYLO — JAVASCRIPT
-   ===================================================== */
 
-const BACKEND_URL =
-  "https://zylo-backend-ec5c.onrender.com";
+  /* =========================================
+     ZYLO VIDEO PLAY / PAUSE
+     ========================================= */
 
+  const feed =
+    document.getElementById("feed");
 
-const UPLOAD_URL =
-  BACKEND_URL + "/api/upload";
-
-
-/* =====================================================
-   ELEMENTS
-   ===================================================== */
-
-const feed =
-  document.getElementById("feed");
-
-const createModal =
-  document.getElementById("createModal");
-
-const openCreate =
-  document.getElementById("openCreate");
-
-const closeCreate =
-  document.getElementById("closeCreate");
-
-const chooseVideo =
-  document.getElementById("chooseVideo");
-
-const clearVideo =
-  document.getElementById("clearVideo");
-
-const videoInput =
-  document.getElementById("videoInput");
-
-const preview =
-  document.getElementById("preview");
-
-const videoUrl =
-  document.getElementById("videoUrl");
-
-const captionInput =
-  document.getElementById("captionInput");
-
-const postButton =
-  document.getElementById("postButton");
-
-const uploadStatus =
-  document.getElementById("uploadStatus");
+  const videos =
+    document.querySelectorAll(".video");
 
 
-let selectedFile = null;
+  /* Tap video = Play / Pause */
 
+  document.addEventListener("click", function(event) {
 
-/* =====================================================
-   OPEN CREATE
-   ===================================================== */
+    const video =
+      event.target.closest(".video");
 
-openCreate.addEventListener("click", () => {
-
-  createModal.classList.add("show");
-
-});
-
-
-/* =====================================================
-   CLOSE CREATE
-   ===================================================== */
-
-closeCreate.addEventListener("click", () => {
-
-  createModal.classList.remove("show");
-
-});
-
-
-/* =====================================================
-   CHOOSE VIDEO
-   ===================================================== */
-
-chooseVideo.addEventListener("click", () => {
-
-  videoInput.click();
-
-});
-
-
-/* =====================================================
-   FILE SELECT
-   ===================================================== */
-
-videoInput.addEventListener("change", () => {
-
-  const file =
-    videoInput.files[0];
-
-  if (!file) {
-    return;
-  }
-
-  selectedFile = file;
-
-  const objectUrl =
-    URL.createObjectURL(file);
-
-  preview.src = objectUrl;
-
-  preview.classList.add("show");
-
-  postButton.disabled = false;
-
-  uploadStatus.textContent =
-    "ভিডিও প্রস্তুত। এখন Post চাপুন।";
-
-});
-
-
-/* =====================================================
-   VIDEO URL
-   ===================================================== */
-
-videoUrl.addEventListener("input", () => {
-
-  const url =
-    videoUrl.value.trim();
-
-  if (!url) {
-
-    if (!selectedFile) {
-      preview.classList.remove("show");
-      postButton.disabled = true;
+    if (!video) {
+      return;
     }
 
-    return;
-  }
+    if (video.paused) {
 
-  selectedFile = null;
+      video.play().catch(() => {});
 
-  preview.src = url;
+    } else {
 
-  preview.classList.add("show");
+      video.pause();
 
-  postButton.disabled = false;
+    }
 
-  uploadStatus.textContent =
-    "Video URL প্রস্তুত। এখন Post চাপুন।";
-
-});
+  });
 
 
-/* =====================================================
-   CLEAR
-   ===================================================== */
+  /* =========================================
+     AUTO PLAY WHEN VIDEO IS VISIBLE
+     ========================================= */
 
-clearVideo.addEventListener("click", () => {
+  const observer =
+    new IntersectionObserver(
 
-  selectedFile = null;
+      entries => {
 
-  videoInput.value = "";
+        entries.forEach(entry => {
 
-  videoUrl.value = "";
+          const video =
+            entry.target;
 
-  preview.removeAttribute("src");
+          if (entry.isIntersecting) {
 
-  preview.load();
+            video.muted = true;
 
-  preview.classList.remove("show");
+            video.play().catch(() => {});
 
-  postButton.disabled = true;
+          } else {
 
-  uploadStatus.textContent = "";
+            video.pause();
 
-});
-
-
-/* =====================================================
-   POST
-   ===================================================== */
-
-postButton.addEventListener("click", async () => {
-
-  if (postButton.disabled) {
-    return;
-  }
-
-
-  postButton.disabled = true;
-
-  uploadStatus.textContent =
-    "ভিডিও আপলোড হচ্ছে...";
-
-
-  try {
-
-    let finalVideoUrl = "";
-
-
-    /* -----------------------------------------------
-       FILE UPLOAD
-       ----------------------------------------------- */
-
-    if (selectedFile) {
-
-      const formData =
-        new FormData();
-
-      formData.append(
-        "video",
-        selectedFile
-      );
-
-
-      const response =
-        await fetch(
-          UPLOAD_URL,
-          {
-            method:"POST",
-            body:formData
           }
-        );
 
+        });
 
-      const data =
-        await response.json();
+      },
 
-
-      if (!response.ok || !data.success) {
-
-        throw new Error(
-          data.message ||
-          "Upload failed"
-        );
-
+      {
+        threshold: 0.75
       }
 
-
-      finalVideoUrl =
-        data.video.url;
-
-    }
-
-
-    /* -----------------------------------------------
-       VIDEO URL
-       ----------------------------------------------- */
-
-    else if (videoUrl.value.trim()) {
-
-      finalVideoUrl =
-        videoUrl.value.trim();
-
-    }
-
-
-    else {
-
-      throw new Error(
-        "ভিডিও নির্বাচন করুন"
-      );
-
-    }
-
-
-    /* -----------------------------------------------
-       CREATE FEED
-       ----------------------------------------------- */
-
-    addVideoToFeed(
-      finalVideoUrl,
-      captionInput.value.trim()
     );
 
 
-    /* -----------------------------------------------
-       SAVE LAST VIDEO
-       ----------------------------------------------- */
+  videos.forEach(video => {
 
-    localStorage.setItem(
-      "zyloLastVideo",
-      JSON.stringify({
-        url:finalVideoUrl,
-        caption:captionInput.value.trim()
-      })
-    );
+    observer.observe(video);
 
-
-    uploadStatus.textContent =
-      "ভিডিও সফলভাবে Post হয়েছে ✓";
-
-
-    setTimeout(() => {
-
-      createModal.classList.remove("show");
-
-      resetCreate();
-
-    },800);
-
-
-  } catch(error) {
-
-    console.error(error);
-
-    uploadStatus.textContent =
-      "সমস্যা হয়েছে: " +
-      error.message;
-
-    postButton.disabled = false;
-
-  }
-
-});
-
-
-/* =====================================================
-   ADD VIDEO TO FEED
-   ===================================================== */
-
-function addVideoToFeed(
-  videoUrl,
-  caption
-){
-
-  const card =
-    document.createElement("section");
-
-  card.className =
-    "video-card";
-
-
-  card.innerHTML = `
-
-    <video
-      class="video"
-      src="${escapeHTML(videoUrl)}"
-      loop
-      muted
-      playsinline
-      preload="metadata">
-    </video>
-
-
-    <div class="top-bar">
-
-      <div class="tabs">
-
-        <button class="tab">
-          LIVE
-        </button>
-
-        <button class="tab">
-          Following
-        </button>
-
-        <button class="tab active">
-          For You
-        </button>
-
-      </div>
-
-      <button class="search-button">
-
-        <svg viewBox="0 0 24 24">
-
-          <circle
-            cx="10.8"
-            cy="10.8"
-            r="6.8">
-          </circle>
-
-          <path d="M16 16l5 5"></path>
-
-        </svg>
-
-      </button>
-
-    </div>
-
-
-    <div class="video-actions">
-
-      <button class="action profile-action">
-
-        <div class="avatar">
-
-          Z
-
-          <span class="follow-plus">
-            +
-          </span>
-
-        </div>
-
-        <span class="follow-text">
-          Follow
-        </span>
-
-      </button>
-
-
-      <button class="action like-button">
-
-        <svg viewBox="0 0 24 24">
-
-          <path
-            d="M20.8 8.7
-               c0 5.5-8.8 10.3-8.8 10.3
-               S3.2 14.2 3.2 8.7
-               C3.2 6 5.1 4 7.6 4
-               c1.5 0 2.9.8 3.6 2
-               .8-1.2 2.1-2 3.6-2
-               2.5 0 4.4 2 4.4 4.7z">
-          </path>
-
-        </svg>
-
-        <span>0</span>
-
-      </button>
-
-
-      <button class="action">
-
-        <svg viewBox="0 0 24 24">
-
-          <path
-            d="M20 11.5
-               a7.5 7.5 0 0 1-7.5 7.5
-               H7l-4 3v-10
-               A7.5 7.5 0 0 1 10.5 4H12.5
-               A7.5 7.5 0 0 1 20 11.5z">
-          </path>
-
-        </svg>
-
-        <span>0</span>
-
-      </button>
-
-
-      <button class="action save-button">
-
-        <svg viewBox="0 0 24 24">
-
-          <path
-            d="M6 4
-               a2 2 0 0 1 2-2
-               h8
-               a2 2 0 0 1 2 2
-               v18
-               l-6-4-6 4z">
-          </path>
-
-        </svg>
-
-        <span>Save</span>
-
-      </button>
-
-
-      <button class="action">
-
-        <svg viewBox="0 0 24 24">
-
-          <path d="M22 2L11 13"></path>
-
-          <path
-            d="M22 2
-               L15 22
-               L11 13
-               L2 9
-               Z">
-          </path>
-
-        </svg>
-
-        <span>Share</span>
-
-      </button>
-
-    </div>
-
-
-    <button class="music-button">
-
-      <svg viewBox="0 0 24 24">
-
-        <path d="M9 18V5"></path>
-
-        <path d="M9 5l10-2v12"></path>
-
-        <circle cx="6" cy="18" r="3"></circle>
-
-        <circle cx="16" cy="15" r="3"></circle>
-
-      </svg>
-
-    </button>
-
-
-    <div class="video-info">
-
-      <div class="username">
-
-        @zylo_creator
-
-        <span class="verified">
-          ✓
-        </span>
-
-      </div>
-
-      <div class="caption">
-        ${escapeHTML(
-          caption || "Welcome to ZYLO 🌎"
-        )}
-      </div>
-
-      <div class="tagline">
-        Create • Connect • Grow
-      </div>
-
-      <div class="hashtags">
-        #ZYLO #Create #Connect #Grow #ForYou
-      </div>
-
-      <div class="sound-text">
-
-        ♪ Original sound - ZYLO
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  feed.prepend(card);
-
-  setupVideo(card);
-
-  card.scrollIntoView({
-    behavior:"smooth"
   });
 
-}
 
+  /* =========================================
+     LIKE
+     ========================================= */
 
-/* =====================================================
-   RESET CREATE
-   ===================================================== */
+  document.addEventListener("click", function(event) {
 
-function resetCreate(){
+    const button =
+      event.target.closest(".like-button");
 
-  selectedFile = null;
-
-  videoInput.value = "";
-
-  videoUrl.value = "";
-
-  preview.removeAttribute("src");
-
-  preview.load();
-
-  preview.classList.remove("show");
-
-  captionInput.value = "";
-
-  postButton.disabled = true;
-
-  uploadStatus.textContent = "";
-
-}
-
-
-/* =====================================================
-   ESCAPE HTML
-   ===================================================== */
-
-function escapeHTML(value){
-
-  return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-
-/* =====================================================
-   VIDEO AUTOPLAY / PAUSE
-   ===================================================== */
-
-const observer =
-  new IntersectionObserver(
-    entries => {
-
-      entries.forEach(entry => {
-
-        const video =
-          entry.target.querySelector(".video");
-
-        if (!video) {
-          return;
-        }
-
-
-        if (entry.isIntersecting) {
-
-          video.play().catch(() => {});
-
-        } else {
-
-          video.pause();
-
-        }
-
-      });
-
-    },
-    {
-      threshold:0.65
+    if (!button) {
+      return;
     }
-  );
+
+    const icon =
+      button.querySelector(".heart-icon");
+
+    if (icon.textContent.trim() === "♡") {
+
+      icon.textContent = "♥";
+
+    } else {
+
+      icon.textContent = "♡";
+
+    }
+
+  });
 
 
-function setupVideo(card){
+  /* =========================================
+     CREATE / UPLOAD
+     ========================================= */
 
-  observer.observe(card);
+  const createButton =
+    document.getElementById("createButton");
 
-
-  const video =
-    card.querySelector(".video");
-
-  if (!video) {
-    return;
-  }
+  const videoInput =
+    document.getElementById("videoInput");
 
 
-  video.addEventListener(
+  createButton.addEventListener(
     "click",
-    () => {
+    function() {
 
-      if (video.paused) {
-
-        video.play().catch(() => {});
-
-      } else {
-
-        video.pause();
-
-      }
+      videoInput.click();
 
     }
   );
 
 
-  const like =
-    card.querySelector(".like-button");
+  /* =========================================
+     VIDEO SELECTION
+     ========================================= */
 
-  if (like) {
+  videoInput.addEventListener(
+    "change",
+    function() {
 
-    like.addEventListener(
-      "click",
-      () => {
+      const file =
+        videoInput.files[0];
 
-        like.classList.toggle("liked");
-
+      if (!file) {
+        return;
       }
-    );
 
-  }
+      const localURL =
+        URL.createObjectURL(file);
 
+      const firstVideo =
+        document.querySelector(".video");
 
-  const save =
-    card.querySelector(".save-button");
+      firstVideo.src =
+        localURL;
 
-  if (save) {
+      firstVideo.load();
 
-    save.addEventListener(
-      "click",
-      () => {
-
-        save.classList.toggle("saved");
-
-      }
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   INITIAL VIDEO
-   ===================================================== */
-
-document
-  .querySelectorAll(".video-card")
-  .forEach(card => {
-
-    setupVideo(card);
-
-  });
-
-
-/* =====================================================
-   LOAD LAST UPLOADED VIDEO
-   ===================================================== */
-
-try {
-
-  const saved =
-    localStorage.getItem(
-      "zyloLastVideo"
-    );
-
-
-  if (saved) {
-
-    const data =
-      JSON.parse(saved);
-
-
-    if (data.url) {
-
-      addVideoToFeed(
-        data.url,
-        data.caption || ""
-      );
+      firstVideo.play().catch(() => {});
 
     }
-
-  }
-
-} catch(error){
-
-  console.log(
-    "No saved video"
   );
-
-}
 
 </script>
 
