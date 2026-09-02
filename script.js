@@ -1,5 +1,10 @@
 const videos = document.querySelectorAll(".video");
 
+
+/* =========================
+   AUTO PLAY / PAUSE
+========================= */
+
 const observer = new IntersectionObserver(
   (entries) => {
 
@@ -7,17 +12,22 @@ const observer = new IntersectionObserver(
 
       const video = entry.target;
 
-      if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+      if (
+        entry.isIntersecting &&
+        entry.intersectionRatio >= 0.6
+      ) {
 
         videos.forEach((v) => {
+
           if (v !== video) {
             v.pause();
           }
+
         });
 
-        video.play().catch(() => {
-          console.log("Autoplay অপেক্ষা করছে...");
-        });
+        video.muted = true;
+
+        video.play().catch(() => {});
 
       } else {
 
@@ -39,12 +49,15 @@ videos.forEach((video) => {
   observer.observe(video);
 
 
-  // Video tap = play/pause
+  /* =========================
+     VIDEO TAP PLAY / PAUSE
+  ========================= */
 
   video.addEventListener("click", () => {
 
-    const parent = video.closest(".video-item");
-    const icon = parent.querySelector(".play-icon");
+    const item = video.closest(".video-item");
+
+    const icon = item.querySelector(".play-icon");
 
     if (video.paused) {
 
@@ -63,7 +76,9 @@ videos.forEach((video) => {
     icon.classList.add("show");
 
     setTimeout(() => {
+
       icon.classList.remove("show");
+
     }, 600);
 
   });
@@ -71,63 +86,145 @@ videos.forEach((video) => {
 });
 
 
-/* Like button */
+/* =========================
+   LIKE
+========================= */
 
 document.querySelectorAll(".like-btn").forEach((button) => {
 
-  button.addEventListener("click", (event) => {
+  button.addEventListener("click", (e) => {
 
-    event.stopPropagation();
+    e.stopPropagation();
 
     const count = button.querySelector("span");
 
-    let likes = Number(count.textContent);
+    let number = Number(count.textContent);
 
     if (button.classList.contains("liked")) {
 
-      likes--;
+      number--;
 
       button.classList.remove("liked");
 
     } else {
 
-      likes++;
+      number++;
 
       button.classList.add("liked");
 
     }
 
-    count.textContent = likes;
+    count.textContent = number;
 
   });
 
 });
 
 
-/* Prevent buttons from affecting video */
+/* =========================
+   SAVE
+========================= */
 
-document.querySelectorAll(".action-btn").forEach((button) => {
+document.querySelectorAll(".save-btn").forEach((button) => {
 
-  button.addEventListener("click", (event) => {
-    event.stopPropagation();
+  button.addEventListener("click", (e) => {
+
+    e.stopPropagation();
+
+    const text = button.querySelector("span");
+
+    if (button.classList.contains("saved")) {
+
+      button.classList.remove("saved");
+
+      text.textContent = "Save";
+
+    } else {
+
+      button.classList.add("saved");
+
+      text.textContent = "Saved";
+
+    }
+
   });
 
 });
 
 
-/* প্রথম ভিডিও চালানোর চেষ্টা */
+/* =========================
+   SHARE
+========================= */
+
+document.querySelectorAll(".share-btn").forEach((button) => {
+
+  button.addEventListener("click", async (e) => {
+
+    e.stopPropagation();
+
+    const url = window.location.href;
+
+    if (navigator.share) {
+
+      try {
+
+        await navigator.share({
+          title: "ZYLO",
+          text: "Check this video on ZYLO",
+          url: url
+        });
+
+      } catch (error) {}
+
+    } else {
+
+      try {
+
+        await navigator.clipboard.writeText(url);
+
+        alert("Video link copied!");
+
+      } catch (error) {
+
+        alert("Share link: " + url);
+
+      }
+
+    }
+
+  });
+
+});
+
+
+/* =========================
+   MUSIC
+========================= */
+
+document.querySelectorAll(".music-btn").forEach((button) => {
+
+  button.addEventListener("click", (e) => {
+
+    e.stopPropagation();
+
+    alert("🎵 Original sound");
+
+  });
+
+});
+
+
+/* =========================
+   FIRST VIDEO
+========================= */
 
 window.addEventListener("load", () => {
 
-  const firstVideo = videos[0];
+  if (videos.length > 0) {
 
-  if (firstVideo) {
+    videos[0].muted = true;
 
-    firstVideo.muted = true;
-
-    firstVideo.play().catch(() => {
-      console.log("User interaction required");
-    });
+    videos[0].play().catch(() => {});
 
   }
 
