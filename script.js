@@ -1,269 +1,266 @@
-const videos = document.querySelectorAll(".video");
+document.addEventListener("DOMContentLoaded", () => {
+
+    const video = document.querySelector(".video");
+
+    const likeBtn = document.getElementById("likeBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const shareBtn = document.getElementById("shareBtn");
+    const commentBtn = document.getElementById("commentBtn");
+    const musicBtn = document.getElementById("musicBtn");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+
+    const likeCount = document.getElementById("likeCount");
 
 
-/* AUTO PLAY / PAUSE */
+    /* =========================
+       VIDEO AUTOPLAY
+    ========================= */
 
-const observer = new IntersectionObserver(
-  (entries) => {
+    const playVideo = () => {
 
-    entries.forEach((entry) => {
-
-      const video = entry.target;
-
-      if (
-        entry.isIntersecting &&
-        entry.intersectionRatio >= 0.6
-      ) {
-
-        videos.forEach((v) => {
-
-          if (v !== video) {
-            v.pause();
-          }
-
+        video.play().catch(() => {
+            console.log("Autoplay blocked");
         });
 
-        video.muted = true;
+    };
 
-        video.play().catch(() => {});
 
-      } else {
+    playVideo();
 
-        video.pause();
 
-      }
+    /* =========================
+       TAP VIDEO PLAY / PAUSE
+    ========================= */
+
+    video.addEventListener("click", () => {
+
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
 
     });
 
-  },
-  {
-    threshold: [0.6]
-  }
-);
 
+    /* =========================
+       LIKE
+    ========================= */
 
-videos.forEach((video) => {
+    let liked = false;
+    let likes = 0;
 
-  observer.observe(video);
+    likeBtn.addEventListener("click", (e) => {
 
+        e.stopPropagation();
 
-  /* PLAY / PAUSE */
+        liked = !liked;
 
-  video.addEventListener("click", () => {
+        if (liked) {
 
-    const item = video.closest(".video-item");
+            likes++;
 
-    const icon = item.querySelector(".play-icon");
+            likeBtn.classList.add("like-active");
 
-    if (video.paused) {
+            likeBtn.querySelector(".action-icon").textContent = "♥";
 
-      video.play().catch(() => {});
+        } else {
 
-      icon.textContent = "▶";
+            likes--;
 
-    } else {
+            likeBtn.classList.remove("like-active");
 
-      video.pause();
+            likeBtn.querySelector(".action-icon").textContent = "♡";
 
-      icon.textContent = "❚❚";
+        }
 
-    }
+        likeCount.textContent = likes;
 
-    icon.classList.add("show");
+    });
 
-    setTimeout(() => {
-      icon.classList.remove("show");
-    }, 600);
 
-  });
+    /* =========================
+       SAVE
+    ========================= */
 
-});
+    let saved = false;
 
+    saveBtn.addEventListener("click", (e) => {
 
-/* LIKE */
+        e.stopPropagation();
 
-document.querySelectorAll(".like-btn").forEach((button) => {
+        saved = !saved;
 
-  button.addEventListener("click", (e) => {
+        if (saved) {
 
-    e.stopPropagation();
+            saveBtn.classList.add("save-active");
 
-    const count = button.querySelector("span");
+            saveBtn.querySelector(".action-icon").textContent = "🔖";
 
-    let number = Number(count.textContent);
+            saveBtn.querySelector(".action-label").textContent = "Saved";
 
-    if (button.classList.contains("liked")) {
+        } else {
 
-      number--;
+            saveBtn.classList.remove("save-active");
 
-      button.classList.remove("liked");
+            saveBtn.querySelector(".action-label").textContent = "Save";
 
-    } else {
+        }
 
-      number++;
+    });
 
-      button.classList.add("liked");
 
-    }
+    /* =========================
+       COMMENT
+    ========================= */
 
-    count.textContent = number;
+    commentBtn.addEventListener("click", (e) => {
 
-  });
+        e.stopPropagation();
 
-});
+        alert("Comments coming soon!");
 
+    });
 
-/* SAVE */
 
-document.querySelectorAll(".save-btn").forEach((button) => {
+    /* =========================
+       SHARE
+    ========================= */
 
-  button.addEventListener("click", (e) => {
+    shareBtn.addEventListener("click", async (e) => {
 
-    e.stopPropagation();
+        e.stopPropagation();
 
-    const text = button.querySelector("span");
+        const shareData = {
+            title: "ZYLO",
+            text: "Check out this video on ZYLO!",
+            url: window.location.href
+        };
 
-    if (button.classList.contains("saved")) {
+        if (navigator.share) {
 
-      button.classList.remove("saved");
+            try {
 
-      text.textContent = "Save";
+                await navigator.share(shareData);
 
-    } else {
+            } catch (error) {
 
-      button.classList.add("saved");
+                console.log("Share cancelled");
 
-      text.textContent = "Saved";
+            }
 
-    }
+        } else {
 
-  });
+            try {
 
-});
+                await navigator.clipboard.writeText(
+                    window.location.href
+                );
 
+                alert("Video link copied!");
 
-/* SHARE */
+            } catch (error) {
 
-document.querySelectorAll(".share-btn").forEach((button) => {
+                alert("Share not supported");
 
-  button.addEventListener("click", async (e) => {
+            }
 
-    e.stopPropagation();
+        }
 
-    const url = window.location.href;
+    });
 
-    if (navigator.share) {
 
-      try {
+    /* =========================
+       MUSIC
+    ========================= */
 
-        await navigator.share({
-          title: "ZYLO",
-          text: "Check this video on ZYLO",
-          url: url
-        });
+    let muted = true;
 
-      } catch (error) {}
+    musicBtn.addEventListener("click", (e) => {
 
-    } else {
+        e.stopPropagation();
 
-      try {
+        muted = !muted;
 
-        await navigator.clipboard.writeText(url);
+        video.muted = muted;
 
-        alert("ZYLO video link copied!");
+        if (muted) {
 
-      } catch (error) {
+            musicBtn.querySelector(".music-action span");
 
-        alert(url);
+        }
 
-      }
+    });
 
-    }
 
-  });
+    /* =========================
+       FULLSCREEN
+    ========================= */
 
-});
+    fullscreenBtn.addEventListener("click", async (e) => {
 
+        e.stopPropagation();
 
-/* MUSIC */
+        try {
 
-document.querySelectorAll(".music-btn").forEach((button) => {
+            if (!document.fullscreenElement) {
 
-  button.addEventListener("click", (e) => {
+                await document.documentElement.requestFullscreen();
 
-    e.stopPropagation();
+            } else {
 
-    alert("🎵 Original sound");
+                await document.exitFullscreen();
 
-  });
+            }
 
-});
+        } catch (error) {
 
+            console.log("Fullscreen unavailable");
 
-/* FULLSCREEN */
+        }
 
-document.querySelectorAll(".fullscreen-btn").forEach((button) => {
+    });
 
-  button.addEventListener("click", async (e) => {
 
-    e.stopPropagation();
+    /* =========================
+       AUTOPLAY WHEN VISIBLE
+    ========================= */
 
-    const item = button.closest(".video-item");
+    const observer = new IntersectionObserver(
+        (entries) => {
 
-    const video = item.querySelector(".video");
+            entries.forEach(entry => {
 
-    try {
+                if (entry.isIntersecting) {
 
-      if (document.fullscreenElement) {
+                    video.play().catch(() => {});
 
-        await document.exitFullscreen();
+                } else {
 
-      } else if (video.requestFullscreen) {
+                    video.pause();
 
-        await video.requestFullscreen();
+                }
 
-      } else if (video.webkitEnterFullscreen) {
+            });
 
-        video.webkitEnterFullscreen();
-
-      }
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-
-  });
-
-});
-
-
-/* VIDEO ERROR CHECK */
-
-videos.forEach((video) => {
-
-  video.addEventListener("error", () => {
-
-    console.log(
-      "Video load failed:",
-      video.currentSrc
+        },
+        {
+            threshold: 0.6
+        }
     );
-  });
-
-});
 
 
-/* FIRST VIDEO */
+    observer.observe(video);
 
-window.addEventListener("load", () => {
 
-  if (videos.length > 0) {
+    /* =========================
+       VIDEO ERROR
+    ========================= */
 
-    videos[0].muted = true;
+    video.addEventListener("error", () => {
 
-    videos[0].play().catch(() => {});
+        console.log("Video could not be loaded.");
 
-  }
+    });
 
 });
