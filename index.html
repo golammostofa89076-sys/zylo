@@ -1,2951 +1,2331 @@
 <!DOCTYPE html>
 <html lang="bn">
-
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>ZYLO</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+    }
+
+    /* =========================
+       TOP NAVIGATION
+    ========================== */
+
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 72px;
+      z-index: 50;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,.72),
+        rgba(0,0,0,0)
+      );
+    }
+
+    .top-tabs {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+      height: 100%;
+    }
+
+    .top-tab {
+      position: relative;
+      border: 0;
+      outline: none;
+      background: none;
+      color: rgba(255,255,255,.72);
+      font-size: 18px;
+      font-weight: 500;
+      padding: 24px 0 16px;
+    }
+
+    .top-tab.active {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .top-tab.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 7px;
+      height: 3px;
+      background: #fff;
+      border-radius: 5px;
+    }
+
+    .search-button {
+      position: absolute;
+      right: 20px;
+      top: 17px;
+
+      width: 52px;
+      height: 52px;
+
+      border: 0;
+      border-radius: 50%;
+      background: rgba(35,35,35,.94);
+      color: #fff;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      font-size: 31px;
+      cursor: pointer;
+    }
 
-<title>ZYLO</title>
+    /* =========================
+       VIDEO FEED
+    ========================== */
 
-<link rel="stylesheet" href="style.css">
+    .video-feed {
+      position: fixed;
+      inset: 0;
 
-<style>
+      width: 100%;
+      height: 100%;
 
-/* =====================================================
-   ZYLO BASE
-===================================================== */
+      overflow-y: auto;
+      overflow-x: hidden;
 
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      background: #000;
+    }
 
-html,
-body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  background:#000;
-  color:#fff;
-  font-family:Arial, sans-serif;
-  overflow:hidden;
-}
+    .video-feed::-webkit-scrollbar {
+      display: none;
+    }
 
-button,
-input,
-textarea,
-select{
-  font-family:inherit;
-}
+    .video-card {
+      position: relative;
 
+      width: 100%;
+      height: 100dvh;
+      min-height: 100vh;
 
-/* =====================================================
-   TOP BAR
-===================================================== */
+      scroll-snap-align: start;
+      overflow: hidden;
 
-.top-bar{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
+      background: #000;
+    }
 
-  height:78px;
+    .video {
+      position: absolute;
+      inset: 0;
 
-  z-index:100;
+      width: 100%;
+      height: 100%;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+      object-fit: cover;
+      background: #000;
+    }
 
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(0,0,0,.75),
-      rgba(0,0,0,0)
-    );
-}
+    /* dark overlay */
+    .video-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
 
-.top-tabs{
-  display:flex;
-  align-items:center;
-  gap:27px;
-}
+      pointer-events: none;
 
-.top-tab{
-  border:0;
-  background:transparent;
+      background:
+        linear-gradient(
+          to bottom,
+          rgba(0,0,0,.15),
+          transparent 25%,
+          transparent 55%,
+          rgba(0,0,0,.38) 100%
+        );
+    }
 
-  color:#aaa;
+    /* =========================
+       RIGHT SIDE ACTIONS
+    ========================== */
 
-  font-size:18px;
-  font-weight:500;
+    .right-actions {
+      position: absolute;
 
-  padding:12px 3px;
-}
+      right: 15px;
+      bottom: 145px;
 
-.top-tab.active{
-  color:#fff;
-  font-weight:700;
+      width: 72px;
 
-  border-bottom:4px solid #fff;
-}
+      z-index: 20;
 
-.search-btn{
-  position:absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
 
-  top:14px;
-  right:14px;
+      gap: 18px;
+    }
 
-  width:58px;
-  height:58px;
+    .action {
+      width: 70px;
 
-  border:0;
-  border-radius:50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
 
-  background:rgba(38,38,38,.9);
+      color: #fff;
+      text-align: center;
 
-  color:#fff;
+      cursor: pointer;
+      user-select: none;
+    }
 
-  font-size:34px;
+    .action-icon {
+      width: 56px;
+      height: 56px;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
+      font-size: 42px;
+      line-height: 1;
 
-/* =====================================================
-   VIDEO FEED
-===================================================== */
+      color: #fff;
 
-.video-feed{
-  position:absolute;
+      filter:
+        drop-shadow(0 2px 3px rgba(0,0,0,.7));
+    }
 
-  inset:0;
+    .action-label {
+      margin-top: 6px;
 
-  width:100%;
-  height:100%;
+      font-size: 14px;
+      line-height: 18px;
 
-  overflow-y:auto;
+      color: #fff;
+      text-shadow: 0 1px 3px #000;
+    }
 
-  scroll-snap-type:y mandatory;
+    .action-count {
+      margin-top: 5px;
 
-  scrollbar-width:none;
-}
+      font-size: 14px;
+      line-height: 18px;
 
-.video-feed::-webkit-scrollbar{
-  display:none;
-}
+      color: #fff;
+      text-shadow: 0 1px 3px #000;
+    }
 
-.video-card{
-  position:relative;
+    /* Profile */
 
-  width:100%;
-  height:100vh;
+    .profile-action {
+      margin-bottom: 2px;
+    }
 
-  min-height:100vh;
+    .profile-avatar {
+      position: relative;
 
-  scroll-snap-align:start;
+      width: 62px;
+      height: 62px;
 
-  overflow:hidden;
+      border: 3px solid #fff;
+      border-radius: 50%;
 
-  background:#000;
-}
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-.video{
-  position:absolute;
+      background: #222;
 
-  inset:0;
+      font-size: 34px;
+      font-weight: 400;
 
-  width:100%;
-  height:100%;
+      box-shadow: 0 2px 7px rgba(0,0,0,.6);
+    }
 
-  object-fit:cover;
+    .follow-plus {
+      position: absolute;
 
-  background:#000;
-}
+      bottom: -8px;
+      left: 50%;
 
-.video-overlay{
-  position:absolute;
+      transform: translateX(-50%);
 
-  inset:0;
+      width: 25px;
+      height: 25px;
 
-  pointer-events:none;
+      border-radius: 50%;
 
-  background:
-    linear-gradient(
-      to top,
-      rgba(0,0,0,.88) 0%,
-      rgba(0,0,0,.48) 18%,
-      rgba(0,0,0,.08) 45%,
-      rgba(0,0,0,0) 65%
-    );
-}
+      background: #fe2c55;
+      color: #fff;
 
+      border: 2px solid #000;
 
-/* =====================================================
-   PROFESSIONAL RIGHT ACTIONS
-===================================================== */
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-.video-actions{
+      font-size: 19px;
+      font-weight: 700;
+    }
 
-  position:absolute;
+    /* Like */
 
-  right:10px;
-  bottom:140px;
+    .like-icon {
+      font-size: 48px;
+    }
 
-  width:70px;
+    .like-icon.liked {
+      color: #fe2c55;
+    }
 
-  z-index:50;
+    /* Comment */
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+    .comment-icon {
+      font-size: 45px;
+    }
 
-  gap:1px;
+    /* Save */
 
-  user-select:none;
-}
+    .save-icon {
+      font-size: 45px;
+    }
 
+    .save-icon.saved {
+      color: #ffd700;
+    }
 
-/* PROFILE */
+    /* Share */
 
-.zylo-profile{
+    .share-icon {
+      font-size: 45px;
+    }
 
-  position:relative;
+    /* Music */
 
-  width:58px;
-  height:58px;
+    .music-disc {
+      position: relative;
 
-  margin-bottom:12px;
+      width: 64px;
+      height: 64px;
 
-  padding:0;
+      border-radius: 50%;
 
-  border-radius:50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-  border:2px solid #fff;
+      background:
+        radial-gradient(
+          circle,
+          #151515 0 25%,
+          #2d2d2d 26% 29%,
+          #111 30% 40%,
+          #3a3a3a 41% 43%,
+          #111 44% 53%,
+          #333 54% 56%,
+          #111 57% 100%
+        );
 
-  background:#262626;
+      border: 2px solid #333;
 
-  color:#fff;
+      animation: rotateDisc 5s linear infinite;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+      box-shadow:
+        0 0 0 2px #111,
+        0 2px 8px rgba(0,0,0,.8);
+    }
 
-  box-shadow:
-    0 3px 12px rgba(0,0,0,.65);
-}
+    .music-disc::before {
+      content: "";
 
-.profile-letter{
+      position: absolute;
 
-  font-size:28px;
-  font-weight:700;
+      width: 28px;
+      height: 28px;
 
-  line-height:1;
-}
+      border-radius: 50%;
 
-.follow-plus{
+      background: #000;
+      border: 1px solid #555;
+    }
 
-  position:absolute;
+    .music-note {
+      position: relative;
+      z-index: 2;
 
-  right:0;
-  bottom:-8px;
+      font-size: 25px;
+    }
 
-  width:26px;
-  height:26px;
+    @keyframes rotateDisc {
+      from {
+        transform: rotate(0deg);
+      }
 
-  border-radius:50%;
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
-  border:2px solid #000;
+    /* =========================
+       VIDEO INFORMATION
+    ========================== */
 
-  background:#ff2d55;
+    .video-info {
+      position: absolute;
 
-  color:#fff;
+      left: 18px;
+      right: 100px;
+      bottom: 145px;
 
-  font-size:19px;
-  font-weight:700;
+      z-index: 20;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+      color: #fff;
 
+      text-shadow:
+        0 1px 3px rgba(0,0,0,.9),
+        0 2px 5px rgba(0,0,0,.7);
+    }
 
-/* ACTION BUTTON */
+    .username {
+      font-size: 20px;
+      font-weight: 700;
 
-.zylo-action{
+      margin-bottom: 12px;
+    }
 
-  width:60px;
-  height:52px;
+    .verified {
+      display: inline-flex;
 
-  margin:0;
-  padding:0;
+      width: 18px;
+      height: 18px;
 
-  border:0;
+      align-items: center;
+      justify-content: center;
 
-  background:transparent;
+      margin-left: 4px;
 
-  color:#fff;
+      border-radius: 50%;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+      background: #20d5ec;
+      color: #fff;
 
-  cursor:pointer;
+      font-size: 12px;
+      font-weight: 900;
 
-  filter:
-    drop-shadow(
-      0 2px 5px rgba(0,0,0,.9)
-    );
-}
+      vertical-align: 2px;
+    }
 
-.action-icon{
+    .caption {
+      font-size: 17px;
+      line-height: 25px;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+      margin-bottom: 7px;
 
-  font-size:39px;
+      max-width: 92%;
+    }
 
-  line-height:1;
+    .hashtags {
+      color: #20d5ec;
 
-  transition:
-    transform .15s ease,
-    color .15s ease;
-}
+      font-size: 16px;
+      line-height: 23px;
 
-.zylo-action:active .action-icon{
-  transform:scale(.82);
-}
+      margin-bottom: 8px;
+    }
 
+    .music-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
-/* LIKE */
+      font-size: 15px;
+      line-height: 22px;
 
-.like-action[data-liked="true"]
-.action-icon{
+      max-width: 90%;
 
-  color:#ff2d55;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-  transform:scale(1.05);
-}
+    .music-small-note {
+      font-size: 20px;
+    }
 
+    /* =========================
+       BOTTOM NAV
+    ========================== */
 
-/* COMMENT */
+    .bottom-nav {
+      position: fixed;
 
-.comment-icon{
-  font-size:31px;
-}
+      left: 0;
+      right: 0;
+      bottom: 0;
 
+      height: 78px;
 
-/* SAVE */
+      z-index: 100;
 
-.save-action .action-icon{
-  font-size:34px;
-}
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
 
-.save-action[data-saved="true"]
-.action-icon{
+      background: rgba(0,0,0,.96);
 
-  color:#ffd84d;
+      border-top: 1px solid rgba(255,255,255,.12);
 
-  transform:scale(1.05);
-}
+      padding-bottom: env(safe-area-inset-bottom);
+    }
 
+    .nav-button {
+      height: 70px;
 
-/* SHARE */
+      border: 0;
+      outline: none;
 
-.share-action .action-icon{
+      background: transparent;
+      color: #fff;
 
-  font-size:39px;
-  font-weight:300;
-}
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
 
+      gap: 3px;
 
-/* COUNTS */
+      font-size: 12px;
 
-.action-number{
+      cursor: pointer;
+    }
 
-  min-height:18px;
+    .nav-icon {
+      font-size: 28px;
+      line-height: 30px;
+    }
 
-  margin-top:-3px;
-  margin-bottom:5px;
+    .nav-label {
+      font-size: 12px;
+    }
 
-  color:#fff;
+    /* Create button */
 
-  font-size:14px;
-  font-weight:500;
+    .upload-button {
+      position: relative;
 
-  text-shadow:
-    0 2px 5px rgba(0,0,0,.9);
-}
+      width: 66px;
+      height: 44px;
 
+      margin: auto;
 
-/* LABEL */
+      border-radius: 12px;
 
-.action-label{
+      background: #fff;
+      color: #000;
 
-  min-height:18px;
+      font-size: 31px;
+      font-weight: 400;
 
-  margin-top:-3px;
-  margin-bottom:7px;
+      box-shadow:
+        -5px 0 0 #20d5ec,
+        5px 0 0 #fe2c55;
+    }
 
-  color:#fff;
+    .upload-button .nav-icon {
+      font-size: 34px;
+      line-height: 40px;
+    }
 
-  font-size:13px;
-  font-weight:500;
+    /* =========================
+       CREATE SCREEN
+    ========================== */
 
-  text-shadow:
-    0 2px 5px rgba(0,0,0,.9);
-}
+    .create-screen {
+      position: fixed;
+      inset: 0;
 
+      z-index: 500;
 
-/* SOUND */
+      display: none;
+      flex-direction: column;
 
-.zylo-sound{
+      background: #000;
 
-  width:58px;
-  height:58px;
+      overflow-y: auto;
+    }
 
-  margin-top:7px;
+    .create-screen.show {
+      display: flex;
+    }
 
-  padding:0;
+    .create-header {
+      position: sticky;
+      top: 0;
 
-  border-radius:50%;
+      height: 70px;
 
-  border:2px solid rgba(255,255,255,.28);
+      flex-shrink: 0;
 
-  background:
-    radial-gradient(
-      circle at center,
-      #333 0%,
-      #1b1b1b 65%,
-      #111 100%
-    );
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-  color:#fff;
+      border-bottom: 1px solid #222;
 
-  font-size:31px;
+      background: #000;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+      z-index: 5;
+    }
 
-  box-shadow:
-    0 4px 14px rgba(0,0,0,.7);
-}
+    .create-header h2 {
+      margin: 0;
 
-.zylo-sound span{
-  display:block;
-}
+      font-size: 25px;
+    }
 
+    .create-close {
+      position: absolute;
 
-/* =====================================================
-   VIDEO INFORMATION
-===================================================== */
+      left: 18px;
 
-.video-info{
+      width: 50px;
+      height: 50px;
 
-  position:absolute;
+      border: 0;
+      border-radius: 50%;
 
-  left:20px;
+      background: #222;
+      color: #fff;
 
-  right:95px;
+      font-size: 38px;
+      line-height: 1;
 
-  bottom:140px;
+      cursor: pointer;
+    }
 
-  z-index:40;
+    .create-options {
+      display: flex;
 
-  max-width:
-    calc(100% - 115px);
+      justify-content: center;
+      gap: 15px;
 
-  text-shadow:
-    0 2px 5px rgba(0,0,0,.9);
-}
+      padding: 30px 20px;
+    }
 
-.username{
+    .create-option {
+      flex: 1;
 
-  margin-bottom:8px;
+      max-width: 180px;
 
-  font-size:19px;
-  font-weight:700;
-}
+      padding: 18px 12px;
 
-.caption{
+      border: 1px solid #444;
+      border-radius: 12px;
 
-  margin-bottom:7px;
+      background: #1b1b1b;
+      color: #fff;
 
-  font-size:17px;
-  line-height:1.4;
+      font-size: 16px;
+    }
 
-  word-break:break-word;
-}
+    .editor {
+      display: none;
 
-.hashtags{
+      padding: 15px 18px 100px;
+    }
 
-  margin-bottom:8px;
+    .editor.show {
+      display: block;
+    }
 
-  font-size:15px;
-  line-height:1.35;
+    .preview-box {
+      width: 100%;
+      max-width: 420px;
 
-  word-break:break-word;
-}
+      margin: 0 auto 20px;
 
-.music{
+      background: #111;
 
-  color:#eee;
+      border-radius: 10px;
+      overflow: hidden;
+    }
 
-  font-size:15px;
+    .preview-video {
+      display: block;
 
-  white-space:nowrap;
+      width: 100%;
+      max-height: 55vh;
 
-  overflow:hidden;
+      background: #000;
 
-  text-overflow:ellipsis;
-}
+      object-fit: contain;
+    }
 
+    .caption-input,
+    .hashtag-input {
+      width: 100%;
 
-/* =====================================================
-   BOTTOM NAVIGATION
-===================================================== */
+      border: 1px solid #2e2e2e;
+      outline: none;
 
-.bottom-nav{
+      border-radius: 16px;
 
-  position:fixed;
+      background: #191919;
+      color: #fff;
 
-  left:0;
-  right:0;
-  bottom:0;
+      padding: 16px;
 
-  height:80px;
+      font-size: 17px;
 
-  z-index:200;
+      margin-bottom: 12px;
+    }
 
-  display:flex;
-  align-items:center;
-  justify-content:space-around;
+    .caption-input {
+      min-height: 120px;
+      resize: none;
+    }
 
-  background:rgba(0,0,0,.96);
+    .hashtag-input {
+      height: 55px;
+    }
 
-  border-top:1px solid #222;
-}
+    .sound-row,
+    .privacy-row {
+      width: 100%;
 
-.nav-button{
+      min-height: 58px;
 
-  width:20%;
-  height:75px;
+      margin-bottom: 12px;
 
-  padding:3px 0;
+      border: 0;
+      border-radius: 15px;
 
-  border:0;
+      background: #191919;
+      color: #fff;
 
-  background:transparent;
+      padding: 0 16px;
 
-  color:#fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
-  display:flex;
-  flex-direction:column;
+      font-size: 16px;
+    }
 
-  align-items:center;
-  justify-content:center;
+    .privacy-row {
+      appearance: none;
+    }
 
-  gap:3px;
+    .settings-box {
+      background: #191919;
 
-  font-size:13px;
-}
+      border-radius: 15px;
 
-.nav-icon{
-  font-size:25px;
-  line-height:1;
-}
+      overflow: hidden;
 
-.nav-button.active{
-  color:#fff;
-}
+      margin-bottom: 14px;
+    }
 
+    .setting-row {
+      min-height: 58px;
 
-/* CREATE BUTTON */
+      padding: 0 16px;
 
-.upload-button{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
-  width:65px;
-  height:50px;
+      border-bottom: 1px solid #303030;
 
-  border-radius:16px;
+      font-size: 16px;
+    }
 
-  background:#fff;
+    .setting-row:last-child {
+      border-bottom: 0;
+    }
 
-  color:#000;
+    .switch {
+      position: relative;
 
-  font-size:35px;
-  font-weight:400;
+      width: 52px;
+      height: 30px;
 
-  box-shadow:
-    -4px 0 0 #00f2ea,
-    4px 0 0 #ff0050;
-}
+      border-radius: 30px;
 
+      background: #555;
 
-/* =====================================================
-   CREATE SCREEN
-===================================================== */
+      cursor: pointer;
+    }
 
-.create-screen{
+    .switch::after {
+      content: "";
 
-  position:fixed;
+      position: absolute;
 
-  inset:0;
+      top: 3px;
+      left: 3px;
 
-  z-index:500;
+      width: 24px;
+      height: 24px;
 
-  display:none;
-  flex-direction:column;
+      border-radius: 50%;
 
-  background:#000;
+      background: #fff;
 
-  overflow-y:auto;
-}
+      transition: .2s;
+    }
 
-.create-screen.show{
-  display:flex;
-}
+    .switch.on {
+      background: #fe2c55;
+    }
 
+    .switch.on::after {
+      left: 25px;
+    }
 
-/* HEADER */
+    .choose-again {
+      width: 100%;
 
-.create-header{
+      height: 50px;
 
-  position:sticky;
+      border: 1px solid #444;
+      border-radius: 12px;
 
-  top:0;
+      background: #181818;
+      color: #fff;
 
-  height:72px;
-  min-height:72px;
+      margin-bottom: 14px;
+    }
 
-  z-index:20;
+    .post-area {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+      gap: 12px;
+    }
 
-  background:#000;
+    .draft-btn,
+    .post-btn {
+      height: 54px;
 
-  border-bottom:1px solid #222;
-}
+      border: 0;
+      border-radius: 14px;
 
-.create-header h2{
+      font-size: 17px;
+      font-weight: 700;
+    }
 
-  margin:0;
+    .draft-btn {
+      background: #2a2a2a;
+      color: #fff;
+    }
 
-  font-size:25px;
-}
+    .post-btn {
+      background: #fe2c55;
+      color: #fff;
+    }
 
-.create-close{
+    .post-btn:disabled {
+      opacity: .45;
+    }
 
-  position:absolute;
+    .upload-status {
+      min-height: 25px;
 
-  left:18px;
+      margin: 10px 0;
 
-  width:52px;
-  height:52px;
+      text-align: center;
 
-  padding:0;
+      font-size: 14px;
+      color: #ccc;
+    }
 
-  border:0;
-  border-radius:50%;
+    #videoInput {
+      display: none;
+    }
 
-  background:#242424;
+    /* =========================
+       MOBILE
+    ========================== */
 
-  color:#fff;
+    @media (max-width: 600px) {
 
-  font-size:38px;
+      .top-bar {
+        height: 68px;
+      }
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+      .top-tabs {
+        gap: 27px;
+      }
 
+      .top-tab {
+        font-size: 17px;
+      }
 
-/* =====================================================
-   CREATE OPTIONS
-===================================================== */
+      .search-button {
+        right: 10px;
+        top: 15px;
 
-.create-options{
+        width: 52px;
+        height: 52px;
+      }
 
-  display:flex;
+      .right-actions {
+        right: 9px;
+        bottom: 132px;
 
-  align-items:center;
-  justify-content:center;
+        width: 66px;
 
-  gap:15px;
+        gap: 15px;
+      }
 
-  padding:50px 20px;
-}
+      .action {
+        width: 66px;
+      }
 
-.create-option{
+      .action-icon {
+        width: 54px;
+        height: 54px;
 
-  width:150px;
-  height:100px;
+        font-size: 39px;
+      }
 
-  border:1px solid #333;
+      .profile-avatar {
+        width: 60px;
+        height: 60px;
 
-  border-radius:18px;
+        font-size: 32px;
+      }
 
-  background:#181818;
+      .follow-plus {
+        width: 25px;
+        height: 25px;
+      }
 
-  color:#fff;
+      .action-label,
+      .action-count {
+        font-size: 13px;
+      }
 
-  font-size:17px;
-}
+      .video-info {
+        left: 18px;
+        right: 90px;
+        bottom: 132px;
+      }
 
+      .username {
+        font-size: 19px;
+      }
 
-/* =====================================================
-   EDITOR
-===================================================== */
+      .caption {
+        font-size: 16px;
+        line-height: 23px;
+      }
 
-.editor{
+      .hashtags {
+        font-size: 15px;
+      }
 
-  display:none;
+      .music-text {
+        font-size: 14px;
+      }
 
-  padding:
-    20px
-    32px
-    120px;
-}
+      .bottom-nav {
+        height: 72px;
+      }
 
-.editor.show{
-  display:block;
-}
+      .nav-icon {
+        font-size: 26px;
+      }
 
-
-/* PREVIEW */
-
-.preview-box{
-
-  width:100%;
-
-  margin-bottom:16px;
-
-  overflow:hidden;
-
-  border-radius:18px;
-
-  background:#111;
-}
-
-.preview-video{
-
-  display:block;
-
-  width:100%;
-
-  max-height:310px;
-
-  background:#000;
-}
-
-
-/* CAPTION */
-
-.caption-box{
-
-  position:relative;
-
-  width:100%;
-
-  margin-bottom:14px;
-
-  border-radius:20px;
-
-  background:#181818;
-}
-
-#captionInput{
-
-  width:100%;
-
-  min-height:150px;
-
-  padding:24px;
-
-  padding-bottom:42px;
-
-  border:0;
-  outline:0;
-
-  resize:none;
-
-  background:transparent;
-
-  color:#fff;
-
-  font-size:19px;
-}
-
-#captionInput::placeholder{
-  color:#888;
-}
-
-.char-count{
-
-  position:absolute;
-
-  right:20px;
-  bottom:15px;
-
-  color:#888;
-
-  font-size:14px;
-}
-
-
-/* HASHTAGS */
-
-#hashtagInput{
-
-  width:100%;
-  height:65px;
-
-  margin-bottom:14px;
-
-  padding:0 24px;
-
-  border:0;
-  outline:0;
-
-  border-radius:18px;
-
-  background:#181818;
-
-  color:#fff;
-
-  font-size:18px;
-}
-
-#hashtagInput::placeholder{
-  color:#888;
-}
-
-
-/* SOUND ROW */
-
-.sound-row{
-
-  width:100%;
-  min-height:72px;
-
-  margin-bottom:14px;
-  padding:0 22px;
-
-  border-radius:18px;
-
-  background:#181818;
-
-  display:flex;
-  align-items:center;
-
-  font-size:25px;
-}
-
-.sound-name{
-
-  margin-left:14px;
-
-  color:#fff;
-
-  font-size:17px;
-}
-
-.sound-arrow{
-
-  margin-left:auto;
-
-  color:#aaa;
-
-  font-size:29px;
-}
-
-
-/* =====================================================
-   SETTINGS
-===================================================== */
-
-.settings-box{
-
-  width:100%;
-
-  margin-bottom:15px;
-
-  overflow:hidden;
-
-  border-radius:20px;
-
-  background:#181818;
-}
-
-.privacy-row{
-
-  width:100%;
-  height:72px;
-
-  padding:0 24px;
-
-  border:0;
-  outline:0;
-
-  background:transparent;
-
-  color:#fff;
-
-  font-size:17px;
-}
-
-.privacy-row option{
-  background:#181818;
-  color:#fff;
-}
-
-.setting-row{
-
-  min-height:68px;
-
-  padding:0 24px;
-
-  border-top:1px solid #292929;
-
-  display:flex;
-  align-items:center;
-
-  font-size:17px;
-}
-
-.setting-row span:first-child{
-  flex:1;
-}
-
-
-/* TOGGLE */
-
-.toggle{
-
-  position:relative;
-
-  width:54px;
-  height:32px;
-
-  padding:0;
-
-  border:0;
-  border-radius:20px;
-
-  background:#555;
-}
-
-.toggle-circle{
-
-  position:absolute;
-
-  top:4px;
-  left:4px;
-
-  width:24px;
-  height:24px;
-
-  border-radius:50%;
-
-  background:#fff;
-
-  transition:.2s;
-}
-
-.toggle.on{
-  background:#ff3158;
-}
-
-.toggle.on .toggle-circle{
-  left:26px;
-}
-
-
-/* CHOOSE AGAIN */
-
-.choose-again{
-
-  width:100%;
-  height:52px;
-
-  margin-bottom:12px;
-
-  border:1px solid #444;
-
-  border-radius:14px;
-
-  background:#111;
-
-  color:#fff;
-
-  font-size:16px;
-}
-
-
-/* STATUS */
-
-.upload-status{
-
-  min-height:30px;
-
-  padding:7px;
-
-  text-align:center;
-
-  color:#ddd;
-
-  font-size:15px;
-}
-
-.upload-status.success{
-  color:#43e36b;
-}
-
-.upload-status.error{
-  color:#ff526b;
-}
-
-
-/* POST BUTTONS */
-
-.post-buttons{
-
-  display:flex;
-
-  gap:16px;
-
-  padding:10px 0;
-
-  background:#000;
-}
-
-.draft-btn,
-.post-btn{
-
-  flex:1;
-
-  height:60px;
-
-  border:0;
-
-  border-radius:18px;
-
-  font-size:20px;
-
-  font-weight:700;
-}
-
-.draft-btn{
-
-  background:#292929;
-
-  color:#fff;
-}
-
-.post-btn{
-
-  background:#ff3158;
-
-  color:#fff;
-}
-
-.post-btn:disabled{
-  opacity:.45;
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media(max-width:600px){
-
-  .top-tabs{
-    gap:21px;
-  }
-
-  .top-tab{
-    font-size:17px;
-  }
-
-  .search-btn{
-    width:56px;
-    height:56px;
-  }
-
-  .video-actions{
-
-    right:6px;
-    bottom:137px;
-
-    width:69px;
-  }
-
-  .zylo-profile{
-
-    width:56px;
-    height:56px;
-  }
-
-  .zylo-action{
-
-    width:56px;
-    height:50px;
-  }
-
-  .action-icon{
-    font-size:37px;
-  }
-
-  .comment-icon{
-    font-size:30px;
-  }
-
-  .zylo-sound{
-
-    width:56px;
-    height:56px;
-  }
-
-  .video-info{
-
-    left:18px;
-    right:88px;
-
-    bottom:137px;
-
-    max-width:
-      calc(100% - 108px);
-  }
-
-  .username{
-    font-size:18px;
-  }
-
-  .caption{
-    font-size:16px;
-  }
-
-  .hashtags{
-    font-size:14px;
-  }
-
-  .music{
-    font-size:14px;
-  }
-
-  .editor{
-    padding-left:20px;
-    padding-right:20px;
-  }
-
-}
-
-
-/* SMALL SCREEN */
-
-@media(max-height:700px){
-
-  .video-actions{
-    bottom:122px;
-  }
-
-  .video-info{
-    bottom:122px;
-  }
-
-  .bottom-nav{
-    height:72px;
-  }
-
-}
-
-</style>
+      .upload-button {
+        width: 65px;
+        height: 43px;
+      }
+    }
+  </style>
 </head>
-
 
 <body>
 
+  <!-- =========================
+       TOP
+  ========================== -->
 
-<!-- =====================================================
-     TOP BAR
-===================================================== -->
+  <header class="top-bar">
 
-<header class="top-bar">
+    <div class="top-tabs">
 
-  <div class="top-tabs">
+      <button class="top-tab">
+        LIVE
+      </button>
 
-    <button class="top-tab">
-      LIVE
+      <button class="top-tab">
+        Following
+      </button>
+
+      <button class="top-tab active">
+        For You
+      </button>
+
+    </div>
+
+    <button class="search-button" onclick="openSearch()">
+      ⌕
     </button>
 
-    <button class="top-tab">
-      Following
+  </header>
+
+
+  <!-- =========================
+       VIDEO FEED
+  ========================== -->
+
+  <main class="video-feed" id="videoFeed">
+
+    <section class="video-card">
+
+      <video
+        class="video"
+        src="uploads/video1.mp4"
+        loop
+        muted
+        playsinline
+        preload="metadata">
+      </video>
+
+
+      <!-- RIGHT ACTIONS -->
+
+      <div class="right-actions">
+
+        <!-- PROFILE -->
+
+        <div class="action profile-action"
+             onclick="openProfile()">
+
+          <div class="profile-avatar">
+
+            Z
+
+            <span class="follow-plus">
+              +
+            </span>
+
+          </div>
+
+          <div class="action-label">
+            Follow
+          </div>
+
+        </div>
+
+
+        <!-- LIKE -->
+
+        <div class="action"
+             onclick="toggleLike(this)">
+
+          <div class="action-icon like-icon">
+            ♡
+          </div>
+
+          <div class="action-count">
+            0
+          </div>
+
+        </div>
+
+
+        <!-- COMMENT -->
+
+        <div class="action"
+             onclick="openComments()">
+
+          <div class="action-icon comment-icon">
+            💬
+          </div>
+
+          <div class="action-count">
+            0
+          </div>
+
+        </div>
+
+
+        <!-- SAVE -->
+
+        <div class="action"
+             onclick="toggleSave(this)">
+
+          <div class="action-icon save-icon">
+            ♡
+          </div>
+
+          <div class="action-label">
+            Save
+          </div>
+
+        </div>
+
+
+        <!-- SHARE -->
+
+        <div class="action"
+             onclick="shareVideo()">
+
+          <div class="action-icon share-icon">
+            ↗
+          </div>
+
+          <div class="action-label">
+            Share
+          </div>
+
+        </div>
+
+
+        <!-- MUSIC -->
+
+        <div class="action">
+
+          <div class="music-disc">
+
+            <span class="music-note">
+              ♪
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- VIDEO INFO -->
+
+      <div class="video-info">
+
+        <div class="username">
+
+          @zylo_creator
+
+          <span class="verified">
+            ✓
+          </span>
+
+        </div>
+
+        <div class="caption">
+
+          Welcome to ZYLO 🌎
+          <br>
+
+          Create • Connect • Grow
+
+        </div>
+
+        <div class="hashtags">
+
+          #ZYLO #Create #Connect #Grow #ForYou
+
+        </div>
+
+        <div class="music-text">
+
+          <span class="music-small-note">
+            ♫
+          </span>
+
+          Original sound - ZYLO
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       BOTTOM NAV
+  ========================== -->
+
+  <nav class="bottom-nav">
+
+    <button class="nav-button"
+            onclick="goHome()">
+
+      <span class="nav-icon">
+        🏠
+      </span>
+
+      <span class="nav-label">
+        Home
+      </span>
+
     </button>
 
-    <button class="top-tab active">
-      For You
+
+    <button class="nav-button"
+            onclick="openDiscover()">
+
+      <span class="nav-icon">
+        ⌕
+      </span>
+
+      <span class="nav-label">
+        Discover
+      </span>
+
     </button>
 
-  </div>
+
+    <button class="nav-button upload-button"
+            onclick="openCreate()">
+
+      <span class="nav-icon">
+        +
+      </span>
+
+    </button>
 
 
-  <button
-    class="search-btn"
-    onclick="openSearch()">
+    <button class="nav-button"
+            onclick="openInbox()">
 
-    ⌕
+      <span class="nav-icon">
+        💬
+      </span>
 
-  </button>
+      <span class="nav-label">
+        Inbox
+      </span>
 
-</header>
-
-
-
-<!-- =====================================================
-     VIDEO FEED
-===================================================== -->
-
-<main
-  class="video-feed"
-  id="videoFeed">
+    </button>
 
 
-  <!-- DEFAULT VIDEO -->
+    <button class="nav-button"
+            onclick="openProfile()">
 
-  <section class="video-card">
+      <span class="nav-icon">
+        👤
+      </span>
 
-    <video
-      class="video"
-      src="uploads/video1.mp4"
-      loop
-      muted
-      playsinline
-      preload="metadata">
-    </video>
+      <span class="nav-label">
+        Profile
+      </span>
 
+    </button>
 
-    <div class="video-overlay"></div>
-
-
-    <!-- INFORMATION -->
-
-    <div class="video-info">
-
-      <div class="username">
-        @zylo_creator
-      </div>
+  </nav>
 
 
-      <div class="caption">
-        Welcome to ZYLO 🌎
-        <br>
-        Create • Connect • Grow
-      </div>
+  <!-- =========================
+       CREATE SCREEN
+  ========================== -->
 
+  <section class="create-screen"
+           id="createScreen">
 
-      <div class="hashtags">
-        #ZYLO #Create #Connect #Grow #ForYou
-      </div>
+    <div class="create-header">
 
+      <button class="create-close"
+              onclick="closeCreate()">
+        ×
+      </button>
 
-      <div class="music">
-        ♪ Original sound - ZYLO
-      </div>
+      <h2>
+        Create
+      </h2>
 
     </div>
 
 
+    <!-- CREATE OPTIONS -->
 
-    <!-- =================================================
-         RIGHT SIDE ACTIONS
-    ================================================= -->
+    <div id="createOptions"
+         class="create-options">
 
-    <div class="video-actions">
+      <button class="create-option"
+              onclick="openCamera()">
 
-
-      <!-- PROFILE -->
-
-      <button
-        class="zylo-profile">
-
-        <span class="profile-letter">
-          Z
-        </span>
-
-        <span class="follow-plus">
-          +
-        </span>
+        📹 Camera
 
       </button>
 
+      <button class="create-option"
+              onclick="openGallery()">
 
-
-      <!-- LIKE -->
-
-      <button
-        class="zylo-action like-action"
-        onclick="likeVideo(this)">
-
-        <span class="action-icon">
-          ♡
-        </span>
+        🖼️ Upload
 
       </button>
 
-      <span class="action-number">
-        0
-      </span>
+    </div>
 
 
+    <!-- EDITOR -->
 
-      <!-- COMMENT -->
-
-      <button
-        class="zylo-action"
-        onclick="openComments()">
-
-        <span class="action-icon comment-icon">
-          💬
-        </span>
-
-      </button>
-
-      <span class="action-number">
-        0
-      </span>
+    <div class="editor"
+         id="editor">
 
 
+      <!-- PREVIEW -->
 
-      <!-- SAVE -->
+      <div class="preview-box">
 
-      <button
-        class="zylo-action save-action"
-        onclick="saveVideo(this)">
+        <video
+          id="previewVideo"
+          class="preview-video"
+          controls
+          playsinline>
+        </video>
 
-        <span class="action-icon">
-          🔖
-        </span>
-
-      </button>
-
-      <span class="action-label">
-        Save
-      </span>
+      </div>
 
 
+      <!-- CAPTION -->
 
-      <!-- SHARE -->
+      <textarea
+        id="captionInput"
+        class="caption-input"
+        maxlength="2200"
+        placeholder="Write a caption...">
+      </textarea>
 
-      <button
-        class="zylo-action share-action"
-        onclick="shareVideo()">
 
-        <span class="action-icon">
-          ↗
-        </span>
+      <!-- HASHTAGS -->
 
-      </button>
-
-      <span class="action-label">
-        Share
-      </span>
-
+      <input
+        id="hashtagInput"
+        class="hashtag-input"
+        maxlength="500"
+        placeholder="Add hashtags #ZYLO #ForYou">
 
 
       <!-- SOUND -->
 
-      <button
-        class="zylo-sound"
-        onclick="toggleSound(this)">
+      <div class="sound-row">
 
         <span>
-          ♪
+          🎵 Sound
         </span>
 
-      </button>
-
-
-    </div>
-
-  </section>
-
-
-</main>
-
-
-
-<!-- =====================================================
-     BOTTOM NAVIGATION
-===================================================== -->
-
-<nav class="bottom-nav">
-
-
-  <button
-    class="nav-button active">
-
-    <span class="nav-icon">
-      🏠
-    </span>
-
-    <span>
-      Home
-    </span>
-
-  </button>
-
-
-
-  <button
-    class="nav-button">
-
-    <span class="nav-icon">
-      🔍
-    </span>
-
-    <span>
-      Discover
-    </span>
-
-  </button>
-
-
-
-  <button
-    class="nav-button upload-button"
-    onclick="openCreate()">
-
-    +
-
-  </button>
-
-
-
-  <button
-    class="nav-button">
-
-    <span class="nav-icon">
-      💬
-    </span>
-
-    <span>
-      Inbox
-    </span>
-
-  </button>
-
-
-
-  <button
-    class="nav-button">
-
-    <span class="nav-icon">
-      👤
-    </span>
-
-    <span>
-      Profile
-    </span>
-
-  </button>
-
-
-</nav>
-
-
-
-<!-- =====================================================
-     CREATE SCREEN
-===================================================== -->
-
-<section
-  class="create-screen"
-  id="createScreen">
-
-
-  <div class="create-header">
-
-    <button
-      class="create-close"
-      onclick="closeCreate()">
-
-      ×
-
-    </button>
-
-
-    <h2>
-      Create
-    </h2>
-
-  </div>
-
-
-
-  <!-- CREATE OPTIONS -->
-
-  <div
-    class="create-options"
-    id="createOptions">
-
-
-    <button
-      class="create-option"
-      onclick="openCamera()">
-
-      📹 Camera
-
-    </button>
-
-
-    <button
-      class="create-option"
-      onclick="openGallery()">
-
-      🖼️ Upload
-
-    </button>
-
-
-  </div>
-
-
-
-  <!-- =================================================
-       VIDEO EDITOR
-  ================================================= -->
-
-  <div
-    class="editor"
-    id="editor">
-
-
-    <!-- PREVIEW -->
-
-    <div class="preview-box">
-
-      <video
-        id="previewVideo"
-        class="preview-video"
-        controls
-        playsinline>
-      </video>
-
-    </div>
-
-
-
-    <!-- CAPTION -->
-
-    <div class="caption-box">
-
-      <textarea
-        id="captionInput"
-        maxlength="2200"
-        placeholder="Write a caption..."
-        oninput="updateCharCount()"></textarea>
-
-
-      <div
-        class="char-count"
-        id="charCount">
-
-        0/2200
+        <span>
+          Original sound - ZYLO →
+        </span>
 
       </div>
 
-    </div>
 
-
-
-    <!-- HASHTAGS -->
-
-    <input
-      id="hashtagInput"
-      type="text"
-      maxlength="300"
-      placeholder="Add hashtags #ZYLO #ForYou">
-
-
-
-    <!-- SOUND -->
-
-    <div class="sound-row">
-
-      🎵
-
-      <span class="sound-name">
-        Original sound - ZYLO
-      </span>
-
-      <span class="sound-arrow">
-        ›
-      </span>
-
-    </div>
-
-
-
-    <!-- SETTINGS -->
-
-    <div class="settings-box">
-
+      <!-- PRIVACY -->
 
       <select
         id="privacySelect"
         class="privacy-row">
 
         <option value="public">
-          🌎 Everyone
+          Everyone can watch
         </option>
 
         <option value="friends">
-          👥 Friends
+          Friends
         </option>
 
         <option value="private">
-          🔒 Only me
+          Only me
         </option>
 
       </select>
 
 
+      <!-- SETTINGS -->
 
-      <!-- COMMENTS -->
+      <div class="settings-box">
 
-      <div class="setting-row">
+        <div class="setting-row">
 
-        <span>
-          Allow comments
-        </span>
+          <span>
+            Allow comments
+          </span>
 
+          <span
+            id="commentsSwitch"
+            class="switch on"
+            onclick="toggleSwitch(this)">
+          </span>
 
-        <button
-          id="commentsToggle"
-          class="toggle on"
-          onclick="toggleSetting('commentsToggle')">
-
-          <span class="toggle-circle"></span>
-
-        </button>
-
-      </div>
-
-
-
-      <!-- DOWNLOADS -->
-
-      <div class="setting-row">
-
-        <span>
-          Allow downloads
-        </span>
-
-
-        <button
-          id="downloadsToggle"
-          class="toggle"
-          onclick="toggleSetting('downloadsToggle')">
-
-          <span class="toggle-circle"></span>
-
-        </button>
-
-      </div>
-
-
-    </div>
-
-
-
-    <!-- CHOOSE ANOTHER -->
-
-    <button
-      class="choose-again"
-      onclick="openGallery()">
-
-      Choose another video
-
-    </button>
-
-
-
-    <!-- STATUS -->
-
-    <div
-      class="upload-status"
-      id="uploadStatus">
-    </div>
-
-
-
-    <!-- BUTTONS -->
-
-    <div class="post-buttons">
-
-
-      <button
-        class="draft-btn"
-        onclick="saveDraft()">
-
-        Draft
-
-      </button>
-
-
-      <button
-        id="postButton"
-        class="post-btn"
-        onclick="postVideo()"
-        disabled>
-
-        Post
-
-      </button>
-
-
-    </div>
-
-
-  </div>
-
-</section>
-
-
-
-<!-- VIDEO FILE INPUT -->
-
-<input
-  id="videoInput"
-  type="file"
-  accept="video/*"
-  style="display:none">
-
-
-
-<script>
-
-/* =====================================================
-   BACKEND
-===================================================== */
-
-const BACKEND_URL =
-  "https://zylo-backend-ec5c.onrender.com";
-
-
-/* =====================================================
-   ELEMENTS
-===================================================== */
-
-const createScreen =
-  document.getElementById("createScreen");
-
-const createOptions =
-  document.getElementById("createOptions");
-
-const editor =
-  document.getElementById("editor");
-
-const videoInput =
-  document.getElementById("videoInput");
-
-const previewVideo =
-  document.getElementById("previewVideo");
-
-const captionInput =
-  document.getElementById("captionInput");
-
-const hashtagInput =
-  document.getElementById("hashtagInput");
-
-const privacySelect =
-  document.getElementById("privacySelect");
-
-const postButton =
-  document.getElementById("postButton");
-
-const uploadStatus =
-  document.getElementById("uploadStatus");
-
-const charCount =
-  document.getElementById("charCount");
-
-const videoFeed =
-  document.getElementById("videoFeed");
-
-
-let selectedVideo = null;
-
-let previewURL = null;
-
-
-/* =====================================================
-   CREATE
-===================================================== */
-
-function openCreate(){
-
-  createScreen.classList.add("show");
-
-  createOptions.style.display = "flex";
-
-  editor.classList.remove("show");
-
-  resetUploadState();
-
-}
-
-
-function closeCreate(){
-
-  createScreen.classList.remove("show");
-
-
-  if(previewURL){
-
-    URL.revokeObjectURL(previewURL);
-
-    previewURL = null;
-
-  }
-
-
-  previewVideo.pause();
-
-  previewVideo.removeAttribute("src");
-
-  previewVideo.load();
-
-
-  selectedVideo = null;
-
-  videoInput.value = "";
-
-}
-
-
-/* =====================================================
-   CAMERA
-===================================================== */
-
-function openCamera(){
-
-  videoInput.setAttribute(
-    "capture",
-    "environment"
-  );
-
-  videoInput.click();
-
-}
-
-
-/* =====================================================
-   GALLERY
-===================================================== */
-
-function openGallery(){
-
-  videoInput.removeAttribute(
-    "capture"
-  );
-
-  videoInput.click();
-
-}
-
-
-/* =====================================================
-   VIDEO SELECT
-===================================================== */
-
-videoInput.addEventListener(
-  "change",
-  function(){
-
-    const file =
-      this.files &&
-      this.files[0];
-
-
-    if(!file){
-      return;
-    }
-
-
-    if(!file.type.startsWith("video/")){
-
-      showError(
-        "শুধু ভিডিও ফাইল নির্বাচন করুন।"
-      );
-
-      return;
-
-    }
-
-
-    const maxSize =
-      200 * 1024 * 1024;
-
-
-    if(file.size > maxSize){
-
-      showError(
-        "ভিডিও সর্বোচ্চ 200 MB হতে পারবে।"
-      );
-
-      return;
-
-    }
-
-
-    selectedVideo = file;
-
-
-    if(previewURL){
-
-      URL.revokeObjectURL(
-        previewURL
-      );
-
-    }
-
-
-    previewURL =
-      URL.createObjectURL(file);
-
-
-    previewVideo.src =
-      previewURL;
-
-
-    previewVideo.load();
-
-
-    createOptions.style.display =
-      "none";
-
-
-    editor.classList.add("show");
-
-
-    resetStatus();
-
-
-    postButton.disabled = false;
-
-  }
-);
-
-
-/* =====================================================
-   CHARACTER COUNT
-===================================================== */
-
-function updateCharCount(){
-
-  charCount.textContent =
-    captionInput.value.length +
-    "/2200";
-
-}
-
-
-/* =====================================================
-   TOGGLES
-===================================================== */
-
-function toggleSetting(id){
-
-  const element =
-    document.getElementById(id);
-
-  element.classList.toggle("on");
-
-}
-
-
-/* =====================================================
-   RESET
-===================================================== */
-
-function resetUploadState(){
-
-  selectedVideo = null;
-
-  captionInput.value = "";
-
-  hashtagInput.value = "";
-
-  privacySelect.value = "public";
-
-
-  charCount.textContent =
-    "0/2200";
-
-
-  document
-    .getElementById("commentsToggle")
-    .classList.add("on");
-
-
-  document
-    .getElementById("downloadsToggle")
-    .classList.remove("on");
-
-
-  resetStatus();
-
-
-  postButton.disabled = true;
-
-}
-
-
-function resetStatus(){
-
-  uploadStatus.textContent = "";
-
-  uploadStatus.className =
-    "upload-status";
-
-}
-
-
-function showError(message){
-
-  uploadStatus.textContent =
-    message;
-
-  uploadStatus.className =
-    "upload-status error";
-
-}
-
-
-/* =====================================================
-   POST / UPLOAD
-===================================================== */
-
-async function postVideo(){
-
-  if(!selectedVideo){
-
-    showError(
-      "প্রথমে একটি ভিডিও নির্বাচন করুন।"
-    );
-
-    return;
-
-  }
-
-
-  postButton.disabled = true;
-
-
-  uploadStatus.className =
-    "upload-status";
-
-
-  uploadStatus.textContent =
-    "সার্ভার প্রস্তুত হচ্ছে...";
-
-
-  const caption =
-    captionInput.value.trim();
-
-
-  const hashtags =
-    hashtagInput.value.trim();
-
-
-  const privacy =
-    privacySelect.value;
-
-
-  const allowComments =
-    document
-      .getElementById("commentsToggle")
-      .classList
-      .contains("on");
-
-
-  const allowDownloads =
-    document
-      .getElementById("downloadsToggle")
-      .classList
-      .contains("on");
-
-
-  try{
-
-
-    /* WAKE BACKEND */
-
-    try{
-
-      await fetch(
-        BACKEND_URL + "/",
-        {
-          method:"GET",
-          cache:"no-store"
-        }
-      );
-
-    }catch(error){
-
-      console.log(
-        "Backend wake error:",
-        error
-      );
-
-    }
-
-
-    uploadStatus.textContent =
-      "ভিডিও আপলোড হচ্ছে...";
-
-
-    /* FORM DATA */
-
-    const formData =
-      new FormData();
-
-
-    formData.append(
-      "video",
-      selectedVideo
-    );
-
-
-    formData.append(
-      "caption",
-      caption
-    );
-
-
-    formData.append(
-      "hashtags",
-      hashtags
-    );
-
-
-    formData.append(
-      "privacy",
-      privacy
-    );
-
-
-    formData.append(
-      "allowComments",
-      String(allowComments)
-    );
-
-
-    formData.append(
-      "allowDownloads",
-      String(allowDownloads)
-    );
-
-
-    /* TIMEOUT */
-
-    const controller =
-      new AbortController();
-
-
-    const timeout =
-      setTimeout(
-        function(){
-
-          controller.abort();
-
-        },
-        120000
-      );
-
-
-    let response;
-
-
-    try{
-
-      response =
-        await fetch(
-
-          BACKEND_URL +
-          "/api/upload",
-
-          {
-            method:"POST",
-
-            body:formData,
-
-            signal:
-              controller.signal
-          }
-
-        );
-
-    }finally{
-
-      clearTimeout(timeout);
-
-    }
-
-
-    /* RESPONSE */
-
-    const contentType =
-      response.headers.get(
-        "content-type"
-      ) || "";
-
-
-    if(
-      !contentType.includes(
-        "application/json"
-      )
-    ){
-
-      const text =
-        await response.text();
-
-
-      throw new Error(
-        text ||
-        "সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।"
-      );
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    if(
-      !response.ok ||
-      !data.success
-    ){
-
-      throw new Error(
-        data.message ||
-        "ভিডিও আপলোড ব্যর্থ হয়েছে।"
-      );
-
-    }
-
-
-    /* SUCCESS */
-
-    uploadStatus.className =
-      "upload-status success";
-
-
-    uploadStatus.textContent =
-      "ভিডিও সফলভাবে পোস্ট হয়েছে!";
-
-
-    if(
-      data.video &&
-      data.video.url
-    ){
-
-      addVideoToFeed(
-        data.video.url,
-        caption,
-        hashtags
-      );
-
-
-      localStorage.setItem(
-        "zyloLastVideo",
-
-        JSON.stringify({
-
-          url:
-            data.video.url,
-
-          caption:
-            caption,
-
-          hashtags:
-            hashtags,
-
-          privacy:
-            privacy,
-
-          allowComments:
-            allowComments,
-
-          allowDownloads:
-            allowDownloads,
-
-          createdAt:
-            new Date().toISOString()
-
-        })
-      );
-
-    }
-
-
-    setTimeout(
-      function(){
-
-        closeCreate();
-
-      },
-      1000
-    );
-
-
-  }catch(error){
-
-    console.error(error);
-
-
-    if(
-      error.name ===
-      "AbortError"
-    ){
-
-      showError(
-        "আপলোডে বেশি সময় লাগছে। আবার চেষ্টা করুন।"
-      );
-
-    }else{
-
-      showError(
-        "আপলোড ব্যর্থ: " +
-        (
-          error.message ||
-          "অজানা সমস্যা"
-        )
-      );
-
-    }
-
-
-    postButton.disabled = false;
-
-  }
-
-}
-
-
-/* =====================================================
-   ADD UPLOADED VIDEO TO FEED
-===================================================== */
-
-function addVideoToFeed(
-  url,
-  caption,
-  hashtags
-){
-
-  const section =
-    document.createElement(
-      "section"
-    );
-
-
-  section.className =
-    "video-card";
-
-
-  section.innerHTML = `
-
-    <video
-      class="video"
-      src="${escapeAttribute(url)}"
-      loop
-      muted
-      playsinline
-      preload="metadata">
-    </video>
-
-
-    <div class="video-overlay"></div>
-
-
-    <div class="video-info">
-
-      <div class="username">
-        @zylo_creator
-      </div>
-
-
-      <div class="caption">
-        ${escapeHTML(caption)}
-      </div>
-
-
-      ${
-        hashtags
-        ?
-        `
-        <div class="hashtags">
-          ${escapeHTML(hashtags)}
         </div>
-        `
-        :
-        ""
+
+
+        <div class="setting-row">
+
+          <span>
+            Allow downloads
+          </span>
+
+          <span
+            id="downloadsSwitch"
+            class="switch"
+            onclick="toggleSwitch(this)">
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- CHANGE VIDEO -->
+
+      <button
+        class="choose-again"
+        onclick="openGallery()">
+
+        Choose another video
+
+      </button>
+
+
+      <!-- STATUS -->
+
+      <div
+        id="uploadStatus"
+        class="upload-status">
+      </div>
+
+
+      <!-- POST BUTTONS -->
+
+      <div class="post-area">
+
+        <button
+          class="draft-btn"
+          onclick="saveDraft()">
+
+          Draft
+
+        </button>
+
+        <button
+          id="postButton"
+          class="post-btn"
+          onclick="postVideo()"
+          disabled>
+
+          Post
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- VIDEO INPUT -->
+
+  <input
+    id="videoInput"
+    type="file"
+    accept="video/*">
+
+
+  <script>
+
+    /* =========================
+       BACKEND
+    ========================== */
+
+    const BACKEND_URL =
+      "https://zylo-backend-ec5c.onrender.com";
+
+
+    /* =========================
+       ELEMENTS
+    ========================== */
+
+    const createScreen =
+      document.getElementById("createScreen");
+
+    const createOptions =
+      document.getElementById("createOptions");
+
+    const editor =
+      document.getElementById("editor");
+
+    const videoInput =
+      document.getElementById("videoInput");
+
+    const previewVideo =
+      document.getElementById("previewVideo");
+
+    const captionInput =
+      document.getElementById("captionInput");
+
+    const hashtagInput =
+      document.getElementById("hashtagInput");
+
+    const privacySelect =
+      document.getElementById("privacySelect");
+
+    const postButton =
+      document.getElementById("postButton");
+
+    const uploadStatus =
+      document.getElementById("uploadStatus");
+
+
+    let selectedVideo = null;
+
+
+    /* =========================
+       CREATE
+    ========================== */
+
+    function openCreate() {
+
+      createScreen.classList.add("show");
+
+      createOptions.style.display = "flex";
+
+      editor.classList.remove("show");
+
+      uploadStatus.textContent = "";
+
+    }
+
+
+    function closeCreate() {
+
+      createScreen.classList.remove("show");
+
+      previewVideo.pause();
+
+      previewVideo.removeAttribute("src");
+
+      previewVideo.load();
+
+      selectedVideo = null;
+
+      videoInput.value = "";
+
+      postButton.disabled = true;
+
+      uploadStatus.textContent = "";
+
+    }
+
+
+    /* =========================
+       CAMERA
+    ========================== */
+
+    function openCamera() {
+
+      videoInput.setAttribute(
+        "capture",
+        "environment"
+      );
+
+      videoInput.click();
+
+    }
+
+
+    /* =========================
+       GALLERY
+    ========================== */
+
+    function openGallery() {
+
+      videoInput.removeAttribute(
+        "capture"
+      );
+
+      videoInput.click();
+
+    }
+
+
+    /* =========================
+       FILE SELECTED
+    ========================== */
+
+    videoInput.addEventListener(
+      "change",
+      function () {
+
+        const file =
+          this.files && this.files[0];
+
+        if (!file) {
+          return;
+        }
+
+
+        if (!file.type.startsWith("video/")) {
+
+          uploadStatus.textContent =
+            "শুধু ভিডিও ফাইল নির্বাচন করুন।";
+
+          return;
+
+        }
+
+
+        selectedVideo = file;
+
+
+        const videoURL =
+          URL.createObjectURL(file);
+
+        previewVideo.src =
+          videoURL;
+
+
+        createOptions.style.display =
+          "none";
+
+        editor.classList.add("show");
+
+
+        postButton.disabled =
+          false;
+
+
+        uploadStatus.textContent =
+          "ভিডিও প্রস্তুত। Post চাপুন।";
+
+      }
+    );
+
+
+    /* =========================
+       SWITCH
+    ========================== */
+
+    function toggleSwitch(element) {
+
+      element.classList.toggle("on");
+
+    }
+
+
+    /* =========================
+       POST VIDEO
+    ========================== */
+
+    async function postVideo() {
+
+      if (!selectedVideo) {
+
+        uploadStatus.textContent =
+          "আগে একটি ভিডিও নির্বাচন করুন।";
+
+        return;
+
       }
 
 
-      <div class="music">
-        ♪ Original sound - ZYLO
-      </div>
+      postButton.disabled =
+        true;
 
-    </div>
+      uploadStatus.textContent =
+        "ভিডিও আপলোড হচ্ছে...";
 
 
-    <div class="video-actions">
+      try {
 
+        const formData =
+          new FormData();
 
-      <button class="zylo-profile">
 
-        <span class="profile-letter">
-          Z
-        </span>
+        formData.append(
+          "video",
+          selectedVideo
+        );
 
-        <span class="follow-plus">
-          +
-        </span>
 
-      </button>
+        formData.append(
+          "caption",
+          captionInput.value.trim()
+        );
 
 
-      <button
-        class="zylo-action like-action"
-        onclick="likeVideo(this)">
+        formData.append(
+          "hashtags",
+          hashtagInput.value.trim()
+        );
 
-        <span class="action-icon">
-          ♡
-        </span>
 
-      </button>
+        formData.append(
+          "privacy",
+          privacySelect.value
+        );
 
 
-      <span class="action-number">
-        0
-      </span>
+        formData.append(
+          "allowComments",
+          document
+            .getElementById("commentsSwitch")
+            .classList.contains("on")
+        );
 
 
-      <button
-        class="zylo-action"
-        onclick="openComments()">
+        formData.append(
+          "allowDownloads",
+          document
+            .getElementById("downloadsSwitch")
+            .classList.contains("on")
+        );
 
-        <span class="action-icon comment-icon">
-          💬
-        </span>
 
-      </button>
+        const controller =
+          new AbortController();
 
 
-      <span class="action-number">
-        0
-      </span>
+        const timeout =
+          setTimeout(
+            () => controller.abort(),
+            120000
+          );
 
 
-      <button
-        class="zylo-action save-action"
-        onclick="saveVideo(this)">
+        const response =
+          await fetch(
+            BACKEND_URL +
+            "/api/upload",
+            {
+              method: "POST",
+              body: formData,
+              signal: controller.signal
+            }
+          );
 
-        <span class="action-icon">
-          🔖
-        </span>
 
-      </button>
+        clearTimeout(timeout);
 
 
-      <span class="action-label">
-        Save
-      </span>
+        const data =
+          await response.json();
 
 
-      <button
-        class="zylo-action share-action"
-        onclick="shareVideo()">
+        if (
+          !response.ok ||
+          !data.success
+        ) {
 
-        <span class="action-icon">
-          ↗
-        </span>
+          throw new Error(
+            data.message ||
+            "Upload failed"
+          );
 
-      </button>
+        }
 
 
-      <span class="action-label">
-        Share
-      </span>
+        /* Add video to feed */
 
+        addVideoToFeed(
+          data.video.url,
+          captionInput.value.trim(),
+          hashtagInput.value.trim()
+        );
 
-      <button
-        class="zylo-sound"
-        onclick="toggleSound(this)">
 
-        <span>
-          ♪
-        </span>
+        /* Save locally */
 
-      </button>
+        localStorage.setItem(
+          "zyloLastVideo",
+          JSON.stringify({
+            url: data.video.url,
+            caption:
+              captionInput.value.trim(),
+            hashtags:
+              hashtagInput.value.trim()
+          })
+        );
 
 
-    </div>
+        uploadStatus.textContent =
+          "ভিডিও সফলভাবে পোস্ট হয়েছে!";
 
-  `;
 
+        setTimeout(
+          () => {
 
-  videoFeed.prepend(section);
+            closeCreate();
 
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
 
-  const newVideo =
-    section.querySelector(
-      ".video"
-    );
+          },
+          800
+        );
 
 
-  setupVideoObserver(
-    newVideo
-  );
+      } catch (error) {
 
+        console.error(error);
 
-  videoFeed.scrollTo({
 
-    top:0,
+        if (
+          error.name ===
+          "AbortError"
+        ) {
 
-    behavior:"smooth"
+          uploadStatus.textContent =
+            "আপলোডে বেশি সময় লাগছে। আবার চেষ্টা করুন।";
 
-  });
+        } else {
 
-}
+          uploadStatus.textContent =
+            "আপলোড ব্যর্থ: " +
+            error.message;
 
+        }
 
-/* =====================================================
-   LIKE
-===================================================== */
 
-function likeVideo(button){
+        postButton.disabled =
+          false;
 
-  const card =
-    button.closest(
-      ".video-card"
-    );
-
-
-  const count =
-    button.parentElement
-      .querySelector(
-        ".action-number"
-      );
-
-
-  let value =
-    parseInt(
-      count.textContent
-    ) || 0;
-
-
-  if(
-    button.dataset.liked ===
-    "true"
-  ){
-
-    button.dataset.liked =
-      "false";
-
-
-    button.querySelector(
-      ".action-icon"
-    ).textContent =
-      "♡";
-
-
-    value =
-      Math.max(
-        0,
-        value - 1
-      );
-
-  }else{
-
-    button.dataset.liked =
-      "true";
-
-
-    button.querySelector(
-      ".action-icon"
-    ).textContent =
-      "♥";
-
-
-    value++;
-
-  }
-
-
-  count.textContent =
-    value;
-
-}
-
-
-/* =====================================================
-   SAVE
-===================================================== */
-
-function saveVideo(button){
-
-  if(
-    button.dataset.saved ===
-    "true"
-  ){
-
-    button.dataset.saved =
-      "false";
-
-
-    button.querySelector(
-      ".action-icon"
-    ).textContent =
-      "🔖";
-
-  }else{
-
-    button.dataset.saved =
-      "true";
-
-
-    button.querySelector(
-      ".action-icon"
-    ).textContent =
-      "🔖";
-
-  }
-
-}
-
-
-/* =====================================================
-   SOUND
-===================================================== */
-
-function toggleSound(button){
-
-  const card =
-    button.closest(
-      ".video-card"
-    );
-
-
-  const video =
-    card.querySelector(
-      ".video"
-    );
-
-
-  if(video.muted){
-
-    video.muted = false;
-
-    button.querySelector(
-      "span"
-    ).textContent =
-      "🔊";
-
-  }else{
-
-    video.muted = true;
-
-    button.querySelector(
-      "span"
-    ).textContent =
-      "♪";
-
-  }
-
-}
-
-
-/* =====================================================
-   SHARE
-===================================================== */
-
-async function shareVideo(){
-
-  const shareData = {
-
-    title:
-      "ZYLO",
-
-    text:
-      "Watch this video on ZYLO",
-
-    url:
-      window.location.href
-
-  };
-
-
-  try{
-
-    if(
-      navigator.share
-    ){
-
-      await navigator.share(
-        shareData
-      );
-
-    }else{
-
-      await navigator.clipboard.writeText(
-        window.location.href
-      );
-
-
-      alert(
-        "ZYLO লিংক কপি হয়েছে।"
-      );
+      }
 
     }
 
-  }catch(error){
 
-    console.log(
-      "Share cancelled"
-    );
+    /* =========================
+       ADD VIDEO TO FEED
+    ========================== */
 
-  }
+    function addVideoToFeed(
+      url,
+      caption,
+      hashtags
+    ) {
 
-}
-
-
-/* =====================================================
-   COMMENTS
-===================================================== */
-
-function openComments(){
-
-  alert(
-    "Comments feature শীঘ্রই যুক্ত হবে।"
-  );
-
-}
+      const feed =
+        document.getElementById(
+          "videoFeed"
+        );
 
 
-/* =====================================================
-   SEARCH
-===================================================== */
-
-function openSearch(){
-
-  const query =
-    prompt(
-      "ZYLO Search"
-    );
+      const card =
+        document.createElement(
+          "section"
+        );
 
 
-  if(
-    query &&
-    query.trim()
-  ){
-
-    alert(
-      "আপনি সার্চ করেছেন: " +
-      query.trim()
-    );
-
-  }
-
-}
+      card.className =
+        "video-card";
 
 
-/* =====================================================
-   DRAFT
-===================================================== */
+      card.innerHTML = `
 
-function saveDraft(){
-
-  const draft = {
-
-    caption:
-      captionInput.value,
-
-    hashtags:
-      hashtagInput.value,
-
-    privacy:
-      privacySelect.value,
-
-    savedAt:
-      new Date().toISOString()
-
-  };
+        <video
+          class="video"
+          src="${escapeHTML(url)}"
+          loop
+          muted
+          playsinline
+          preload="metadata">
+        </video>
 
 
-  localStorage.setItem(
-    "zyloDraft",
-    JSON.stringify(draft)
-  );
+        <div class="right-actions">
+
+          <div class="action profile-action">
+
+            <div class="profile-avatar">
+
+              Z
+
+              <span class="follow-plus">
+                +
+              </span>
+
+            </div>
+
+            <div class="action-label">
+              Follow
+            </div>
+
+          </div>
 
 
-  uploadStatus.className =
-    "upload-status success";
+          <div
+            class="action"
+            onclick="toggleLike(this)">
+
+            <div class="action-icon like-icon">
+              ♡
+            </div>
+
+            <div class="action-count">
+              0
+            </div>
+
+          </div>
 
 
-  uploadStatus.textContent =
-    "Draft সংরক্ষণ হয়েছে।";
+          <div class="action">
 
-}
+            <div class="action-icon comment-icon">
+              💬
+            </div>
 
+            <div class="action-count">
+              0
+            </div>
 
-/* =====================================================
-   SECURITY
-===================================================== */
-
-function escapeHTML(value){
-
-  return String(value)
-
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
-}
+          </div>
 
 
-function escapeAttribute(value){
+          <div
+            class="action"
+            onclick="toggleSave(this)">
 
-  return String(value)
+            <div class="action-icon save-icon">
+              ♡
+            </div>
 
-    .replace(
-      /"/g,
-      "&quot;"
-    )
+            <div class="action-label">
+              Save
+            </div>
 
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
-}
+          </div>
 
 
-/* =====================================================
-   VIDEO AUTOPLAY
-===================================================== */
+          <div
+            class="action"
+            onclick="shareVideo()">
 
-const videoObserver =
-  new IntersectionObserver(
+            <div class="action-icon share-icon">
+              ↗
+            </div>
 
-    function(entries){
+            <div class="action-label">
+              Share
+            </div>
 
-      entries.forEach(
-        function(entry){
-
-          const video =
-            entry.target;
+          </div>
 
 
-          if(
-            entry.isIntersecting
-          ){
+          <div class="action">
 
-            video.play()
-              .catch(
-                function(){}
-              );
+            <div class="music-disc">
 
-          }else{
+              <span class="music-note">
+                ♪
+              </span>
 
-            video.pause();
+            </div>
 
+          </div>
+
+        </div>
+
+
+        <div class="video-info">
+
+          <div class="username">
+
+            @zylo_creator
+
+            <span class="verified">
+              ✓
+            </span>
+
+          </div>
+
+
+          <div class="caption">
+            ${escapeHTML(caption || "Welcome to ZYLO 🌎")}
+          </div>
+
+
+          <div class="hashtags">
+            ${escapeHTML(
+              hashtags ||
+              "#ZYLO #ForYou"
+            )}
+          </div>
+
+
+          <div class="music-text">
+
+            <span class="music-small-note">
+              ♫
+            </span>
+
+            Original sound - ZYLO
+
+          </div>
+
+        </div>
+
+      `;
+
+
+      feed.prepend(card);
+
+
+      setupVideoObserver();
+
+    }
+
+
+    /* =========================
+       VIDEO AUTOPLAY
+    ========================== */
+
+    function setupVideoObserver() {
+
+      const videos =
+        document.querySelectorAll(
+          ".video"
+        );
+
+
+      const observer =
+        new IntersectionObserver(
+          entries => {
+
+            entries.forEach(
+              entry => {
+
+                const video =
+                  entry.target;
+
+
+                if (
+                  entry.isIntersecting &&
+                  entry.intersectionRatio >= .65
+                ) {
+
+                  video.play()
+                    .catch(() => {});
+
+                } else {
+
+                  video.pause();
+
+                }
+
+              }
+            );
+
+          },
+          {
+            threshold: [
+              .25,
+              .65,
+              .9
+            ]
           }
+        );
+
+
+      videos.forEach(
+        video => {
+
+          observer.observe(video);
 
         }
       );
 
-    },
-
-    {
-      threshold:.65
     }
 
-  );
+
+    setupVideoObserver();
 
 
-function setupVideoObserver(video){
+    /* =========================
+       LIKE
+    ========================== */
 
-  videoObserver.observe(
-    video
-  );
+    function toggleLike(action) {
 
-}
+      const icon =
+        action.querySelector(
+          ".like-icon"
+        );
+
+      const count =
+        action.querySelector(
+          ".action-count"
+        );
 
 
-document
-  .querySelectorAll(
-    ".video"
-  )
-  .forEach(
-    function(video){
+      const liked =
+        icon.classList.toggle(
+          "liked"
+        );
 
-      setupVideoObserver(
-        video
+
+      icon.textContent =
+        liked ? "♥" : "♡";
+
+
+      count.textContent =
+        liked ? "1" : "0";
+
+    }
+
+
+    /* =========================
+       SAVE
+    ========================== */
+
+    function toggleSave(action) {
+
+      const icon =
+        action.querySelector(
+          ".save-icon"
+        );
+
+
+      const saved =
+        icon.classList.toggle(
+          "saved"
+        );
+
+
+      icon.textContent =
+        saved ? "🔖" : "♡";
+
+    }
+
+
+    /* =========================
+       SHARE
+    ========================== */
+
+    async function shareVideo() {
+
+      const shareData = {
+
+        title: "ZYLO",
+
+        text:
+          "Check out this video on ZYLO 🌎",
+
+        url:
+          window.location.href
+
+      };
+
+
+      try {
+
+        if (
+          navigator.share
+        ) {
+
+          await navigator.share(
+            shareData
+          );
+
+        } else {
+
+          await navigator.clipboard.writeText(
+            window.location.href
+          );
+
+          alert(
+            "ভিডিওর লিংক কপি হয়েছে।"
+          );
+
+        }
+
+      } catch (error) {
+
+        console.log(
+          "Share cancelled"
+        );
+
+      }
+
+    }
+
+
+    /* =========================
+       SEARCH
+    ========================== */
+
+    function openSearch() {
+
+      const query =
+        prompt(
+          "ZYLO-তে কী খুঁজবেন?"
+        );
+
+
+      if (query) {
+
+        alert(
+          "Search: " + query
+        );
+
+      }
+
+    }
+
+
+    /* =========================
+       OTHER NAVIGATION
+    ========================== */
+
+    function goHome() {
+
+      document
+        .getElementById("videoFeed")
+        .scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+
+    }
+
+
+    function openDiscover() {
+
+      alert(
+        "Discover page শীঘ্রই আসছে।"
       );
 
     }
-  );
 
 
-/* =====================================================
-   PAGE LOAD
-===================================================== */
+    function openInbox() {
 
-window.addEventListener(
-  "load",
-  function(){
+      alert(
+        "Inbox শীঘ্রই আসছে।"
+      );
 
-    updateCharCount();
+    }
 
-  }
-);
 
-</script>
+    function openProfile() {
+
+      alert(
+        "Profile page শীঘ্রই আসছে।"
+      );
+
+    }
+
+
+    function openComments() {
+
+      alert(
+        "Comments panel শীঘ্রই আসছে।"
+      );
+
+    }
+
+
+    /* =========================
+       DRAFT
+    ========================== */
+
+    function saveDraft() {
+
+      if (!selectedVideo) {
+
+        alert(
+          "আগে একটি ভিডিও নির্বাচন করুন।"
+        );
+
+        return;
+
+      }
+
+
+      localStorage.setItem(
+        "zyloDraft",
+        JSON.stringify({
+          caption:
+            captionInput.value,
+          hashtags:
+            hashtagInput.value,
+          privacy:
+            privacySelect.value
+        })
+      );
+
+
+      uploadStatus.textContent =
+        "Draft সংরক্ষণ হয়েছে।";
+
+    }
+
+
+    /* =========================
+       SECURITY
+    ========================== */
+
+    function escapeHTML(value) {
+
+      return String(value || "")
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+        .replace(
+          /</g,
+          "&lt;"
+        )
+        .replace(
+          />/g,
+          "&gt;"
+        )
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
+    }
+
+  </script>
 
 </body>
 </html>
