@@ -15,7 +15,6 @@ body {
 
 body {
   height: 100dvh;
-  touch-action: manipulation;
 }
 
 #app {
@@ -28,9 +27,7 @@ body {
 }
 
 
-/* =========================
-   VIDEO FEED
-========================= */
+/* VIDEO FEED */
 
 #feed {
   width: 100%;
@@ -64,9 +61,7 @@ body {
 }
 
 
-/* =========================
-   VIDEO
-========================= */
+/* VIDEO */
 
 .video {
   position: absolute;
@@ -78,15 +73,13 @@ body {
 
   object-fit: cover;
 
-  background: #000;
-
   display: block;
+
+  background: #000;
 }
 
 
-/* =========================
-   TOP BAR
-========================= */
+/* TOP BAR */
 
 .top-bar {
   position: fixed;
@@ -97,16 +90,13 @@ body {
 
   height: 72px;
 
-  padding-top: env(safe-area-inset-top);
+  z-index: 100;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  padding-left: 16px;
-  padding-right: 16px;
-
-  z-index: 100;
+  padding: 10px 16px;
 
   color: white;
 
@@ -117,30 +107,24 @@ body {
   );
 }
 
-
 .logo {
+  width: 75px;
+
   font-size: 24px;
   font-weight: 900;
   letter-spacing: 1px;
 
-  width: 70px;
-
   text-shadow: 0 2px 6px #000;
 }
-
 
 .top-tabs {
   display: flex;
   align-items: center;
-
   gap: 22px;
 }
 
-
 .top-tabs button {
   border: none;
-  outline: none;
-
   background: transparent;
 
   color: rgba(255,255,255,.7);
@@ -151,38 +135,30 @@ body {
   padding: 10px 2px;
 }
 
-
 .top-tabs button.active {
-  color: #fff;
-
-  border-bottom: 2px solid #fff;
+  color: white;
+  border-bottom: 2px solid white;
 }
 
-
 .search-btn {
-  border: none;
-  outline: none;
-
   width: 42px;
   height: 42px;
 
+  border: none;
   background: transparent;
 
-  color: #fff;
+  color: white;
 
   font-size: 30px;
 }
 
 
-/* =========================
-   RIGHT SIDE
-========================= */
+/* RIGHT BUTTONS */
 
 .right-buttons {
   position: absolute;
 
-  right: 9px;
-
+  right: 8px;
   bottom: 105px;
 
   z-index: 50;
@@ -195,17 +171,14 @@ body {
   gap: 17px;
 }
 
-
 .action-btn {
-  border: none;
-  outline: none;
+  width: 58px;
+  min-height: 55px;
 
+  border: none;
   background: transparent;
 
   color: white;
-
-  width: 58px;
-  min-height: 52px;
 
   display: flex;
   flex-direction: column;
@@ -213,52 +186,70 @@ body {
   align-items: center;
   justify-content: center;
 
-  cursor: pointer;
-
   text-shadow:
     0 2px 5px #000,
     0 0 5px #000;
-
-  -webkit-tap-highlight-color: transparent;
 }
-
 
 .action-btn strong {
   font-size: 30px;
-
   line-height: 34px;
 }
-
 
 .action-btn span {
   margin-top: 2px;
 
   font-size: 12px;
-
   font-weight: 600;
 }
-
 
 .like-btn.liked strong {
   color: red;
 }
-
 
 .save-btn.saved strong {
   color: gold;
 }
 
 
-/* =========================
-   VIDEO INFO
-========================= */
+/* FULLSCREEN
+   আলাদা জায়গায় */
+
+.fullscreen-btn {
+  position: absolute;
+
+  top: 82px;
+  right: 15px;
+
+  z-index: 70;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(0,0,0,.40);
+
+  color: white;
+
+  font-size: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-shadow: 0 2px 5px #000;
+}
+
+
+/* VIDEO INFO */
 
 .video-info {
   position: absolute;
 
   left: 15px;
   right: 85px;
-
   bottom: 80px;
 
   z-index: 40;
@@ -270,29 +261,22 @@ body {
     0 0 5px #000;
 }
 
-
 .video-info h3 {
   font-size: 18px;
-
   margin-bottom: 8px;
 }
 
-
 .video-info p {
   font-size: 15px;
-
   margin-bottom: 7px;
 }
-
 
 .music-name {
   font-size: 13px !important;
 }
 
 
-/* =========================
-   PLAY ICON
-========================= */
+/* PLAY ICON */
 
 .play-icon {
   position: absolute;
@@ -302,64 +286,25 @@ body {
 
   transform: translate(-50%, -50%);
 
+  z-index: 60;
+
   color: white;
 
   font-size: 65px;
 
   opacity: 0;
 
-  z-index: 60;
-
   pointer-events: none;
 
   text-shadow: 0 2px 10px #000;
-
-  transition: opacity .2s;
 }
-
 
 .play-icon.show {
   opacity: 1;
 }
 
 
-/* =========================
-   FULLSCREEN BUTTON
-========================= */
-
-.fullscreen-btn {
-  position: absolute;
-
-  right: 15px;
-  bottom: 245px;
-
-  z-index: 60;
-
-  width: 45px;
-  height: 45px;
-
-  border: none;
-  border-radius: 50%;
-
-  background: rgba(0,0,0,.35);
-
-  color: white;
-
-  font-size: 27px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  text-shadow: 0 2px 5px #000;
-
-  -webkit-tap-highlight-color: transparent;
-}
-
-
-/* =========================
-   BOTTOM NAV
-========================= */
+/* BOTTOM NAV */
 
 .bottom-nav {
   position: fixed;
@@ -370,25 +315,22 @@ body {
 
   height: 68px;
 
-  padding-bottom: env(safe-area-inset-bottom);
-
   z-index: 100;
 
   display: flex;
   align-items: center;
   justify-content: space-around;
 
-  background: rgba(0,0,0,.82);
+  background: rgba(0,0,0,.84);
 
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-}
 
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
 .bottom-nav button {
   border: none;
-  outline: none;
-
   background: transparent;
 
   color: white;
@@ -402,26 +344,19 @@ body {
   justify-content: center;
 
   gap: 2px;
-
-  -webkit-tap-highlight-color: transparent;
 }
-
 
 .bottom-nav button b {
   font-size: 23px;
-
   line-height: 25px;
 }
-
 
 .bottom-nav button span {
   font-size: 10px;
 }
 
 
-/* =========================
-   UPLOAD
-========================= */
+/* UPLOAD */
 
 .upload-btn {
   width: 54px !important;
@@ -430,22 +365,15 @@ body {
   min-width: 54px !important;
 
   background: white !important;
-
   color: black !important;
 
   border-radius: 10px !important;
 
   font-size: 35px !important;
-
-  line-height: 35px;
-
-  box-shadow: 0 0 8px rgba(255,255,255,.35);
 }
 
 
-/* =========================
-   MOBILE
-========================= */
+/* MOBILE */
 
 @media (max-width: 600px) {
 
@@ -454,8 +382,9 @@ body {
   }
 
   .right-buttons {
-    right: 7px;
+    right: 6px;
     bottom: 108px;
+    gap: 15px;
   }
 
   .video-info {
@@ -464,8 +393,7 @@ body {
   }
 
   .fullscreen-btn {
-    right: 12px;
-    bottom: 255px;
+    top: 78px;
+    right: 14px;
   }
-
 }
