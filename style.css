@@ -1,4 +1,4 @@
-/* =========================================================
+তো/* =========================================================
    ZYLO • TikTok Style Video UI
    ========================================================= */
 
@@ -1030,4 +1030,121 @@ button {
 
 .music-disc {
   bottom: 92px !important;
+}
+/* =========================================
+   ZYLO FINAL - SEARCH + MUSIC FIX
+   ========================================= */
+
+/* SEARCH BUTTON */
+.search-button,
+.search-btn,
+.search-icon {
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+  min-height: 54px !important;
+
+  border-radius: 50% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: rgba(35, 35, 35, 0.95) !important;
+  color: #fff !important;
+
+  font-size: 30px !important;
+  line-height: 1 !important;
+}
+
+/* যদি search button-এর ভিতরে icon থাকে */
+.search-button .icon,
+.search-btn .icon,
+.search-icon .icon {
+  font-size: 30px !important;
+  color: #fff !important;
+}
+
+
+/* =========================================
+   MUSIC BUTTON
+   Bottom Navigation-এর ঠিক উপরে
+   ========================================= */
+
+.music-button,
+.sound-button,
+.video-music {
+  position: absolute !important;
+
+  right: 14px !important;
+  bottom: 108px !important;
+
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+  min-height: 54px !important;
+
+  border-radius: 50% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: #111 !important;
+  border: 2px solid rgba(255,255,255,.30) !important;
+
+  color: #fff !important;
+
+  z-index: 50 !important;
+
+  overflow: visible !important;
+}
+
+/* Music icon */
+.music-button::before,
+.sound-button::before,
+.video-music::before {
+  color: #fff !important;
+  font-size: 24px !important;
+}
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+  .search-button,
+  .search-btn,
+  .search-icon {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+    font-size: 28px !important;
+  }
+
+  .search-button .icon,
+  .search-btn .icon,
+  .search-icon .icon {
+    font-size: 28px !important;
+  }
+
+  .music-button,
+  .sound-button,
+  .video-music {
+    right: 10px !important;
+    bottom: 104px !important;
+
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+  }
+
+  .music-button::before,
+  .sound-button::before,
+  .video-music::before {
+    font-size: 23px !important;
+  }
 }
