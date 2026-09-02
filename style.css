@@ -1,5 +1,5 @@
 /* =========================================================
-   ZYLO — FULL TIKTOK STYLE VIDEO FEED
+   ZYLO - FULL SCREEN SHORT VIDEO UI
    Create • Connect • Grow
    ========================================================= */
 
@@ -25,17 +25,19 @@ body {
   inset: 0;
 }
 
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
 button {
   border: 0;
   outline: 0;
   background: transparent;
   color: #fff;
-  font-family: inherit;
   cursor: pointer;
-}
-
-button:active {
-  transform: scale(.94);
 }
 
 /* =========================================================
@@ -45,10 +47,11 @@ button:active {
 #app,
 .app,
 .zylo-app {
-  position: relative;
+  position: fixed;
+  inset: 0;
   width: 100%;
-  height: 100%;
-  min-height: 100vh;
+  height: 100dvh;
+  min-height: 100dvh;
   background: #000;
   overflow: hidden;
 }
@@ -59,161 +62,181 @@ button:active {
 
 .video-feed,
 .feed,
-.videos,
-#videoFeed {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background: #000;
-  overflow-y: auto;
-  overflow-x: hidden;
+.video-container {
+  position: fixed !important;
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+
+  background: #000 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
   scroll-snap-type: y mandatory;
   -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: none;
 }
 
 .video-feed::-webkit-scrollbar,
-.feed::-webkit-scrollbar {
+.feed::-webkit-scrollbar,
+.video-container::-webkit-scrollbar {
   display: none;
 }
 
+/* =========================================================
+   VIDEO CARD
+   ========================================================= */
+
 .video-card {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  min-height: 100vh;
-  background: #000;
-  overflow: hidden;
+  position: relative !important;
+
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+
+  flex: 0 0 100dvh;
+
+  background: #000 !important;
+
+  overflow: hidden !important;
+
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 
 /* =========================================================
-   VIDEO
+   FULL SCREEN VIDEO
    ========================================================= */
 
 .video-card video,
 .video-player,
 .video-card > video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: #000;
-  z-index: 1;
-}
+  position: absolute !important;
 
-/* Make sure video can fill screen */
-video {
-  max-width: 100%;
+  top: 0 !important;
+  left: 0 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 100% !important;
+  min-height: 100% !important;
+
+  display: block !important;
+
+  background: #000 !important;
+
+  object-fit: cover !important;
+  object-position: center center !important;
+
+  border: 0 !important;
+  outline: 0 !important;
+
+  z-index: 1 !important;
 }
 
 /* =========================================================
-   DARK GRADIENT
+   VIDEO OVERLAY
    ========================================================= */
 
 .video-card::after {
   content: "";
+
   position: absolute;
   inset: 0;
+
   pointer-events: none;
-  z-index: 3;
 
   background:
     linear-gradient(
       to bottom,
-      rgba(0,0,0,.42) 0%,
-      rgba(0,0,0,0) 18%,
-      rgba(0,0,0,0) 62%,
-      rgba(0,0,0,.12) 72%,
-      rgba(0,0,0,.82) 100%
+      rgba(0, 0, 0, 0.35),
+      transparent 18%,
+      transparent 62%,
+      rgba(0, 0, 0, 0.78) 100%
     );
+
+  z-index: 2;
 }
 
 /* =========================================================
    TOP BAR
    ========================================================= */
 
-.top-bar,
-.top-nav,
-.header {
+.top-bar {
   position: fixed !important;
+
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
 
-  height: 82px !important;
+  height: 72px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 
   z-index: 100 !important;
 
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  padding-top: 8px !important;
+  padding-top: env(safe-area-inset-top);
 
   background: linear-gradient(
     to bottom,
-    rgba(0,0,0,.58),
-    rgba(0,0,0,0)
+    rgba(0, 0, 0, 0.7),
+    transparent
   ) !important;
 }
 
-/* Top tabs */
+/* Tabs */
 
-.top-tabs,
-.tabs {
+.top-tabs {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
 
-  gap: 42px !important;
+  gap: 34px !important;
 
-  height: 100% !important;
+  height: 100%;
 }
 
 .top-tabs button,
-.tabs button,
-.top-bar button {
+.top-tab {
   position: relative;
 
-  color: rgba(255,255,255,.72);
+  color: rgba(255, 255, 255, 0.75) !important;
 
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 18px !important;
+  font-weight: 500 !important;
 
-  padding: 10px 0;
+  white-space: nowrap;
+
+  padding: 8px 0 !important;
 }
 
 .top-tabs button.active,
-.tabs button.active,
-.top-tabs .active,
-.tabs .active {
+.top-tab.active {
   color: #fff !important;
   font-weight: 700 !important;
 }
 
-/* For You underline */
-
 .top-tabs button.active::after,
-.tabs button.active::after,
-.top-tabs .active::after,
-.tabs .active::after {
+.top-tab.active::after {
   content: "";
 
   position: absolute;
 
   left: 0;
   right: 0;
+  bottom: -4px;
 
-  bottom: -2px;
+  height: 4px;
 
-  height: 5px;
+  border-radius: 4px;
 
   background: #fff;
-
-  border-radius: 8px;
 }
 
 /* =========================================================
@@ -222,15 +245,17 @@ video {
 
 .search-button,
 .search-btn,
-.top-search,
-.search-icon {
-  position: absolute !important;
+.top-search {
+  position: fixed !important;
 
-  top: 20px !important;
+  top: 14px !important;
   right: 14px !important;
 
-  width: 56px !important;
-  height: 56px !important;
+  width: 54px !important;
+  height: 54px !important;
+
+  min-width: 54px !important;
+  min-height: 54px !important;
 
   display: flex !important;
   align-items: center !important;
@@ -238,204 +263,117 @@ video {
 
   border-radius: 50% !important;
 
-  background: rgba(35,35,35,.9) !important;
+  background: rgba(35, 35, 35, 0.9) !important;
 
   color: #fff !important;
 
-  z-index: 120 !important;
+  z-index: 110 !important;
 
-  font-size: 0 !important;
-}
-
-/* Magnifying glass */
-
-.search-button::before,
-.search-btn::before,
-.top-search::before,
-.search-icon::before {
-  content: "";
-
-  width: 26px;
-  height: 26px;
-
-  border: 4px solid #fff;
-
-  border-radius: 50%;
-
-  position: absolute;
-
-  left: 13px;
-  top: 11px;
-}
-
-.search-button::after,
-.search-btn::after,
-.top-search::after,
-.search-icon::after {
-  content: "";
-
-  position: absolute;
-
-  width: 16px;
-  height: 4px;
-
-  background: #fff;
-
-  border-radius: 5px;
-
-  transform: rotate(48deg);
-
-  right: 7px;
-  bottom: 14px;
+  font-size: 30px !important;
 }
 
 /* =========================================================
    VIDEO INFORMATION
    ========================================================= */
 
-.video-info,
-.video-details,
-.caption-area {
+.video-info {
   position: absolute !important;
 
-  left: 24px !important;
-  right: 100px !important;
+  left: 18px !important;
+  right: 90px !important;
 
-  bottom: 104px !important;
+  bottom: 92px !important;
 
-  z-index: 20 !important;
+  z-index: 15 !important;
 
   color: #fff !important;
+
+  text-align: left !important;
 }
 
-/* Username */
-
-.username,
-.video-username,
-.creator-name {
+.video-info .username,
+.username {
   display: flex;
-
   align-items: center;
-
   gap: 7px;
 
+  margin-bottom: 12px;
+
+  font-size: 22px !important;
+  line-height: 1.2;
+
+  font-weight: 700 !important;
+}
+
+.verified {
+  display: inline-flex;
+
+  width: 30px;
+  height: 30px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #20c5ed;
+
   color: #fff;
-
-  font-size: 22px;
-
-  font-weight: 700;
-
-  margin-bottom: 16px;
-}
-
-/* Verification badge */
-
-.verified,
-.verified-badge,
-.verification {
-  width: 30px !important;
-  height: 30px !important;
-
-  min-width: 30px !important;
-
-  display: inline-flex !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  background: #20bde5 !important;
-
-  border-radius: 50% !important;
-
-  color: #fff !important;
-
-  font-size: 18px !important;
-  font-weight: 900 !important;
-}
-
-/* Caption */
-
-.caption,
-.video-caption {
-  color: #fff;
-
-  font-size: 22px;
-
-  line-height: 1.45;
-
-  margin-bottom: 7px;
-}
-
-/* Description */
-
-.description,
-.video-description {
-  color: #fff;
-
-  font-size: 21px;
-
-  line-height: 1.45;
-
-  margin-bottom: 10px;
-}
-
-/* Hashtags */
-
-.hashtags,
-.video-hashtags {
-  color: #20c8f4 !important;
-
-  font-size: 19px;
-
-  line-height: 1.5;
-
-  margin-bottom: 14px;
-}
-
-/* Sound text */
-
-.original-sound,
-.sound-name,
-.video-sound {
-  color: #fff !important;
 
   font-size: 18px;
 
-  line-height: 1.4;
-
-  white-space: nowrap;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 
-.original-sound::before,
-.sound-name::before,
-.video-sound::before {
-  content: "♪";
+.video-info .caption,
+.caption {
+  font-size: 20px !important;
+  line-height: 1.4 !important;
 
-  margin-right: 10px;
+  margin-bottom: 6px;
 
-  color: #fff;
+  color: #fff !important;
+}
+
+.video-info .hashtags,
+.hashtags {
+  color: #25c9f2 !important;
+
+  font-size: 17px !important;
+  line-height: 1.5 !important;
+
+  margin-top: 8px;
+}
+
+.video-info .sound,
+.sound {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 13px;
+
+  color: #fff !important;
+
+  font-size: 16px !important;
+
+  white-space: nowrap;
 }
 
 /* =========================================================
-   RIGHT ACTION COLUMN
+   RIGHT ACTION BUTTONS
    ========================================================= */
 
-.video-actions,
-.action-column,
-.right-actions {
+.video-actions {
   position: absolute !important;
 
   right: 12px !important;
 
-  top: 52% !important;
+  top: 50% !important;
 
-  transform: translateY(-35%) !important;
+  transform: translateY(-12%) !important;
 
-  width: 62px !important;
+  width: 58px !important;
 
   display: flex !important;
 
@@ -445,23 +383,20 @@ video {
 
   justify-content: flex-start !important;
 
-  gap: 17px !important;
+  gap: 13px !important;
 
-  z-index: 40 !important;
+  z-index: 30 !important;
 }
 
 /* Every button */
 
 .video-actions button,
-.action-column button,
-.right-actions button,
+.video-actions .action-button,
 .action-button {
-  position: relative !important;
+  width: 50px !important;
+  min-width: 50px !important;
 
-  width: 54px !important;
-  min-width: 54px !important;
-
-  min-height: 48px !important;
+  min-height: 45px !important;
 
   padding: 0 !important;
   margin: 0 !important;
@@ -478,39 +413,41 @@ video {
 
   background: transparent !important;
 
-  border: none !important;
+  border: 0 !important;
 }
 
-/* Action icons */
+/* Icon */
 
 .video-actions .icon,
-.action-column .icon,
-.right-actions .icon,
 .action-button .icon {
+  display: flex !important;
+
+  align-items: center;
+  justify-content: center;
+
   color: #fff !important;
 
-  font-size: 34px !important;
+  font-size: 30px !important;
 
   line-height: 1 !important;
 
-  display: block;
+  width: 40px;
+  height: 40px;
 }
 
 /* Labels */
 
 .video-actions span,
-.action-column span,
-.right-actions span,
 .action-button span {
   color: #fff !important;
 
-  font-size: 13px !important;
+  font-size: 12px !important;
 
-  line-height: 16px !important;
+  line-height: 15px !important;
 
-  margin-top: 5px !important;
+  margin-top: 3px !important;
 
-  text-align: center !important;
+  text-align: center;
 }
 
 /* =========================================================
@@ -519,11 +456,7 @@ video {
 
 .video-actions .profile,
 .video-actions .avatar,
-.action-column .profile,
-.action-column .avatar,
 .profile-avatar {
-  position: relative !important;
-
   width: 58px !important;
   height: 58px !important;
 
@@ -534,34 +467,30 @@ video {
 
   border: 2px solid #fff !important;
 
-  background: #000 !important;
-
   display: flex !important;
 
   align-items: center !important;
   justify-content: center !important;
 
+  background: #000 !important;
+
   color: #fff !important;
 
-  font-size: 31px !important;
-
-  margin-bottom: -1px !important;
+  font-size: 28px !important;
 }
 
-/* Follow badge */
+/* Plus badge */
 
-.follow-badge,
-.follow-plus,
-.profile-plus {
+.video-actions .follow-badge,
+.follow-badge {
   position: absolute !important;
 
-  right: -5px !important;
-  bottom: -6px !important;
+  right: 0 !important;
 
-  width: 25px !important;
-  height: 25px !important;
+  top: 42px !important;
 
-  min-width: 25px !important;
+  width: 24px !important;
+  height: 24px !important;
 
   border-radius: 50% !important;
 
@@ -570,85 +499,76 @@ video {
   align-items: center !important;
   justify-content: center !important;
 
-  background: #ff174f !important;
-
-  border: 2px solid #fff !important;
+  background: #ff1765 !important;
 
   color: #fff !important;
 
-  font-size: 17px !important;
+  border: 2px solid #fff !important;
+
+  font-size: 16px !important;
 
   font-weight: 700 !important;
 }
 
-/* =========================================================
-   HEART
-   ========================================================= */
+/* Follow text */
 
-.like-icon,
-.heart-icon {
-  font-size: 38px !important;
+.video-actions .follow-text {
+  font-size: 12px !important;
 
-  color: #fff !important;
-
-  line-height: 1 !important;
+  margin-top: 3px !important;
 }
 
 /* =========================================================
-   COMMENT
+   LIKE / COMMENT / SAVE / SHARE
    ========================================================= */
 
-.comment-icon {
+.video-actions .like-icon {
   font-size: 34px !important;
+}
+
+.video-actions .comment-icon {
+  font-size: 32px !important;
+}
+
+.video-actions .save-icon {
+  font-size: 31px !important;
+}
+
+.video-actions .share-icon {
+  font-size: 31px !important;
+
+/* Keep white */
+  color: #fff !important;
+}
+
+/* Counts */
+
+.video-actions .count {
+  font-size: 12px !important;
 
   color: #fff !important;
 
-  line-height: 1 !important;
+  margin-top: 2px !important;
 }
 
 /* =========================================================
-   SAVE
-   ========================================================= */
-
-.save-icon,
-.bookmark-icon {
-  font-size: 34px !important;
-
-  color: #fff !important;
-
-  line-height: 1 !important;
-}
-
-/* =========================================================
-   SHARE
-   ========================================================= */
-
-.share-icon {
-  font-size: 34px !important;
-
-  color: #fff !important;
-
-  line-height: 1 !important;
-}
-
-/* =========================================================
-   MUSIC DISC
+   MUSIC BUTTON
    ========================================================= */
 
 .music-button,
 .sound-button,
-.video-music,
-.music-disc {
+.video-music {
   position: absolute !important;
 
-  right: 11px !important;
+  right: 13px !important;
 
   bottom: 88px !important;
 
-  width: 60px !important;
-  height: 60px !important;
+  width: 58px !important;
+  height: 58px !important;
 
-  min-width: 60px !important;
+  min-width: 58px !important;
+  min-height: 58px !important;
 
   border-radius: 50% !important;
 
@@ -657,53 +577,47 @@ video {
   align-items: center !important;
   justify-content: center !important;
 
-  background:
-    radial-gradient(
-      circle,
-      #111 0%,
-      #111 48%,
-      #222 49%,
-      #222 54%,
-      #111 55%,
-      #111 68%,
-      #292929 69%,
-      #111 72%,
-      #111 100%
-    ) !important;
+  background: #111 !important;
 
-  border: 2px solid rgba(255,255,255,.18) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
 
   color: #fff !important;
 
-  z-index: 45 !important;
+  z-index: 35 !important;
 
-  box-shadow:
-    0 0 0 5px rgba(255,255,255,.03),
-    0 0 0 9px rgba(255,255,255,.03);
+  overflow: visible !important;
 }
 
-/* Music symbol */
+/* Music disc rings */
 
-.music-button::before,
-.sound-button::before,
-.video-music::before,
-.music-disc::before {
-  content: "♪" !important;
+.music-button::after,
+.sound-button::after,
+.video-music::after {
+  content: "";
 
+  position: absolute;
+
+  inset: 5px;
+
+  border-radius: 50%;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  pointer-events: none;
+}
+
+/* Music icon */
+
+.music-button .icon,
+.sound-button .icon,
+.video-music .icon {
   color: #fff !important;
 
-  font-size: 29px !important;
+  font-size: 26px !important;
 
   line-height: 1 !important;
-}
 
-/* Hide unwanted text */
-
-.music-button span,
-.sound-button span,
-.video-music span,
-.music-disc span {
-  display: none !important;
+  z-index: 2;
 }
 
 /* =========================================================
@@ -719,34 +633,30 @@ video {
   right: 0 !important;
   bottom: 0 !important;
 
-  height: 82px !important;
+  width: 100% !important;
 
-  z-index: 90 !important;
+  height: 72px !important;
+
+  padding-bottom: env(safe-area-inset-bottom);
 
   display: grid !important;
 
-  grid-template-columns:
-    1fr
-    1fr
-    1.35fr
-    1fr
-    1fr !important;
+  grid-template-columns: 1fr 1fr 1.2fr 1fr 1fr !important;
 
   align-items: center !important;
 
   background: #000 !important;
 
-  border-top: 1px solid rgba(255,255,255,.12) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
 
-  padding: 4px 4px 7px !important;
+  z-index: 100 !important;
 }
 
 /* Bottom buttons */
 
 .bottom-nav button,
 .bottom-navigation button,
-.nav-bar button,
-.nav-item {
+.nav-bar button {
   height: 72px !important;
 
   display: flex !important;
@@ -754,71 +664,55 @@ video {
   flex-direction: column !important;
 
   align-items: center !important;
+
   justify-content: center !important;
 
-  gap: 5px !important;
+  gap: 3px !important;
 
   color: #fff !important;
 
   background: transparent !important;
+
+  font-size: 13px !important;
 }
 
 /* Bottom icons */
 
 .bottom-nav .icon,
 .bottom-navigation .icon,
-.nav-bar .icon,
-.nav-item .icon {
+.nav-bar .icon {
   color: #fff !important;
 
-  font-size: 31px !important;
+  font-size: 29px !important;
 
   line-height: 1 !important;
 }
 
-/* Bottom labels */
+/* Bottom text */
 
 .bottom-nav span,
 .bottom-navigation span,
-.nav-bar span,
-.nav-item span {
+.nav-bar span {
   color: #fff !important;
 
-  font-size: 14px !important;
-
-  line-height: 18px !important;
+  font-size: 13px !important;
 }
 
 /* =========================================================
-   CENTER CREATE / UPLOAD BUTTON
+   CENTER UPLOAD BUTTON
    ========================================================= */
 
-.create-button,
 .upload-button,
-.create-btn,
+.create-button,
 .plus-button {
   position: relative !important;
 
-  width: 145px !important;
+  width: 94px !important;
+  height: 52px !important;
 
-  height: 60px !important;
+  border-radius: 14px !important;
 
-  min-width: 145px !important;
-
-  margin: 0 auto !important;
-
-  border-radius: 16px !important;
-
-  background:
-    linear-gradient(
-      90deg,
-      #22dce6 0%,
-      #22dce6 13%,
-      #fff 13%,
-      #fff 87%,
-      #ff1760 87%,
-      #ff1760 100%
-    ) !important;
+  background: #fff !important;
 
   color: #000 !important;
 
@@ -827,76 +721,64 @@ video {
   align-items: center !important;
   justify-content: center !important;
 
+  margin: 0 auto !important;
+
   font-size: 34px !important;
 
   font-weight: 400 !important;
 
-  box-shadow: none !important;
+  box-shadow:
+    -7px 0 0 #25dbe7,
+    7px 0 0 #ff1765 !important;
+
+  z-index: 2 !important;
 }
 
-/* Plus */
-
-.create-button::before,
 .upload-button::before,
-.create-btn::before,
+.create-button::before,
 .plus-button::before {
-  content: "+" !important;
+  content: "+";
 
-  color: #000 !important;
+  color: #000;
 
-  font-size: 34px !important;
-
-  font-weight: 400 !important;
+  font-size: 32px;
 }
 
-/* Hide duplicate text */
-
-.create-button span,
+/* Remove duplicate plus if text exists */
 .upload-button span,
-.create-btn span,
+.create-button span,
 .plus-button span {
-  display: none !important;
+  color: transparent !important;
+  font-size: 0 !important;
 }
 
 /* =========================================================
-   UPLOAD / CREATE MODAL
+   UPLOAD / CREATE SCREEN
    ========================================================= */
 
-.upload-modal,
-.create-modal,
-#uploadModal {
+.create-screen,
+.upload-screen {
   position: fixed;
 
   inset: 0;
 
-  z-index: 500;
-
-  display: none;
+  width: 100%;
+  height: 100dvh;
 
   background: #000;
 
-  color: #fff;
+  z-index: 500;
 
   overflow-y: auto;
 }
 
-.upload-modal.active,
-.create-modal.active,
-#uploadModal.active,
-.upload-modal.show,
-.create-modal.show {
-  display: block;
-}
-
-/* Modal header */
-
-.upload-header,
-.create-header {
+.create-header,
+.upload-header {
   position: sticky;
 
   top: 0;
 
-  height: 64px;
+  height: 58px;
 
   display: flex;
 
@@ -904,426 +786,407 @@ video {
 
   justify-content: center;
 
-  border-bottom: 1px solid #222;
-
   background: #000;
 
   z-index: 10;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.upload-header h2,
-.create-header h2 {
+.create-header h1,
+.upload-header h1 {
   margin: 0;
 
   font-size: 20px;
+
+  color: #fff;
 }
 
-.close-button,
-.close-modal {
+.close-button {
   position: absolute;
 
-  left: 15px;
+  left: 16px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
 
   font-size: 28px;
+
+  color: #fff;
 }
 
 /* =========================================================
-   UPLOAD FORM
+   VIDEO PREVIEW
    ========================================================= */
 
-.upload-content,
-.create-content {
-  padding: 18px;
-}
-
-.upload-content video,
-.create-content video,
-.preview-video {
+.video-preview {
   width: 100%;
 
-  max-height: 58vh;
+  background: #000;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+}
+
+.video-preview video {
+  width: 100%;
+
+  max-height: 65vh;
 
   object-fit: contain;
 
-  background: #111;
-
-  border-radius: 12px;
+  background: #000;
 }
 
-.caption-input,
-.hashtag-input,
-.upload-input,
-.create-content textarea,
-.create-content input,
-.create-content select {
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.upload-form,
+.create-form {
+  padding: 15px;
+
+  padding-bottom: 100px;
+}
+
+.upload-form textarea,
+.create-form textarea,
+.caption-input {
   width: 100%;
 
-  margin-top: 15px;
+  min-height: 100px;
 
-  padding: 14px;
+  resize: vertical;
+
+  padding: 12px;
 
   border-radius: 10px;
 
   border: 1px solid #333;
 
-  background: #151515;
+  outline: none;
+
+  background: #111;
 
   color: #fff;
 
   font-size: 16px;
+}
+
+.upload-form input,
+.create-form input {
+  width: 100%;
+
+  padding: 12px;
+
+  margin-top: 10px;
+
+  border-radius: 10px;
+
+  border: 1px solid #333;
 
   outline: none;
-}
 
-/* =========================================================
-   HIDDEN FILE INPUT
-   ========================================================= */
+  background: #111;
 
-input[type="file"] {
   color: #fff;
+
+  font-size: 16px;
+}
+
+.upload-form select,
+.create-form select {
+  width: 100%;
+
+  padding: 12px;
+
+  margin-top: 10px;
+
+  border-radius: 10px;
+
+  border: 1px solid #333;
+
+  background: #111;
+
+  color: #fff;
+
+  font-size: 16px;
 }
 
 /* =========================================================
-   DESKTOP
+   POST BUTTON
    ========================================================= */
 
-@media (min-width: 700px) {
+.post-button {
+  width: 100%;
 
-  .video-card video {
-    object-fit: contain;
-  }
+  height: 50px;
 
-  .video-info {
-    left: 30px !important;
+  margin-top: 15px;
 
-    max-width: 650px;
-  }
+  border-radius: 10px;
 
-  .video-actions {
-    right: 24px !important;
-  }
+  background: #fff;
 
-  .music-button,
-  .sound-button,
-  .video-music,
-  .music-disc {
-    right: 23px !important;
-  }
+  color: #000;
+
+  font-size: 17px;
+
+  font-weight: 700;
+}
+
+.post-button:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
 }
 
 /* =========================================================
-   MOBILE — IMPORTANT
+   RESPONSIVE MOBILE
    ========================================================= */
 
 @media (max-width: 600px) {
 
-  html,
-  body,
-  #app,
-  .app,
-  .zylo-app {
-    width: 100%;
-    height: 100%;
-    min-height: 100vh;
+  .top-bar {
+    height: 64px !important;
   }
 
-  /* TOP */
-
-  .top-bar,
-  .top-nav,
-  .header {
-    height: 70px !important;
-
-    padding-top: 3px !important;
-  }
-
-  .top-tabs,
-  .tabs {
-    gap: 31px !important;
+  .top-tabs {
+    gap: 27px !important;
   }
 
   .top-tabs button,
-  .tabs button,
-  .top-bar button {
-    font-size: 18px !important;
+  .top-tab {
+    font-size: 17px !important;
   }
 
-  .top-tabs button.active::after,
-  .tabs button.active::after,
-  .top-tabs .active::after,
-  .tabs .active::after {
-    height: 4px !important;
-
-    bottom: -1px !important;
-  }
-
-  /* SEARCH — SMALLER */
+  /* Search smaller */
 
   .search-button,
   .search-btn,
-  .top-search,
-  .search-icon {
-    top: 20px !important;
+  .top-search {
+    top: 12px !important;
+    right: 10px !important;
 
-    right: 14px !important;
+    width: 52px !important;
+    height: 52px !important;
 
-    width: 55px !important;
-    height: 55px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+
+    font-size: 28px !important;
   }
 
-  .search-button::before,
-  .search-btn::before,
-  .top-search::before,
-  .search-icon::before {
-    width: 25px;
+  /* Full screen video */
 
-    height: 25px;
-
-    border-width: 4px;
-
-    left: 12px;
-
-    top: 10px;
+  .video-card,
+  .video-card video,
+  .video-player {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
   }
 
-  .search-button::after,
-  .search-btn::after,
-  .top-search::after,
-  .search-icon::after {
-    width: 15px;
-
-    height: 4px;
-
-    right: 7px;
-
-    bottom: 14px;
+  .video-card video {
+    object-fit: cover !important;
   }
 
-  /* RIGHT BUTTONS */
+  /* Right buttons lower */
 
-  .video-actions,
-  .action-column,
-  .right-actions {
+  .video-actions {
     right: 8px !important;
 
-    top: 53% !important;
+    top: 51% !important;
 
-    transform: translateY(-34%) !important;
+    transform: translateY(-8%) !important;
 
-    width: 60px !important;
+    width: 55px !important;
 
-    gap: 13px !important;
+    gap: 10px !important;
   }
 
   .video-actions button,
-  .action-column button,
-  .right-actions button,
+  .video-actions .action-button,
   .action-button {
-    width: 48px !important;
+    width: 46px !important;
+    min-width: 46px !important;
 
-    min-width: 48px !important;
-
-    min-height: 43px !important;
+    min-height: 42px !important;
   }
 
   .video-actions .icon,
-  .action-column .icon,
-  .right-actions .icon,
   .action-button .icon {
-    font-size: 29px !important;
+    width: 36px !important;
+    height: 36px !important;
+
+    font-size: 28px !important;
   }
 
-  .video-actions .like-icon,
-  .heart-icon {
-    font-size: 34px !important;
+  .video-actions .like-icon {
+    font-size: 32px !important;
   }
 
   .video-actions .comment-icon {
     font-size: 30px !important;
   }
 
-  .video-actions .save-icon,
-  .bookmark-icon {
-    font-size: 30px !important;
-  }
-
-  .video-actions .share-icon {
-    font-size: 31px !important;
-  }
-
-  .video-actions span,
-  .action-column span,
-  .right-actions span,
-  .action-button span {
-    font-size: 12px !important;
-
-    line-height: 15px !important;
-
-    margin-top: 3px !important;
-  }
-
-  /* PROFILE */
-
-  .video-actions .profile,
-  .video-actions .avatar,
-  .action-column .profile,
-  .action-column .avatar,
-  .profile-avatar {
-    width: 55px !important;
-
-    height: 55px !important;
-
-    min-width: 55px !important;
-
-    min-height: 55px !important;
-
+  .video-actions .save-icon {
     font-size: 29px !important;
   }
 
-  .follow-badge,
-  .follow-plus,
-  .profile-plus {
-    width: 24px !important;
-
-    height: 24px !important;
-
-    min-width: 24px !important;
-
-    font-size: 16px !important;
+  .video-actions .share-icon {
+    font-size: 29px !important;
   }
 
-  /* VIDEO INFO */
+  .video-actions span,
+  .action-button span {
+    font-size: 11px !important;
 
-  .video-info,
-  .video-details,
-  .caption-area {
-    left: 24px !important;
-
-    right: 88px !important;
-
-    bottom: 94px !important;
+    margin-top: 2px !important;
   }
 
-  .username,
-  .video-username,
-  .creator-name {
-    font-size: 21px !important;
+  /* Profile */
 
-    margin-bottom: 13px !important;
+  .video-actions .profile,
+  .video-actions .avatar,
+  .profile-avatar {
+    width: 54px !important;
+    height: 54px !important;
+
+    min-width: 54px !important;
+    min-height: 54px !important;
+
+    font-size: 26px !important;
   }
 
-  .verified,
-  .verified-badge,
-  .verification {
-    width: 30px !important;
+  .video-actions .follow-badge,
+  .follow-badge {
+    width: 23px !important;
+    height: 23px !important;
 
-    height: 30px !important;
+    top: 39px !important;
 
-    min-width: 30px !important;
+    font-size: 15px !important;
   }
 
-  .caption,
-  .video-caption {
-    font-size: 20px !important;
-  }
-
-  .description,
-  .video-description {
-    font-size: 20px !important;
-  }
-
-  .hashtags,
-  .video-hashtags {
-    font-size: 18px !important;
-  }
-
-  .original-sound,
-  .sound-name,
-  .video-sound {
-    font-size: 17px !important;
-  }
-
-  /* MUSIC BUTTON — FULLY VISIBLE */
+  /* Music */
 
   .music-button,
   .sound-button,
-  .video-music,
-  .music-disc {
+  .video-music {
     right: 9px !important;
 
-    bottom: 91px !important;
+    bottom: 82px !important;
 
-    width: 57px !important;
+    width: 56px !important;
+    height: 56px !important;
 
-    height: 57px !important;
-
-    min-width: 57px !important;
-
-    z-index: 80 !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
   }
 
-  .music-button::before,
-  .sound-button::before,
-  .video-music::before,
-  .music-disc::before {
-    font-size: 27px !important;
+  .music-button .icon,
+  .sound-button .icon,
+  .video-music .icon {
+    font-size: 25px !important;
   }
 
-  /* BOTTOM NAV */
+  /* Video information */
+
+  .video-info {
+    left: 14px !important;
+
+    right: 82px !important;
+
+    bottom: 82px !important;
+  }
+
+  .video-info .username,
+  .username {
+    font-size: 20px !important;
+
+    margin-bottom: 9px;
+  }
+
+  .verified {
+    width: 28px;
+    height: 28px;
+
+    font-size: 17px;
+  }
+
+  .video-info .caption,
+  .caption {
+    font-size: 18px !important;
+  }
+
+  .video-info .hashtags,
+  .hashtags {
+    font-size: 16px !important;
+  }
+
+  .video-info .sound,
+  .sound {
+    font-size: 15px !important;
+  }
+
+  /* Bottom nav */
 
   .bottom-nav,
   .bottom-navigation,
   .nav-bar {
-    height: 82px !important;
+    height: 70px !important;
 
     grid-template-columns:
       1fr
       1fr
-      1.25fr
+      1.15fr
       1fr
       1fr !important;
-
-    padding: 3px 2px 6px !important;
   }
 
   .bottom-nav button,
   .bottom-navigation button,
-  .nav-bar button,
-  .nav-item {
-    height: 72px !important;
-
-    gap: 5px !important;
+  .nav-bar button {
+    height: 70px !important;
   }
 
   .bottom-nav .icon,
   .bottom-navigation .icon,
-  .nav-bar .icon,
-  .nav-item .icon {
-    font-size: 30px !important;
+  .nav-bar .icon {
+    font-size: 28px !important;
   }
 
   .bottom-nav span,
   .bottom-navigation span,
-  .nav-bar span,
-  .nav-item span {
-    font-size: 14px !important;
+  .nav-bar span {
+    font-size: 12px !important;
   }
 
-  /* CREATE BUTTON — SEPARATE FROM INBOX */
+  /* Center plus */
 
-  .create-button,
   .upload-button,
-  .create-btn,
+  .create-button,
   .plus-button {
-    width: 140px !important;
+    width: 82px !important;
 
-    min-width: 140px !important;
+    height: 48px !important;
 
-    height: 58px !important;
+    border-radius: 13px !important;
 
-    border-radius: 15px !important;
+    box-shadow:
+      -6px 0 0 #25dbe7,
+      6px 0 0 #ff1765 !important;
+  }
 
-    margin: 0 auto !important;
+  .upload-button::before,
+  .create-button::before,
+  .plus-button::before {
+    font-size: 30px;
   }
 }
 
@@ -1333,84 +1196,83 @@ input[type="file"] {
 
 @media (max-width: 380px) {
 
-  .top-tabs,
-  .tabs {
-    gap: 22px !important;
+  .top-tabs {
+    gap: 20px !important;
   }
 
   .top-tabs button,
-  .tabs button {
-    font-size: 17px !important;
+  .top-tab {
+    font-size: 15px !important;
+  }
+
+  .search-button,
+  .search-btn,
+  .top-search {
+    width: 48px !important;
+    height: 48px !important;
+
+    min-width: 48px !important;
+    min-height: 48px !important;
   }
 
   .video-actions {
     right: 5px !important;
 
-    gap: 10px !important;
+    gap: 8px !important;
   }
 
   .video-info {
-    left: 17px !important;
-
-    right: 80px !important;
+    left: 11px !important;
+    right: 72px !important;
   }
 
-  .caption,
-  .video-caption {
+  .video-info .username,
+  .username {
     font-size: 18px !important;
   }
 
-  .description,
-  .video-description {
-    font-size: 18px !important;
-  }
-
-  .hashtags {
+  .video-info .caption,
+  .caption {
     font-size: 16px !important;
   }
 
-  .create-button,
-  .upload-button,
-  .create-btn,
-  .plus-button {
-    width: 105px !important;
+  .video-info .hashtags,
+  .hashtags {
+    font-size: 14px !important;
+  }
 
-    min-width: 105px !important;
+  .music-button,
+  .sound-button,
+  .video-music {
+    right: 6px !important;
+    bottom: 78px !important;
+
+    width: 52px !important;
+    height: 52px !important;
+
+    min-width: 52px !important;
+    min-height: 52px !important;
+  }
+
+  .upload-button,
+  .create-button,
+  .plus-button {
+    width: 76px !important;
   }
 }
 
 /* =========================================================
-   SAFETY FIXES
+   SAFE AREA
    ========================================================= */
 
-/* Prevent bottom nav from covering content */
+@supports (padding: max(0px)) {
 
-.video-feed {
-  padding-bottom: 0 !important;
+  .bottom-nav,
+  .bottom-navigation,
+  .nav-bar {
+    padding-bottom: max(
+      env(safe-area-inset-bottom),
+      0px
+    ) !important;
+  }
 }
-
-/* Keep action buttons above everything */
-
-.video-actions,
-.action-column,
-.right-actions {
-  pointer-events: auto !important;
-}
-
-/* Keep bottom navigation separate */
-
-.bottom-nav,
-.bottom-navigation,
-.nav-bar {
-  pointer-events: auto !important;
-}
-
-/* Make uploaded video fill the screen */
-
-.video-card video {
-  object-position: center center;
-}
-
-/* =========================================================
-   END ZYLO CSS
-   ========================================================= */
