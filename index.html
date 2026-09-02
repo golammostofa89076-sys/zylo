@@ -6,15 +6,31 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <title>ZYLO</title>
-
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+<div id="app">
+
+  <!-- TOP BAR -->
+  <header class="top-bar">
+
+    <div class="logo">ZYLO</div>
+
+    <div class="top-tabs">
+      <button>Following</button>
+      <button class="active">For You</button>
+    </div>
+
+    <button class="search-btn">⌕</button>
+
+  </header>
+
+
+  <!-- VIDEO FEED -->
   <main id="feed">
 
-    <!-- VIDEO 1 -->
     <section class="video-item">
 
       <video
@@ -26,69 +42,93 @@
         preload="auto">
       </video>
 
-      <!-- Right buttons -->
+
+      <!-- RIGHT SIDE -->
       <div class="right-buttons">
 
         <button class="action-btn like-btn">
-          ❤️
+          <strong>♥</strong>
           <span>0</span>
         </button>
 
         <button class="action-btn">
-          💬
+          <strong>💬</strong>
           <span>0</span>
         </button>
 
-        <button class="action-btn">
-          ↗️
+        <button class="action-btn save-btn">
+          <strong>🔖</strong>
+          <span>Save</span>
+        </button>
+
+        <button class="action-btn share-btn">
+          <strong>↗</strong>
           <span>Share</span>
+        </button>
+
+        <button class="action-btn music-btn">
+          <strong>♫</strong>
+          <span>Music</span>
         </button>
 
       </div>
 
-      <!-- Bottom information -->
+
+      <!-- VIDEO INFORMATION -->
       <div class="video-info">
 
         <h3>@zylo_creator</h3>
 
-        <p>
-          Welcome to ZYLO 🌍
-        </p>
+        <p>Welcome to ZYLO 🌍</p>
 
-        <p class="music">
-          🎵 Original sound
+        <p class="music-name">
+          ♫ Original sound
         </p>
 
       </div>
 
-      <!-- Play/Pause -->
+
+      <!-- PLAY/PAUSE -->
       <div class="play-icon">▶</div>
 
     </section>
 
-
-    <!-- নিচের ভিডিও যোগ করতে চাইলে একই structure ব্যবহার করবেন -->
-
   </main>
 
 
-  <!-- Bottom navigation -->
+  <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
 
-    <button>⌂<span>Home</span></button>
+    <button>
+      <b>⌂</b>
+      <span>Home</span>
+    </button>
 
-    <button>🔍<span>Discover</span></button>
+    <button>
+      <b>⌕</b>
+      <span>Discover</span>
+    </button>
 
-    <button class="upload-btn">＋</button>
+    <button class="upload-btn">
+      +
+    </button>
 
-    <button>💬<span>Inbox</span></button>
+    <button>
+      <b>💬</b>
+      <span>Inbox</span>
+    </button>
 
-    <button>👤<span>Profile</span></button>
+    <button>
+      <b>●</b>
+      <span>Profile</span>
+    </button>
 
   </nav>
 
+</div>
 
-  <script src="script.js"></script>
+
+<script src="script.js"></script>
 
 </body>
 </html>
