@@ -1,1278 +1,222 @@
-/* =========================================================
-   ZYLO - FULL SCREEN SHORT VIDEO UI
-   Create • Connect • Grow
-   ========================================================= */
-
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
 }
 
 html,
 body {
-  margin: 0;
-  padding: 0;
   width: 100%;
   height: 100%;
-  background: #000;
-  color: #fff;
-  font-family: Arial, Helvetica, sans-serif;
   overflow: hidden;
+  background: #000;
+  font-family: Arial, sans-serif;
 }
 
-body {
-  position: fixed;
-  inset: 0;
-}
-
-button,
-input,
-textarea,
-select {
-  font-family: inherit;
-}
-
-button {
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #fff;
-  cursor: pointer;
-}
-
-/* =========================================================
-   MAIN APP
-   ========================================================= */
-
-#app,
-.app,
-.zylo-app {
-  position: fixed;
-  inset: 0;
+#feed {
   width: 100%;
-  height: 100dvh;
-  min-height: 100dvh;
-  background: #000;
-  overflow: hidden;
-}
-
-/* =========================================================
-   VIDEO FEED
-   ========================================================= */
-
-.video-feed,
-.feed,
-.video-container {
-  position: fixed !important;
-  inset: 0 !important;
-
-  width: 100% !important;
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-
-  background: #000 !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-
+  height: 100vh;
+  overflow-y: scroll;
   scroll-snap-type: y mandatory;
-  -webkit-overflow-scrolling: touch;
-
   scrollbar-width: none;
 }
 
-.video-feed::-webkit-scrollbar,
-.feed::-webkit-scrollbar,
-.video-container::-webkit-scrollbar {
+#feed::-webkit-scrollbar {
   display: none;
 }
 
-/* =========================================================
-   VIDEO CARD
-   ========================================================= */
-
-.video-card {
-  position: relative !important;
-
-  width: 100% !important;
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-
-  flex: 0 0 100dvh;
-
-  background: #000 !important;
-
-  overflow: hidden !important;
-
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-}
-
-/* =========================================================
-   FULL SCREEN VIDEO
-   ========================================================= */
-
-.video-card video,
-.video-player,
-.video-card > video {
-  position: absolute !important;
-
-  top: 0 !important;
-  left: 0 !important;
-
-  width: 100% !important;
-  height: 100% !important;
-
-  min-width: 100% !important;
-  min-height: 100% !important;
-
-  display: block !important;
-
-  background: #000 !important;
-
-  object-fit: cover !important;
-  object-position: center center !important;
-
-  border: 0 !important;
-  outline: 0 !important;
-
-  z-index: 1 !important;
-}
-
-/* =========================================================
-   VIDEO OVERLAY
-   ========================================================= */
-
-.video-card::after {
-  content: "";
-
-  position: absolute;
-  inset: 0;
-
-  pointer-events: none;
-
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.35),
-      transparent 18%,
-      transparent 62%,
-      rgba(0, 0, 0, 0.78) 100%
-    );
-
-  z-index: 2;
-}
-
-/* =========================================================
-   TOP BAR
-   ========================================================= */
-
-.top-bar {
-  position: fixed !important;
-
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-
-  height: 72px !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  z-index: 100 !important;
-
-  padding-top: env(safe-area-inset-top);
-
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.7),
-    transparent
-  ) !important;
-}
-
-/* Tabs */
-
-.top-tabs {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  gap: 34px !important;
-
-  height: 100%;
-}
-
-.top-tabs button,
-.top-tab {
+.video-item {
   position: relative;
-
-  color: rgba(255, 255, 255, 0.75) !important;
-
-  font-size: 18px !important;
-  font-weight: 500 !important;
-
-  white-space: nowrap;
-
-  padding: 8px 0 !important;
+  width: 100%;
+  height: 100vh;
+  scroll-snap-align: start;
+  overflow: hidden;
+  background: #000;
 }
 
-.top-tabs button.active,
-.top-tab.active {
-  color: #fff !important;
-  font-weight: 700 !important;
-}
-
-.top-tabs button.active::after,
-.top-tab.active::after {
-  content: "";
-
+.video {
   position: absolute;
-
-  left: 0;
-  right: 0;
-  bottom: -4px;
-
-  height: 4px;
-
-  border-radius: 4px;
-
-  background: #fff;
-}
-
-/* =========================================================
-   SEARCH BUTTON
-   ========================================================= */
-
-.search-button,
-.search-btn,
-.top-search {
-  position: fixed !important;
-
-  top: 14px !important;
-  right: 14px !important;
-
-  width: 54px !important;
-  height: 54px !important;
-
-  min-width: 54px !important;
-  min-height: 54px !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  border-radius: 50% !important;
-
-  background: rgba(35, 35, 35, 0.9) !important;
-
-  color: #fff !important;
-
-  z-index: 110 !important;
-
-  font-size: 30px !important;
-}
-
-/* =========================================================
-   VIDEO INFORMATION
-   ========================================================= */
-
-.video-info {
-  position: absolute !important;
-
-  left: 18px !important;
-  right: 90px !important;
-
-  bottom: 92px !important;
-
-  z-index: 15 !important;
-
-  color: #fff !important;
-
-  text-align: left !important;
-}
-
-.video-info .username,
-.username {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-
-  margin-bottom: 12px;
-
-  font-size: 22px !important;
-  line-height: 1.2;
-
-  font-weight: 700 !important;
-}
-
-.verified {
-  display: inline-flex;
-
-  width: 30px;
-  height: 30px;
-
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background: #20c5ed;
-
-  color: #fff;
-
-  font-size: 18px;
-
-  flex-shrink: 0;
-}
-
-.video-info .caption,
-.caption {
-  font-size: 20px !important;
-  line-height: 1.4 !important;
-
-  margin-bottom: 6px;
-
-  color: #fff !important;
-}
-
-.video-info .hashtags,
-.hashtags {
-  color: #25c9f2 !important;
-
-  font-size: 17px !important;
-  line-height: 1.5 !important;
-
-  margin-top: 8px;
-}
-
-.video-info .sound,
-.sound {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  margin-top: 13px;
-
-  color: #fff !important;
-
-  font-size: 16px !important;
-
-  white-space: nowrap;
-}
-
-/* =========================================================
-   RIGHT ACTION BUTTONS
-   ========================================================= */
-
-.video-actions {
-  position: absolute !important;
-
-  right: 12px !important;
-
-  top: 50% !important;
-
-  transform: translateY(-12%) !important;
-
-  width: 58px !important;
-
-  display: flex !important;
-
-  flex-direction: column !important;
-
-  align-items: center !important;
-
-  justify-content: flex-start !important;
-
-  gap: 13px !important;
-
-  z-index: 30 !important;
-}
-
-/* Every button */
-
-.video-actions button,
-.video-actions .action-button,
-.action-button {
-  width: 50px !important;
-  min-width: 50px !important;
-
-  min-height: 45px !important;
-
-  padding: 0 !important;
-  margin: 0 !important;
-
-  display: flex !important;
-
-  flex-direction: column !important;
-
-  align-items: center !important;
-
-  justify-content: center !important;
-
-  color: #fff !important;
-
-  background: transparent !important;
-
-  border: 0 !important;
-}
-
-/* Icon */
-
-.video-actions .icon,
-.action-button .icon {
-  display: flex !important;
-
-  align-items: center;
-  justify-content: center;
-
-  color: #fff !important;
-
-  font-size: 30px !important;
-
-  line-height: 1 !important;
-
-  width: 40px;
-  height: 40px;
-}
-
-/* Labels */
-
-.video-actions span,
-.action-button span {
-  color: #fff !important;
-
-  font-size: 12px !important;
-
-  line-height: 15px !important;
-
-  margin-top: 3px !important;
-
-  text-align: center;
-}
-
-/* =========================================================
-   PROFILE BUTTON
-   ========================================================= */
-
-.video-actions .profile,
-.video-actions .avatar,
-.profile-avatar {
-  width: 58px !important;
-  height: 58px !important;
-
-  min-width: 58px !important;
-  min-height: 58px !important;
-
-  border-radius: 50% !important;
-
-  border: 2px solid #fff !important;
-
-  display: flex !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  background: #000 !important;
-
-  color: #fff !important;
-
-  font-size: 28px !important;
-}
-
-/* Plus badge */
-
-.video-actions .follow-badge,
-.follow-badge {
-  position: absolute !important;
-
-  right: 0 !important;
-
-  top: 42px !important;
-
-  width: 24px !important;
-  height: 24px !important;
-
-  border-radius: 50% !important;
-
-  display: flex !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  background: #ff1765 !important;
-
-  color: #fff !important;
-
-  border: 2px solid #fff !important;
-
-  font-size: 16px !important;
-
-  font-weight: 700 !important;
-}
-
-/* Follow text */
-
-.video-actions .follow-text {
-  font-size: 12px !important;
-
-  margin-top: 3px !important;
-}
-
-/* =========================================================
-   LIKE / COMMENT / SAVE / SHARE
-   ========================================================= */
-
-.video-actions .like-icon {
-  font-size: 34px !important;
-}
-
-.video-actions .comment-icon {
-  font-size: 32px !important;
-}
-
-.video-actions .save-icon {
-  font-size: 31px !important;
-}
-
-.video-actions .share-icon {
-  font-size: 31px !important;
-
-/* Keep white */
-  color: #fff !important;
-}
-
-/* Counts */
-
-.video-actions .count {
-  font-size: 12px !important;
-
-  color: #fff !important;
-
-  margin-top: 2px !important;
-}
-
-/* =========================================================
-   MUSIC BUTTON
-   ========================================================= */
-
-.music-button,
-.sound-button,
-.video-music {
-  position: absolute !important;
-
-  right: 13px !important;
-
-  bottom: 88px !important;
-
-  width: 58px !important;
-  height: 58px !important;
-
-  min-width: 58px !important;
-  min-height: 58px !important;
-
-  border-radius: 50% !important;
-
-  display: flex !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  background: #111 !important;
-
-  border: 2px solid rgba(255, 255, 255, 0.3) !important;
-
-  color: #fff !important;
-
-  z-index: 35 !important;
-
-  overflow: visible !important;
-}
-
-/* Music disc rings */
-
-.music-button::after,
-.sound-button::after,
-.video-music::after {
-  content: "";
-
-  position: absolute;
-
-  inset: 5px;
-
-  border-radius: 50%;
-
-  border: 1px solid rgba(255, 255, 255, 0.18);
-
-  pointer-events: none;
-}
-
-/* Music icon */
-
-.music-button .icon,
-.sound-button .icon,
-.video-music .icon {
-  color: #fff !important;
-
-  font-size: 26px !important;
-
-  line-height: 1 !important;
-
-  z-index: 2;
-}
-
-/* =========================================================
-   BOTTOM NAVIGATION
-   ========================================================= */
-
-.bottom-nav,
-.bottom-navigation,
-.nav-bar {
-  position: fixed !important;
-
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-
-  width: 100% !important;
-
-  height: 72px !important;
-
-  padding-bottom: env(safe-area-inset-bottom);
-
-  display: grid !important;
-
-  grid-template-columns: 1fr 1fr 1.2fr 1fr 1fr !important;
-
-  align-items: center !important;
-
-  background: #000 !important;
-
-  border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
-
-  z-index: 100 !important;
-}
-
-/* Bottom buttons */
-
-.bottom-nav button,
-.bottom-navigation button,
-.nav-bar button {
-  height: 72px !important;
-
-  display: flex !important;
-
-  flex-direction: column !important;
-
-  align-items: center !important;
-
-  justify-content: center !important;
-
-  gap: 3px !important;
-
-  color: #fff !important;
-
-  background: transparent !important;
-
-  font-size: 13px !important;
-}
-
-/* Bottom icons */
-
-.bottom-nav .icon,
-.bottom-navigation .icon,
-.nav-bar .icon {
-  color: #fff !important;
-
-  font-size: 29px !important;
-
-  line-height: 1 !important;
-}
-
-/* Bottom text */
-
-.bottom-nav span,
-.bottom-navigation span,
-.nav-bar span {
-  color: #fff !important;
-
-  font-size: 13px !important;
-}
-
-/* =========================================================
-   CENTER UPLOAD BUTTON
-   ========================================================= */
-
-.upload-button,
-.create-button,
-.plus-button {
-  position: relative !important;
-
-  width: 94px !important;
-  height: 52px !important;
-
-  border-radius: 14px !important;
-
-  background: #fff !important;
-
-  color: #000 !important;
-
-  display: flex !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  margin: 0 auto !important;
-
-  font-size: 34px !important;
-
-  font-weight: 400 !important;
-
-  box-shadow:
-    -7px 0 0 #25dbe7,
-    7px 0 0 #ff1765 !important;
-
-  z-index: 2 !important;
-}
-
-.upload-button::before,
-.create-button::before,
-.plus-button::before {
-  content: "+";
-
-  color: #000;
-
-  font-size: 32px;
-}
-
-/* Remove duplicate plus if text exists */
-.upload-button span,
-.create-button span,
-.plus-button span {
-  color: transparent !important;
-  font-size: 0 !important;
-}
-
-/* =========================================================
-   UPLOAD / CREATE SCREEN
-   ========================================================= */
-
-.create-screen,
-.upload-screen {
-  position: fixed;
-
   inset: 0;
 
   width: 100%;
-  height: 100dvh;
+  height: 100%;
+
+  object-fit: cover;
 
   background: #000;
-
-  z-index: 500;
-
-  overflow-y: auto;
 }
 
-.create-header,
-.upload-header {
-  position: sticky;
 
-  top: 0;
+/* Right side buttons */
 
-  height: 58px;
+.right-buttons {
+  position: absolute;
+
+  right: 12px;
+  bottom: 115px;
 
   display: flex;
-
+  flex-direction: column;
   align-items: center;
 
-  justify-content: center;
+  gap: 20px;
 
-  background: #000;
+  z-index: 10;
+}
+
+.action-btn {
+  border: none;
+  background: transparent;
+
+  color: white;
+
+  font-size: 30px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  cursor: pointer;
+
+  text-shadow: 0 1px 4px #000;
+}
+
+.action-btn span {
+  margin-top: 3px;
+
+  font-size: 12px;
+
+  color: white;
+}
+
+
+/* Bottom video information */
+
+.video-info {
+  position: absolute;
+
+  left: 15px;
+  right: 80px;
+  bottom: 85px;
 
   z-index: 10;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+
+  text-shadow: 0 1px 4px #000;
 }
 
-.create-header h1,
-.upload-header h1 {
-  margin: 0;
-
-  font-size: 20px;
-
-  color: #fff;
+.video-info h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
 }
 
-.close-button {
+.video-info p {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.music {
+  font-size: 13px !important;
+}
+
+
+/* Play icon */
+
+.play-icon {
   position: absolute;
 
-  left: 16px;
-
+  left: 50%;
   top: 50%;
 
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
 
-  font-size: 28px;
+  color: white;
 
-  color: #fff;
+  font-size: 60px;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  z-index: 20;
+
+  text-shadow: 0 2px 10px #000;
 }
 
-/* =========================================================
-   VIDEO PREVIEW
-   ========================================================= */
+.play-icon.show {
+  opacity: 1;
+}
 
-.video-preview {
-  width: 100%;
 
-  background: #000;
+/* Bottom navigation */
+
+.bottom-nav {
+  position: fixed;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 62px;
+
+  background: rgba(0, 0, 0, 0.85);
 
   display: flex;
-
-  justify-content: center;
-
   align-items: center;
+  justify-content: space-around;
+
+  z-index: 100;
 }
 
-.video-preview video {
-  width: 100%;
+.bottom-nav button {
+  border: none;
+  background: transparent;
 
-  max-height: 65vh;
+  color: white;
 
-  object-fit: contain;
+  font-size: 22px;
 
-  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  cursor: pointer;
 }
 
-/* =========================================================
-   FORM
-   ========================================================= */
-
-.upload-form,
-.create-form {
-  padding: 15px;
-
-  padding-bottom: 100px;
+.bottom-nav button span {
+  font-size: 10px;
+  margin-top: 3px;
 }
 
-.upload-form textarea,
-.create-form textarea,
-.caption-input {
-  width: 100%;
+.bottom-nav .upload-btn {
+  width: 48px;
+  height: 38px;
 
-  min-height: 100px;
-
-  resize: vertical;
-
-  padding: 12px;
+  background: white;
+  color: black;
 
   border-radius: 10px;
 
-  border: 1px solid #333;
-
-  outline: none;
-
-  background: #111;
-
-  color: #fff;
-
-  font-size: 16px;
+  font-size: 30px;
 }
 
-.upload-form input,
-.create-form input {
-  width: 100%;
 
-  padding: 12px;
-
-  margin-top: 10px;
-
-  border-radius: 10px;
-
-  border: 1px solid #333;
-
-  outline: none;
-
-  background: #111;
-
-  color: #fff;
-
-  font-size: 16px;
-}
-
-.upload-form select,
-.create-form select {
-  width: 100%;
-
-  padding: 12px;
-
-  margin-top: 10px;
-
-  border-radius: 10px;
-
-  border: 1px solid #333;
-
-  background: #111;
-
-  color: #fff;
-
-  font-size: 16px;
-}
-
-/* =========================================================
-   POST BUTTON
-   ========================================================= */
-
-.post-button {
-  width: 100%;
-
-  height: 50px;
-
-  margin-top: 15px;
-
-  border-radius: 10px;
-
-  background: #fff;
-
-  color: #000;
-
-  font-size: 17px;
-
-  font-weight: 700;
-}
-
-.post-button:disabled {
-  opacity: 0.45;
-
-  cursor: not-allowed;
-}
-
-/* =========================================================
-   RESPONSIVE MOBILE
-   ========================================================= */
+/* Mobile */
 
 @media (max-width: 600px) {
 
-  .top-bar {
-    height: 64px !important;
+  .video {
+    object-fit: cover;
   }
 
-  .top-tabs {
-    gap: 27px !important;
-  }
-
-  .top-tabs button,
-  .top-tab {
-    font-size: 17px !important;
-  }
-
-  /* Search smaller */
-
-  .search-button,
-  .search-btn,
-  .top-search {
-    top: 12px !important;
-    right: 10px !important;
-
-    width: 52px !important;
-    height: 52px !important;
-
-    min-width: 52px !important;
-    min-height: 52px !important;
-
-    font-size: 28px !important;
-  }
-
-  /* Full screen video */
-
-  .video-card,
-  .video-card video,
-  .video-player {
-    width: 100% !important;
-    height: 100dvh !important;
-    min-height: 100dvh !important;
-  }
-
-  .video-card video {
-    object-fit: cover !important;
-  }
-
-  /* Right buttons lower */
-
-  .video-actions {
-    right: 8px !important;
-
-    top: 51% !important;
-
-    transform: translateY(-8%) !important;
-
-    width: 55px !important;
-
-    gap: 10px !important;
-  }
-
-  .video-actions button,
-  .video-actions .action-button,
-  .action-button {
-    width: 46px !important;
-    min-width: 46px !important;
-
-    min-height: 42px !important;
-  }
-
-  .video-actions .icon,
-  .action-button .icon {
-    width: 36px !important;
-    height: 36px !important;
-
-    font-size: 28px !important;
-  }
-
-  .video-actions .like-icon {
-    font-size: 32px !important;
-  }
-
-  .video-actions .comment-icon {
-    font-size: 30px !important;
-  }
-
-  .video-actions .save-icon {
-    font-size: 29px !important;
-  }
-
-  .video-actions .share-icon {
-    font-size: 29px !important;
-  }
-
-  .video-actions span,
-  .action-button span {
-    font-size: 11px !important;
-
-    margin-top: 2px !important;
-  }
-
-  /* Profile */
-
-  .video-actions .profile,
-  .video-actions .avatar,
-  .profile-avatar {
-    width: 54px !important;
-    height: 54px !important;
-
-    min-width: 54px !important;
-    min-height: 54px !important;
-
-    font-size: 26px !important;
-  }
-
-  .video-actions .follow-badge,
-  .follow-badge {
-    width: 23px !important;
-    height: 23px !important;
-
-    top: 39px !important;
-
-    font-size: 15px !important;
-  }
-
-  /* Music */
-
-  .music-button,
-  .sound-button,
-  .video-music {
-    right: 9px !important;
-
-    bottom: 82px !important;
-
-    width: 56px !important;
-    height: 56px !important;
-
-    min-width: 56px !important;
-    min-height: 56px !important;
-  }
-
-  .music-button .icon,
-  .sound-button .icon,
-  .video-music .icon {
-    font-size: 25px !important;
-  }
-
-  /* Video information */
-
-  .video-info {
-    left: 14px !important;
-
-    right: 82px !important;
-
-    bottom: 82px !important;
-  }
-
-  .video-info .username,
-  .username {
-    font-size: 20px !important;
-
-    margin-bottom: 9px;
-  }
-
-  .verified {
-    width: 28px;
-    height: 28px;
-
-    font-size: 17px;
-  }
-
-  .video-info .caption,
-  .caption {
-    font-size: 18px !important;
-  }
-
-  .video-info .hashtags,
-  .hashtags {
-    font-size: 16px !important;
-  }
-
-  .video-info .sound,
-  .sound {
-    font-size: 15px !important;
-  }
-
-  /* Bottom nav */
-
-  .bottom-nav,
-  .bottom-navigation,
-  .nav-bar {
-    height: 70px !important;
-
-    grid-template-columns:
-      1fr
-      1fr
-      1.15fr
-      1fr
-      1fr !important;
-  }
-
-  .bottom-nav button,
-  .bottom-navigation button,
-  .nav-bar button {
-    height: 70px !important;
-  }
-
-  .bottom-nav .icon,
-  .bottom-navigation .icon,
-  .nav-bar .icon {
-    font-size: 28px !important;
-  }
-
-  .bottom-nav span,
-  .bottom-navigation span,
-  .nav-bar span {
-    font-size: 12px !important;
-  }
-
-  /* Center plus */
-
-  .upload-button,
-  .create-button,
-  .plus-button {
-    width: 82px !important;
-
-    height: 48px !important;
-
-    border-radius: 13px !important;
-
-    box-shadow:
-      -6px 0 0 #25dbe7,
-      6px 0 0 #ff1765 !important;
-  }
-
-  .upload-button::before,
-  .create-button::before,
-  .plus-button::before {
-    font-size: 30px;
-  }
-}
-
-/* =========================================================
-   VERY SMALL PHONES
-   ========================================================= */
-
-@media (max-width: 380px) {
-
-  .top-tabs {
-    gap: 20px !important;
-  }
-
-  .top-tabs button,
-  .top-tab {
-    font-size: 15px !important;
-  }
-
-  .search-button,
-  .search-btn,
-  .top-search {
-    width: 48px !important;
-    height: 48px !important;
-
-    min-width: 48px !important;
-    min-height: 48px !important;
-  }
-
-  .video-actions {
-    right: 5px !important;
-
-    gap: 8px !important;
+  .right-buttons {
+    right: 10px;
+    bottom: 120px;
   }
 
   .video-info {
-    left: 11px !important;
-    right: 72px !important;
+    bottom: 80px;
   }
 
-  .video-info .username,
-  .username {
-    font-size: 18px !important;
-  }
-
-  .video-info .caption,
-  .caption {
-    font-size: 16px !important;
-  }
-
-  .video-info .hashtags,
-  .hashtags {
-    font-size: 14px !important;
-  }
-
-  .music-button,
-  .sound-button,
-  .video-music {
-    right: 6px !important;
-    bottom: 78px !important;
-
-    width: 52px !important;
-    height: 52px !important;
-
-    min-width: 52px !important;
-    min-height: 52px !important;
-  }
-
-  .upload-button,
-  .create-button,
-  .plus-button {
-    width: 76px !important;
-  }
-}
-
-/* =========================================================
-   SAFE AREA
-   ========================================================= */
-
-@supports (padding: max(0px)) {
-
-  .bottom-nav,
-  .bottom-navigation,
-  .nav-bar {
-    padding-bottom: max(
-      env(safe-area-inset-bottom),
-      0px
-    ) !important;
-  }
 }
