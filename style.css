@@ -1020,3 +1020,14 @@ button {
     height: 56px !important;
   }
 }
+
+/* ZYLO - final right controls alignment */
+
+.video-actions {
+  top: 39% !important;
+  gap: 9px !important;
+}
+
+.music-disc {
+  bottom: 92px !important;
+}
