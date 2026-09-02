@@ -15,13 +15,16 @@ body {
 
 body {
   height: 100dvh;
+  touch-action: manipulation;
 }
 
 #app {
-  position: relative;
+  position: fixed;
+  inset: 0;
   width: 100%;
   height: 100dvh;
   overflow: hidden;
+  background: #000;
 }
 
 
@@ -34,6 +37,7 @@ body {
   height: 100dvh;
 
   overflow-y: scroll;
+  overflow-x: hidden;
 
   scroll-snap-type: y mandatory;
 
@@ -44,12 +48,12 @@ body {
   display: none;
 }
 
+
 .video-item {
   position: relative;
 
   width: 100%;
   height: 100dvh;
-
   min-height: 100dvh;
 
   overflow: hidden;
@@ -60,13 +64,14 @@ body {
 }
 
 
-/* VIDEO */
+/* =========================
+   VIDEO
+========================= */
 
 .video {
   position: absolute;
 
-  top: 0;
-  left: 0;
+  inset: 0;
 
   width: 100%;
   height: 100%;
@@ -74,6 +79,8 @@ body {
   object-fit: cover;
 
   background: #000;
+
+  display: block;
 }
 
 
@@ -88,123 +95,133 @@ body {
   left: 0;
   right: 0;
 
-  height: 70px;
+  height: 72px;
+
+  padding-top: env(safe-area-inset-top);
 
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
-  padding: 12px 15px;
+  padding-left: 16px;
+  padding-right: 16px;
 
-  z-index: 50;
+  z-index: 100;
 
   color: white;
 
   background: linear-gradient(
     to bottom,
-    rgba(0,0,0,.65),
+    rgba(0,0,0,.75),
     rgba(0,0,0,0)
   );
 }
 
+
 .logo {
-  font-size: 23px;
-
-  font-weight: 800;
-
+  font-size: 24px;
+  font-weight: 900;
   letter-spacing: 1px;
 
   width: 70px;
+
+  text-shadow: 0 2px 6px #000;
 }
+
 
 .top-tabs {
   display: flex;
-
   align-items: center;
 
-  gap: 18px;
-
-  height: 100%;
+  gap: 22px;
 }
+
 
 .top-tabs button {
   border: none;
+  outline: none;
 
   background: transparent;
 
   color: rgba(255,255,255,.7);
 
   font-size: 15px;
-
   font-weight: 600;
 
-  padding: 8px 2px;
+  padding: 10px 2px;
 }
+
 
 .top-tabs button.active {
-  color: white;
+  color: #fff;
 
-  border-bottom: 2px solid white;
+  border-bottom: 2px solid #fff;
 }
 
-.search-btn {
-  width: 40px;
 
+.search-btn {
   border: none;
+  outline: none;
+
+  width: 42px;
+  height: 42px;
 
   background: transparent;
 
-  color: white;
+  color: #fff;
 
   font-size: 30px;
 }
 
 
 /* =========================
-   RIGHT BUTTONS
+   RIGHT SIDE
 ========================= */
 
 .right-buttons {
   position: absolute;
 
-  right: 10px;
+  right: 9px;
 
   bottom: 105px;
 
-  z-index: 20;
+  z-index: 50;
 
   display: flex;
-
   flex-direction: column;
 
   align-items: center;
 
-  gap: 18px;
+  gap: 17px;
 }
+
 
 .action-btn {
   border: none;
+  outline: none;
 
   background: transparent;
 
   color: white;
 
-  display: flex;
+  width: 58px;
+  min-height: 52px;
 
+  display: flex;
   flex-direction: column;
 
   align-items: center;
-
   justify-content: center;
-
-  min-width: 55px;
 
   cursor: pointer;
 
-  text-shadow: 0 2px 6px black;
+  text-shadow:
+    0 2px 5px #000,
+    0 0 5px #000;
+
+  -webkit-tap-highlight-color: transparent;
 }
+
 
 .action-btn strong {
   font-size: 30px;
@@ -212,23 +229,20 @@ body {
   line-height: 34px;
 }
 
+
 .action-btn span {
-  margin-top: 3px;
+  margin-top: 2px;
 
   font-size: 12px;
 
-  font-weight: 500;
+  font-weight: 600;
 }
 
-
-/* LIKE */
 
 .like-btn.liked strong {
   color: red;
 }
 
-
-/* SAVE */
 
 .save-btn.saved strong {
   color: gold;
@@ -243,17 +257,19 @@ body {
   position: absolute;
 
   left: 15px;
+  right: 85px;
 
-  right: 80px;
+  bottom: 80px;
 
-  bottom: 82px;
-
-  z-index: 20;
+  z-index: 40;
 
   color: white;
 
-  text-shadow: 0 2px 5px black;
+  text-shadow:
+    0 2px 5px #000,
+    0 0 5px #000;
 }
+
 
 .video-info h3 {
   font-size: 18px;
@@ -261,11 +277,13 @@ body {
   margin-bottom: 8px;
 }
 
+
 .video-info p {
   font-size: 15px;
 
   margin-bottom: 7px;
 }
+
 
 .music-name {
   font-size: 13px !important;
@@ -290,17 +308,52 @@ body {
 
   opacity: 0;
 
-  z-index: 30;
+  z-index: 60;
 
   pointer-events: none;
 
-  text-shadow: 0 2px 10px black;
+  text-shadow: 0 2px 10px #000;
 
   transition: opacity .2s;
 }
 
+
 .play-icon.show {
   opacity: 1;
+}
+
+
+/* =========================
+   FULLSCREEN BUTTON
+========================= */
+
+.fullscreen-btn {
+  position: absolute;
+
+  right: 15px;
+  bottom: 245px;
+
+  z-index: 60;
+
+  width: 45px;
+  height: 45px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(0,0,0,.35);
+
+  color: white;
+
+  font-size: 27px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-shadow: 0 2px 5px #000;
+
+  -webkit-tap-highlight-color: transparent;
 }
 
 
@@ -315,42 +368,44 @@ body {
   right: 0;
   bottom: 0;
 
-  height: 65px;
+  height: 68px;
+
+  padding-bottom: env(safe-area-inset-bottom);
 
   z-index: 100;
 
   display: flex;
-
   align-items: center;
-
   justify-content: space-around;
 
   background: rgba(0,0,0,.82);
 
-  backdrop-filter: blur(5px);
-
-  padding-bottom: 3px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
+
 
 .bottom-nav button {
   border: none;
+  outline: none;
 
   background: transparent;
 
   color: white;
 
-  min-width: 55px;
+  min-width: 58px;
 
   display: flex;
-
   flex-direction: column;
 
   align-items: center;
-
   justify-content: center;
 
   gap: 2px;
+
+  -webkit-tap-highlight-color: transparent;
 }
+
 
 .bottom-nav button b {
   font-size: 23px;
@@ -358,19 +413,21 @@ body {
   line-height: 25px;
 }
 
+
 .bottom-nav button span {
   font-size: 10px;
 }
 
 
-/* UPLOAD BUTTON */
+/* =========================
+   UPLOAD
+========================= */
 
 .upload-btn {
-  width: 52px !important;
+  width: 54px !important;
+  height: 42px !important;
 
-  height: 40px !important;
-
-  min-width: 52px !important;
+  min-width: 54px !important;
 
   background: white !important;
 
@@ -378,26 +435,37 @@ body {
 
   border-radius: 10px !important;
 
-  font-size: 34px !important;
+  font-size: 35px !important;
 
-  line-height: 34px;
+  line-height: 35px;
+
+  box-shadow: 0 0 8px rgba(255,255,255,.35);
 }
 
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 600px) {
 
   .top-bar {
-    height: 65px;
+    height: 68px;
   }
 
   .right-buttons {
-    bottom: 105px;
+    right: 7px;
+    bottom: 108px;
   }
 
   .video-info {
-    bottom: 75px;
+    left: 14px;
+    bottom: 82px;
+  }
+
+  .fullscreen-btn {
+    right: 12px;
+    bottom: 255px;
   }
 
 }
