@@ -17,7 +17,7 @@
 
 <div id="app">
 
-  <!-- TOP -->
+  <!-- TOP BAR -->
   <header class="top-bar">
 
     <div class="logo">ZYLO</div>
@@ -32,16 +32,15 @@
   </header>
 
 
-  <!-- VIDEO -->
+  <!-- VIDEO FEED -->
   <main id="feed">
 
     <section class="video-item">
 
-      <!-- IMPORTANT:
-           Raw GitHub URL ব্যবহার করা হয়নি -->
+      <!-- VIDEO -->
       <video
         class="video"
-        src="/backend/uploads/video1.mp4"
+        src="./backend/uploads/video1.mp4"
         loop
         muted
         playsinline
@@ -50,7 +49,7 @@
       </video>
 
 
-      <!-- RIGHT BUTTONS -->
+      <!-- RIGHT SIDE BUTTONS -->
 
       <div class="right-buttons">
 
@@ -82,6 +81,14 @@
       </div>
 
 
+      <!-- FULLSCREEN BUTTON -->
+      <!-- আলাদা জায়গায় রাখা হয়েছে -->
+
+      <button class="fullscreen-btn">
+        ⛶
+      </button>
+
+
       <!-- VIDEO INFO -->
 
       <div class="video-info">
@@ -97,14 +104,9 @@
       </div>
 
 
-      <!-- PLAY -->
+      <!-- PLAY / PAUSE -->
 
       <div class="play-icon">▶</div>
-
-
-      <!-- FULLSCREEN -->
-
-      <button class="fullscreen-btn">⛶</button>
 
     </section>
 
@@ -125,7 +127,9 @@
       <span>Discover</span>
     </button>
 
-    <button class="upload-btn">+</button>
+    <button class="upload-btn">
+      +
+    </button>
 
     <button>
       <b>💬</b>
@@ -140,7 +144,6 @@
   </nav>
 
 </div>
-
 
 <script src="script.js"></script>
 
