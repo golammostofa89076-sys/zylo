@@ -829,3 +829,194 @@ button {
     bottom: 78px;
   }
 }
+/* =========================================
+   ZYLO - TikTok Style Right Action Buttons
+   ========================================= */
+
+.video-card {
+  position: relative;
+}
+
+/* Right action column */
+.video-actions {
+  position: absolute !important;
+  right: 14px !important;
+  top: 50% !important;
+  transform: translateY(-25%) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  width: 62px !important;
+  gap: 15px !important;
+
+  z-index: 20 !important;
+}
+
+/* Every action */
+.video-actions button,
+.action-button {
+  width: 52px !important;
+  min-width: 52px !important;
+  height: auto !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  color: #fff !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Icons */
+.video-actions .icon,
+.action-button .icon {
+  font-size: 32px !important;
+  line-height: 1 !important;
+}
+
+/* Small white labels */
+.video-actions span,
+.action-button span {
+  color: #fff !important;
+  font-size: 13px !important;
+  line-height: 16px !important;
+  margin-top: 5px !important;
+}
+
+/* Profile */
+.video-actions .profile,
+.video-actions .avatar {
+  width: 58px !important;
+  height: 58px !important;
+  border-radius: 50% !important;
+}
+
+/* Follow plus badge */
+.video-actions .follow-badge {
+  width: 25px !important;
+  height: 25px !important;
+  font-size: 17px !important;
+}
+
+/* Like */
+.video-actions .like-icon {
+  font-size: 38px !important;
+}
+
+/* Comment */
+.video-actions .comment-icon {
+  font-size: 34px !important;
+}
+
+/* Save */
+.video-actions .save-icon {
+  font-size: 34px !important;
+}
+
+/* Share */
+.video-actions .share-icon {
+  font-size: 34px !important;
+}
+
+/* =========================================
+   MUSIC BUTTON
+   Directly above Profile in bottom nav
+   ========================================= */
+
+.music-button,
+.sound-button,
+.video-music {
+  position: absolute !important;
+
+  right: 14px !important;
+  bottom: 82px !important;
+
+  width: 58px !important;
+  height: 58px !important;
+
+  border-radius: 50% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: #111 !important;
+  border: 2px solid rgba(255,255,255,.28) !important;
+
+  color: #fff !important;
+
+  z-index: 25 !important;
+}
+
+/* Music icon */
+.music-button::before,
+.sound-button::before,
+.video-music::before {
+  color: #fff !important;
+  font-size: 25px !important;
+}
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+  .video-actions {
+    right: 10px !important;
+    top: 51% !important;
+    transform: translateY(-20%) !important;
+
+    width: 58px !important;
+    gap: 12px !important;
+  }
+
+  .video-actions button,
+  .action-button {
+    width: 48px !important;
+    min-width: 48px !important;
+  }
+
+  .video-actions .icon,
+  .action-button .icon {
+    font-size: 29px !important;
+  }
+
+  .video-actions .like-icon {
+    font-size: 34px !important;
+  }
+
+  .video-actions .comment-icon,
+  .video-actions .save-icon,
+  .video-actions .share-icon {
+    font-size: 30px !important;
+  }
+
+  .video-actions span,
+  .action-button span {
+    font-size: 12px !important;
+    margin-top: 4px !important;
+  }
+
+  .video-actions .profile,
+  .video-actions .avatar {
+    width: 54px !important;
+    height: 54px !important;
+  }
+
+  .music-button,
+  .sound-button,
+  .video-music {
+    right: 10px !important;
+    bottom: 78px !important;
+    width: 56px !important;
+    height: 56px !important;
+  }
+}
