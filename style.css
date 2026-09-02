@@ -1,6 +1,7 @@
-/* ================================
-   ZYLO - TikTok Style Video UI
-   ================================ */
+/* =========================================
+   ZYLO — TikTok Style Short Video UI
+   Create • Connect • Grow
+========================================= */
 
 * {
   box-sizing: border-box;
@@ -19,45 +20,55 @@ body {
   overflow: hidden;
 }
 
+body {
+  position: relative;
+}
+
 button {
   border: 0;
   outline: 0;
-  background: none;
+  background: transparent;
   color: #fff;
+  cursor: pointer;
 }
 
-/* ================================
+/* =========================================
    TOP BAR
-   ================================ */
+========================================= */
 
 .top-bar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 72px;
-  z-index: 100;
+  height: 76px;
+  z-index: 1000;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   background: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.65),
-    transparent
+    rgba(0, 0, 0, 0)
   );
 }
 
 .top-bar .tabs {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 34px;
 }
 
 .top-bar .tab {
   position: relative;
-  font-size: 17px;
-  color: rgba(255, 255, 255, 0.7);
   padding: 8px 0;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 17px;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
 .top-bar .tab.active {
@@ -70,55 +81,48 @@ button {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -5px;
+  bottom: -6px;
   height: 3px;
   border-radius: 3px;
   background: #fff;
 }
+
+/* Search */
 
 .search-button {
   position: absolute;
   right: 18px;
-  top: 17px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(30, 30, 30, 0.72);
+  top: 18px;
+
+  width: 48px;
+  height: 48px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-}
 
-.search-button::before {
-  content: "";
-  width: 20px;
-  height: 20px;
-  border: 3px solid #fff;
   border-radius: 50%;
+  background: rgba(30, 30, 30, 0.85);
+  color: #fff;
+  font-size: 30px;
 }
 
-.search-button::after {
-  content: "";
-  position: absolute;
-  width: 11px;
-  height: 3px;
-  background: #fff;
-  transform: rotate(45deg);
-  right: 8px;
-  bottom: 10px;
-  border-radius: 3px;
-}
-
-/* ================================
+/* =========================================
    VIDEO FEED
-   ================================ */
+========================================= */
 
 .video-feed {
+  position: fixed;
+  inset: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
+
   overflow-y: auto;
+  overflow-x: hidden;
+
   scroll-snap-type: y mandatory;
   scrollbar-width: none;
+
   background: #000;
 }
 
@@ -130,8 +134,12 @@ button {
   position: relative;
   width: 100%;
   height: 100vh;
+
   min-height: 100vh;
+
   scroll-snap-align: start;
+  scroll-snap-stop: always;
+
   overflow: hidden;
   background: #000;
 }
@@ -139,37 +147,113 @@ button {
 .video {
   position: absolute;
   inset: 0;
+
   width: 100%;
   height: 100%;
+
   object-fit: cover;
+  background: #000;
 }
 
-/* ================================
-   RIGHT SIDE ACTIONS
-   ================================ */
+/* Dark gradient */
+
+.video-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.25) 0%,
+      rgba(0, 0, 0, 0) 22%,
+      rgba(0, 0, 0, 0) 60%,
+      rgba(0, 0, 0, 0.75) 100%
+    );
+}
+
+/* =========================================
+   VIDEO INFORMATION
+========================================= */
+
+.video-info {
+  position: absolute;
+
+  left: 18px;
+  right: 105px;
+  bottom: 108px;
+
+  z-index: 20;
+
+  color: #fff;
+}
+
+.username {
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.caption {
+  font-size: 17px;
+  line-height: 1.45;
+  margin-bottom: 7px;
+}
+
+.music {
+  font-size: 16px;
+  line-height: 1.4;
+  margin-top: 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Hashtags */
+
+.hashtags {
+  color: #18d9ff;
+  font-size: 16px;
+  line-height: 1.45;
+  margin-top: 8px;
+}
+
+/* =========================================
+   RIGHT SIDE ACTION BUTTONS
+   ছোট + সাদা + নিচের দিকে
+========================================= */
 
 .video-actions {
   position: absolute;
-  right: 12px;
 
-  /* নিচের দিকে নামানো */
-  bottom: 135px;
+  right: 13px;
+  bottom: 245px;
 
-  width: 58px;
+  z-index: 50;
+
+  width: 64px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  gap: 18px;
+  gap: 17px;
 
-  z-index: 30;
+  color: #fff;
 }
 
-/* প্রতিটি action */
+/* Each action */
+
 .action-button {
-  width: 52px;
-  min-height: 54px;
+  width: 58px;
+  min-height: 52px;
 
   display: flex;
   flex-direction: column;
@@ -177,42 +261,44 @@ button {
   justify-content: center;
 
   color: #fff;
-  cursor: pointer;
+  text-align: center;
 
-  font-size: 12px;
-  font-weight: 400;
-
-  padding: 0;
+  font-size: 13px;
+  line-height: 1.1;
 }
 
-/* আইকন */
+/* ICON */
+
 .action-icon {
-  width: 34px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   color: #fff;
-  font-size: 31px;
+  fill: #fff;
+  stroke: #fff;
+
+  font-size: 34px;
   line-height: 1;
-
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
 }
 
-/* সংখ্যা / লেখা */
+/* Count / label */
+
 .action-count {
-  margin-top: 4px;
+  margin-top: 5px;
+
   color: #fff;
+
   font-size: 13px;
-  line-height: 16px;
-  text-align: center;
+  line-height: 1;
 }
 
-/* ================================
-   PROFILE BUTTON
-   ================================ */
+/* =========================================
+   PROFILE / FOLLOW BUTTON
+========================================= */
 
 .profile-action {
   margin-bottom: 2px;
@@ -221,138 +307,148 @@ button {
 .profile-avatar {
   position: relative;
 
-  width: 48px;
-  height: 48px;
-
-  border-radius: 50%;
+  width: 54px;
+  height: 54px;
 
   border: 2px solid #fff;
-
-  background: #222;
+  border-radius: 50%;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  overflow: visible;
+  color: #fff;
+  background: #222;
 
-  font-size: 24px;
+  font-size: 28px;
 }
 
-.profile-follow-plus {
+.follow-plus {
   position: absolute;
 
-  right: -5px;
-  bottom: -5px;
+  right: -4px;
+  bottom: -7px;
 
-  width: 21px;
-  height: 21px;
+  width: 24px;
+  height: 24px;
 
   border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   background: #fe2c55;
   color: #fff;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 20px;
+  font-weight: 700;
 
   border: 2px solid #000;
 }
 
 .follow-text {
-  margin-top: 5px;
+  margin-top: 7px;
+
+  color: #fff;
   font-size: 13px;
 }
 
-/* ================================
-   LIKE
-   ================================ */
+/* =========================================
+   HEART
+========================================= */
 
 .like-icon {
-  font-size: 34px;
+  font-size: 40px;
+  color: #fff;
+  line-height: 1;
 }
 
-.like-button.liked .like-icon {
+.like-icon.liked {
   color: #fe2c55;
 }
 
-/* ================================
+/* =========================================
    COMMENT
-   ================================ */
+========================================= */
 
 .comment-icon {
-  font-size: 31px;
+  font-size: 38px;
+  color: #fff;
+  line-height: 1;
 }
 
-/* ================================
+/* =========================================
    SAVE
-   ================================ */
+========================================= */
 
 .save-icon {
-  font-size: 31px;
-}
-
-.save-button.saved .save-icon {
+  font-size: 38px;
   color: #fff;
+  line-height: 1;
 }
 
-/* ================================
+/* =========================================
    SHARE
-   ================================ */
+========================================= */
 
 .share-icon {
-  font-size: 31px;
+  font-size: 38px;
+  color: #fff;
+  line-height: 1;
 }
 
-/* ================================
+/* =========================================
    MUSIC DISC
-   ================================ */
-
-.music-action {
-  margin-top: 2px;
-}
-
-/*
-   Music button একদম নিচে,
-   Profile বাটনের মাথার কাছে নয়।
-   Bottom navigation-এর একটু উপরে থাকবে।
-*/
+   Profile-এর ঠিক মাথার কাছাকাছি
+========================================= */
 
 .music-disc {
-  width: 50px;
-  height: 50px;
+  position: fixed;
+
+  right: 15px;
+  bottom: 93px;
+
+  z-index: 80;
+
+  width: 58px;
+  height: 58px;
 
   border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      #111 0 35%,
-      #252525 36% 50%,
-      #111 51% 62%,
-      #333 63% 66%,
-      #111 67%
-    );
-
-  border: 2px solid #333;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  color: #fff;
+  background: #111;
 
-  font-size: 25px;
+  border: 2px solid #555;
 
   box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.05),
-    0 0 0 6px rgba(255, 255, 255, 0.03);
+    0 0 0 4px rgba(255, 255, 255, 0.08),
+    0 0 0 8px rgba(255, 255, 255, 0.03);
 
-  animation: musicRotate 6s linear infinite;
+  color: #fff;
+
+  animation: musicRotate 7s linear infinite;
+}
+
+.music-disc::before {
+  content: "";
+
+  position: absolute;
+  inset: 5px;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+.music-disc span {
+  position: relative;
+  z-index: 2;
+
+  font-size: 25px;
+  color: #fff;
 }
 
 @keyframes musicRotate {
@@ -365,77 +461,9 @@ button {
   }
 }
 
-.music-disc span {
-  animation: musicCounterRotate 6s linear infinite;
-}
-
-@keyframes musicCounterRotate {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(-360deg);
-  }
-}
-
-/* ================================
-   VIDEO INFORMATION
-   ================================ */
-
-.video-info {
-  position: absolute;
-
-  left: 18px;
-  right: 85px;
-
-  bottom: 112px;
-
-  z-index: 20;
-
-  color: #fff;
-
-  text-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.9),
-    0 2px 5px rgba(0, 0, 0, 0.6);
-}
-
-.username {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.caption {
-  font-size: 16px;
-  line-height: 1.5;
-  margin-bottom: 6px;
-}
-
-.hashtags {
-  color: #fff;
-  font-size: 15px;
-  line-height: 1.5;
-  margin-top: 3px;
-}
-
-.music {
-  margin-top: 10px;
-
-  font-size: 14px;
-
-  display: flex;
-  align-items: center;
-  gap: 7px;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ================================
+/* =========================================
    BOTTOM NAVIGATION
-   ================================ */
+========================================= */
 
 .bottom-nav {
   position: fixed;
@@ -444,22 +472,25 @@ button {
   right: 0;
   bottom: 0;
 
-  height: 76px;
+  height: 78px;
 
-  z-index: 90;
+  z-index: 500;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 
   background: #000;
 
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
+  padding-bottom: env(safe-area-inset-bottom);
 }
+
+/* Nav button */
 
 .nav-button {
   width: 20%;
-
   height: 70px;
 
   display: flex;
@@ -467,69 +498,287 @@ button {
   align-items: center;
   justify-content: center;
 
-  gap: 4px;
-
   color: #fff;
-
-  font-size: 12px;
 }
 
 .nav-icon {
-  font-size: 25px;
-  line-height: 1;
-}
+  width: 30px;
+  height: 30px;
 
-.nav-button.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   color: #fff;
+  fill: #fff;
+  stroke: #fff;
+
+  font-size: 28px;
 }
 
 .nav-label {
-  font-size: 12px;
+  margin-top: 4px;
+
+  color: #fff;
+
+  font-size: 13px;
 }
 
-/* ================================
-   CREATE BUTTON
-   ================================ */
+/* =========================================
+   CREATE + BUTTON
+========================================= */
 
 .upload-button {
   position: relative;
 
-  width: 68px;
-  height: 38px;
+  width: 66px;
+  height: 46px;
 
-  border-radius: 11px;
+  border-radius: 13px;
 
   background: #fff;
 
   color: #000;
 
-  font-size: 28px;
+  border-left: 5px solid #25f4ee;
+  border-right: 5px solid #fe2c55;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   margin-top: -1px;
-
-  box-shadow:
-    -4px 0 0 #25f4ee,
-    4px 0 0 #fe2c55;
 }
 
 .upload-button span {
-  color: #000;
-  font-size: 28px !important;
-  line-height: 1;
+  color: #000 !important;
+
+  font-size: 31px !important;
+  font-weight: 400;
 }
 
-/* ================================
+/* =========================================
+   CREATE SCREEN
+========================================= */
+
+.create-screen {
+  position: fixed;
+  inset: 0;
+
+  z-index: 2000;
+
+  display: none;
+
+  background: #000;
+
+  color: #fff;
+}
+
+.create-screen.active {
+  display: block;
+}
+
+.create-header {
+  height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-bottom: 1px solid #222;
+}
+
+.create-header h2 {
+  margin: 0;
+
+  font-size: 20px;
+}
+
+.create-close {
+  position: absolute;
+
+  left: 15px;
+  top: 15px;
+
+  font-size: 30px;
+
+  color: #fff;
+}
+
+/* =========================================
+   CREATE OPTIONS
+========================================= */
+
+.create-options {
+  display: flex;
+
+  gap: 15px;
+
+  padding: 25px 18px;
+}
+
+.create-option {
+  flex: 1;
+
+  min-height: 55px;
+
+  border: 1px solid #444;
+  border-radius: 12px;
+
+  color: #fff;
+  background: #111;
+
+  font-size: 16px;
+}
+
+/* =========================================
+   EDITOR
+========================================= */
+
+.editor {
+  padding: 15px;
+
+  overflow-y: auto;
+
+  height: calc(100vh - 64px);
+}
+
+.preview-box {
+  width: 100%;
+  max-height: 52vh;
+
+  overflow: hidden;
+
+  border-radius: 12px;
+
+  background: #111;
+}
+
+.preview-video {
+  display: block;
+
+  width: 100%;
+  max-height: 52vh;
+
+  object-fit: contain;
+
+  background: #000;
+}
+
+#captionInput {
+  width: 100%;
+
+  min-height: 90px;
+
+  margin-top: 15px;
+
+  padding: 12px;
+
+  border: 1px solid #333;
+  border-radius: 10px;
+
+  background: #111;
+
+  color: #fff;
+
+  resize: none;
+
+  font-size: 16px;
+
+  outline: none;
+}
+
+.sound-row,
+.privacy-row {
+  width: 100%;
+
+  margin-top: 12px;
+
+  padding: 15px;
+
+  border-radius: 10px;
+
+  background: #111;
+
+  color: #fff;
+
+  border: 1px solid #333;
+
+  font-size: 15px;
+}
+
+.choose-again {
+  margin-top: 12px;
+
+  color: #25f4ee;
+
+  font-size: 14px;
+}
+
+.upload-status {
+  margin-top: 15px;
+
+  min-height: 22px;
+
+  color: #fff;
+
+  font-size: 14px;
+}
+
+.post-btn {
+  width: 100%;
+
+  height: 50px;
+
+  margin-top: 15px;
+
+  border-radius: 10px;
+
+  background: #fff;
+
+  color: #000;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.post-btn:disabled {
+  opacity: 0.5;
+}
+
+/* =========================================
+   SEARCH SCREEN
+========================================= */
+
+.search-screen {
+  position: fixed;
+  inset: 0;
+
+  z-index: 2500;
+
+  display: none;
+
+  background: #000;
+
+  color: #fff;
+}
+
+.search-screen.active {
+  display: block;
+}
+
+/* =========================================
    MOBILE
-   ================================ */
+========================================= */
 
 @media (max-width: 600px) {
 
   .top-bar {
-    height: 64px;
+    height: 68px;
   }
 
   .top-bar .tabs {
-    gap: 27px;
+    gap: 25px;
   }
 
   .top-bar .tab {
@@ -537,87 +786,93 @@ button {
   }
 
   .search-button {
-    right: 14px;
-    top: 14px;
-    width: 43px;
-    height: 43px;
-  }
+    right: 12px;
+    top: 11px;
 
-  /* RIGHT BUTTONS */
-  .video-actions {
-    right: 9px;
-    bottom: 126px;
-    width: 54px;
-    gap: 16px;
-  }
-
-  .action-button {
-    width: 50px;
-    min-height: 51px;
-  }
-
-  .action-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 29px;
-  }
-
-  .action-count {
-    font-size: 12px;
-    margin-top: 3px;
-  }
-
-  .profile-avatar {
-    width: 46px;
-    height: 46px;
-    font-size: 23px;
-  }
-
-  .profile-follow-plus {
-    width: 20px;
-    height: 20px;
-    font-size: 16px;
-  }
-
-  .follow-text {
-    font-size: 12px;
-  }
-
-  /* MUSIC */
-  .music-disc {
     width: 48px;
     height: 48px;
-    font-size: 23px;
   }
 
-  /* INFO */
   .video-info {
-    left: 18px;
-    right: 78px;
+    left: 14px;
+    right: 90px;
     bottom: 91px;
   }
 
   .username {
-    font-size: 17px;
-    margin-bottom: 9px;
+    font-size: 18px;
   }
 
   .caption {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .hashtags {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .music {
-    font-size: 13px;
-    margin-top: 8px;
+    font-size: 15px;
+  }
+
+  /* RIGHT BUTTONS */
+  .video-actions {
+    right: 8px;
+    bottom: 235px;
+
+    width: 58px;
+
+    gap: 14px;
+  }
+
+  .action-button {
+    width: 54px;
+    min-height: 48px;
+  }
+
+  .action-icon {
+    width: 38px;
+    height: 38px;
+
+    font-size: 31px;
+  }
+
+  .profile-avatar {
+    width: 50px;
+    height: 50px;
+
+    font-size: 25px;
+  }
+
+  .follow-plus {
+    width: 23px;
+    height: 23px;
+
+    font-size: 18px;
+  }
+
+  .like-icon {
+    font-size: 37px;
+  }
+
+  .comment-icon,
+  .save-icon,
+  .share-icon {
+    font-size: 35px;
+  }
+
+  /* MUSIC */
+  .music-disc {
+    right: 9px;
+    bottom: 91px;
+
+    width: 56px;
+    height: 56px;
   }
 
   /* BOTTOM */
   .bottom-nav {
-    height: 72px;
+    height: 76px;
   }
 
   .nav-button {
@@ -625,15 +880,35 @@ button {
   }
 
   .nav-icon {
-    font-size: 23px;
+    font-size: 26px;
   }
 
   .nav-label {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .upload-button {
     width: 66px;
-    height: 38px;
+    height: 45px;
+  }
+}
+
+/* =========================================
+   SMALL HEIGHT DEVICES
+========================================= */
+
+@media (max-height: 700px) {
+
+  .video-actions {
+    bottom: 220px;
+    gap: 10px;
+  }
+
+  .music-disc {
+    bottom: 88px;
+  }
+
+  .video-info {
+    bottom: 88px;
   }
 }
