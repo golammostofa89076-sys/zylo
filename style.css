@@ -1,42 +1,172 @@
-/* =========================
-   ZYLO - Right Side SVG Buttons
-   ========================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  color: #fff;
+}
+
+/* TOP BAR */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.55),
+    transparent
+  );
+}
+
+.top-tabs {
+  display: flex;
+  gap: 28px;
+}
+
+.top-tab {
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px 4px;
+}
+
+.top-tab.active {
+  color: #fff;
+}
+
+/* VIDEO FEED */
+.video-feed {
+  width: 100%;
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+
+.video-feed::-webkit-scrollbar {
+  display: none;
+}
+
+.video-card {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  scroll-snap-align: start;
+  background: #111;
+}
+
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #111;
+}
+
+/* GRADIENT */
+.video-gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.75) 0%,
+      rgba(0, 0, 0, 0.15) 35%,
+      transparent 65%
+    );
+}
+
+/* VIDEO INFO */
+.video-info {
+  position: absolute;
+  left: 16px;
+  right: 85px;
+  bottom: 95px;
+  z-index: 5;
+  text-shadow: 0 1px 4px #000;
+}
+
+.username {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.caption {
+  font-size: 16px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.music {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* RIGHT ACTIONS */
 .right-actions {
   position: absolute;
   right: 12px;
-  bottom: 120px;
+  bottom: 90px;
+  z-index: 10;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  z-index: 20;
+  gap: 17px;
 }
 
 .action-btn {
+  position: relative;
+
   width: 52px;
-  height: 52px;
-  border: 0;
-  background: transparent;
-  color: #fff;
+  min-height: 52px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  border: 0;
+  background: transparent;
+  color: #fff;
+
   cursor: pointer;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
+
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.7));
 }
 
 .action-btn svg {
   width: 34px;
   height: 34px;
+
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.2;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,.5));
 }
 
 .action-btn .count {
@@ -44,10 +174,9 @@
   font-size: 12px;
   font-weight: 600;
   color: #fff;
-  text-shadow: 0 1px 3px #000;
 }
 
-/* Like */
+/* LIKE */
 .like-btn.active {
   color: #ff2d55;
 }
@@ -57,59 +186,7 @@
   stroke: #ff2d55;
 }
 
-/* Follow profile circle */
-.profile-action {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  overflow: visible;
-  position: relative;
-}
-
-.profile-action img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.follow-plus {
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #fe2c55;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 17px;
-  font-weight: bold;
-  border: 2px solid #fff;
-}
-
-/* Share */
-.share-btn svg {
-  width: 33px;
-  height: 33px;
-}
-
-/* Comment */
-.comment-btn svg {
-  width: 34px;
-  height: 34px;
-}
-
-/* Save */
-.save-btn svg {
-  width: 32px;
-  height: 32px;
-}
-
+/* SAVE */
 .save-btn.active {
   color: #ffd60a;
 }
@@ -119,28 +196,277 @@
   stroke: #ffd60a;
 }
 
-/* Sound / Music */
-.sound-btn svg {
-  width: 32px;
-  height: 32px;
+/* PROFILE */
+.profile-action {
+  margin-bottom: 2px;
 }
 
-/* Button press animation */
-.action-btn:active {
-  transform: scale(.88);
+.avatar {
+  width: 48px;
+  height: 48px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #fff;
+  color: #111;
+
+  font-size: 22px;
+  font-weight: 700;
+
+  border: 2px solid #fff;
 }
 
-/* Mobile */
+.follow-plus {
+  position: absolute;
+
+  bottom: -4px;
+
+  width: 21px;
+  height: 21px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ff2d55;
+  color: #fff;
+
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.profile-action.following .follow-plus {
+  background: #22c55e;
+}
+
+/* SHARE */
+.share-btn .count {
+  font-size: 11px;
+}
+
+/* SOUND */
+.sound-btn.active {
+  color: #00e5ff;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed;
+
+  left: 0;
+  bottom: 0;
+
+  width: 100%;
+  height: 68px;
+
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  background: rgba(0, 0, 0, 0.88);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-button {
+  width: 20%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 3px;
+
+  border: 0;
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.nav-button svg {
+  width: 24px;
+  height: 24px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav-button.active {
+  color: #fff;
+}
+
+/* UPLOAD BUTTON */
+.upload-button {
+  width: 48px;
+  height: 36px;
+
+  margin-top: -4px;
+
+  border-radius: 10px;
+
+  background: #fff;
+  color: #000;
+}
+
+.upload-button svg {
+  width: 28px;
+  height: 28px;
+  stroke-width: 2.5;
+}
+
+/* UPLOAD MODAL */
+.upload-modal {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.upload-modal.show {
+  display: flex;
+}
+
+.upload-box {
+  position: relative;
+
+  width: min(420px, 100%);
+
+  padding: 28px 20px;
+
+  border-radius: 18px;
+
+  background: #181818;
+  color: #fff;
+
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+}
+
+.upload-box h2 {
+  margin-bottom: 8px;
+  font-size: 24px;
+}
+
+.upload-box p {
+  margin-bottom: 18px;
+  color: #aaa;
+}
+
+.close-upload {
+  position: absolute;
+
+  top: 10px;
+  right: 12px;
+
+  width: 36px;
+  height: 36px;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: #333;
+  color: #fff;
+
+  font-size: 24px;
+
+  cursor: pointer;
+}
+
+#videoInput {
+  width: 100%;
+  margin-bottom: 18px;
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  background: #252525;
+  color: #fff;
+}
+
+.upload-submit {
+  width: 100%;
+
+  padding: 13px;
+
+  border: 0;
+  border-radius: 10px;
+
+  background: #ff2d55;
+  color: #fff;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.upload-submit:disabled {
+  opacity: 0.5;
+}
+
+#uploadStatus {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* MOBILE */
 @media (max-width: 600px) {
+  .top-bar {
+    height: 52px;
+  }
+
+  .top-tabs {
+    gap: 22px;
+  }
+
+  .video-info {
+    bottom: 85px;
+    left: 12px;
+    right: 75px;
+  }
+
+  .username {
+    font-size: 17px;
+  }
+
+  .caption {
+    font-size: 15px;
+  }
+
   .right-actions {
-    right: 8px;
-    bottom: 105px;
-    gap: 17px;
+    right: 7px;
+    bottom: 78px;
+    gap: 12px;
   }
 
   .action-btn {
     width: 48px;
-    height: 48px;
+    min-height: 48px;
   }
 
   .action-btn svg {
@@ -148,7 +474,12 @@
     height: 31px;
   }
 
-  .action-btn .count {
-    font-size: 11px;
+  .avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .bottom-nav {
+    height: 62px;
   }
 }
