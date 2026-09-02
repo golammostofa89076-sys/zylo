@@ -1,151 +1,175 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0,
-        maximum-scale=1.0, user-scalable=no,
-        viewport-fit=cover">
+    <title>ZYLO</title>
 
-  <title>ZYLO</title>
-
-  <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
 
-<div id="app">
+<div class="app">
 
-  <!-- TOP BAR -->
-  <header class="top-bar">
+    <!-- TOP BAR -->
+    <header class="top-bar">
 
-    <div class="logo">ZYLO</div>
+        <div class="top-left">
+            <span class="live">LIVE</span>
+        </div>
 
-    <div class="top-tabs">
-      <button>Following</button>
-      <button class="active">For You</button>
-    </div>
+        <div class="top-tabs">
+            <button>Following</button>
+            <button class="active">For You</button>
+        </div>
 
-    <button class="search-btn">⌕</button>
+        <button class="search-btn">⌕</button>
 
-  </header>
-
-
-  <!-- VIDEO FEED -->
-  <main id="feed">
-
-    <section class="video-item">
-
-      <!-- VIDEO -->
-      <video
-        class="video"
-        src="./backend/uploads/video1.mp4"
-        loop
-        muted
-        playsinline
-        webkit-playsinline
-        preload="auto">
-      </video>
+    </header>
 
 
-      <!-- RIGHT SIDE BUTTONS -->
+    <!-- VIDEO FEED -->
+    <main class="video-feed">
 
-      <div class="right-buttons">
+        <section class="video-card">
 
-        <button class="action-btn like-btn">
-          <strong>♥</strong>
-          <span>0</span>
+            <video
+                class="video"
+                src="https://cdn.jsdelivr.net/gh/golammostofa89076-sys/zylo@main/backend/uploads/video1.mp4"
+                playsinline
+                loop
+                muted
+                preload="auto">
+            </video>
+
+
+            <!-- VIDEO DARK GRADIENT -->
+            <div class="video-gradient"></div>
+
+
+            <!-- RIGHT ACTIONS -->
+            <div class="right-actions">
+
+                <!-- PROFILE -->
+                <button class="profile-action">
+                    <div class="profile-circle">Z</div>
+                    <span class="follow-plus">+</span>
+                    <small>Follow</small>
+                </button>
+
+
+                <!-- LIKE -->
+                <button class="action-btn" id="likeBtn">
+                    <span class="action-icon">♡</span>
+                    <span class="action-label" id="likeCount">0</span>
+                </button>
+
+
+                <!-- COMMENT -->
+                <button class="action-btn" id="commentBtn">
+                    <span class="action-icon">💬</span>
+                    <span class="action-label">0</span>
+                </button>
+
+
+                <!-- SAVE -->
+                <button class="action-btn" id="saveBtn">
+                    <span class="action-icon">🔖</span>
+                    <span class="action-label">Save</span>
+                </button>
+
+
+                <!-- SHARE -->
+                <button class="action-btn" id="shareBtn">
+                    <span class="action-icon">↗</span>
+                    <span class="action-label">Share</span>
+                </button>
+
+
+                <!-- MUSIC -->
+                <button class="music-action" id="musicBtn">
+                    <div class="music-disc">
+                        ♪
+                    </div>
+                    <span>Music</span>
+                </button>
+
+            </div>
+
+
+            <!-- FULLSCREEN -->
+            <button class="fullscreen-btn" id="fullscreenBtn">
+                ⛶
+            </button>
+
+
+            <!-- VIDEO INFORMATION -->
+            <div class="video-info">
+
+                <div class="username">
+                    @zylo_creator
+                    <span class="verified">✓</span>
+                </div>
+
+                <div class="caption">
+                    Welcome to ZYLO 🌍
+                </div>
+
+                <div class="tagline">
+                    Create • Connect • Grow
+                </div>
+
+                <div class="hashtags">
+                    #ZYLO #Create #Connect #Grow #ForYou
+                </div>
+
+                <div class="sound">
+                    ♪ Original sound - ZYLO
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+
+        <button class="nav-item active">
+            <span>⌂</span>
+            <small>Home</small>
         </button>
 
-        <button class="action-btn comment-btn">
-          <strong>💬</strong>
-          <span>0</span>
+        <button class="nav-item">
+            <span>⌕</span>
+            <small>Discover</small>
         </button>
 
-        <button class="action-btn save-btn">
-          <strong>🔖</strong>
-          <span>Save</span>
+        <button class="create-btn">
+            +
         </button>
 
-        <button class="action-btn share-btn">
-          <strong>↗</strong>
-          <span>Share</span>
+        <button class="nav-item">
+            <span>♧</span>
+            <small>Inbox</small>
         </button>
 
-        <button class="action-btn music-btn">
-          <strong>♫</strong>
-          <span>Music</span>
+        <button class="nav-item">
+            <span>♙</span>
+            <small>Profile</small>
         </button>
 
-      </div>
-
-
-      <!-- FULLSCREEN BUTTON -->
-      <!-- আলাদা জায়গায় রাখা হয়েছে -->
-
-      <button class="fullscreen-btn">
-        ⛶
-      </button>
-
-
-      <!-- VIDEO INFO -->
-
-      <div class="video-info">
-
-        <h3>@zylo_creator</h3>
-
-        <p>Welcome to ZYLO 🌍</p>
-
-        <p class="music-name">
-          ♫ Original sound
-        </p>
-
-      </div>
-
-
-      <!-- PLAY / PAUSE -->
-
-      <div class="play-icon">▶</div>
-
-    </section>
-
-  </main>
-
-
-  <!-- BOTTOM NAV -->
-
-  <nav class="bottom-nav">
-
-    <button>
-      <b>⌂</b>
-      <span>Home</span>
-    </button>
-
-    <button>
-      <b>⌕</b>
-      <span>Discover</span>
-    </button>
-
-    <button class="upload-btn">
-      +
-    </button>
-
-    <button>
-      <b>💬</b>
-      <span>Inbox</span>
-    </button>
-
-    <button>
-      <b>●</b>
-      <span>Profile</span>
-    </button>
-
-  </nav>
+    </nav>
 
 </div>
 
-<script src="script.js"></script>
+
+<script src="./script.js"></script>
 
 </body>
 </html>
