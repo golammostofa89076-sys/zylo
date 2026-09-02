@@ -1,29 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
 
-  <title>ZYLO — Create • Connect • Grow</title>
+  <title>ZYLO</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-  <!-- TOP BAR -->
+  <!-- ================= TOP BAR ================= -->
+
   <header class="top-bar">
+
+    <button class="live-button" id="liveButton">
+      LIVE
+    </button>
+
     <div class="top-tabs">
-      <button class="top-tab">Following</button>
-      <button class="top-tab active">For You</button>
+
+      <button class="top-tab">
+        Following
+      </button>
+
+      <button class="top-tab active">
+        For You
+      </button>
+
     </div>
+
+    <!-- SEARCH BUTTON -->
+
+    <button class="top-search" id="topSearch" aria-label="Search">
+
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="11" cy="11" r="7"></circle>
+        <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+      </svg>
+
+    </button>
+
   </header>
 
 
-  <!-- VIDEO FEED -->
-  <main id="videoFeed" class="video-feed">
+  <!-- ================= VIDEO FEED ================= -->
+
+  <main class="video-feed" id="videoFeed">
 
     <!-- VIDEO 1 -->
+
     <section class="video-card">
 
       <video
@@ -32,107 +69,175 @@
         loop
         muted
         playsinline
-        preload="metadata">
-      </video>
+        preload="metadata"
+      ></video>
 
       <div class="video-gradient"></div>
 
-      <div class="video-info">
-        <div class="username">@zylo_creator</div>
 
-        <div class="caption">
-          Welcome to ZYLO 🌍<br>
-          Create • Connect • Grow
-        </div>
+      <!-- RIGHT ACTIONS -->
 
-        <div class="music">
-          ♫ Original sound — ZYLO
-        </div>
-      </div>
-
-
-      <!-- RIGHT BUTTONS -->
       <div class="right-actions">
 
         <!-- PROFILE -->
+
         <button class="action-btn profile-action">
-          <div class="avatar">Z</div>
-          <span class="follow-plus">+</span>
+
+          <div class="avatar">
+            Z
+          </div>
+
+          <span class="follow-plus">
+            +
+          </span>
+
         </button>
 
 
         <!-- LIKE -->
+
         <button class="action-btn like-btn">
 
-          <svg viewBox="0 0 24 24">
-            <path d="M20.8 8.7c0 5.5-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.7A4.7 4.7 0 0 1 12 6.3a4.7 4.7 0 0 1 8.8 2.4Z"/>
+          <svg
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M20.8 8.7c0 5.5-8.8 10.2-8.8 10.2S3.2 14.2 3.2 8.7C3.2 5.7 5.4 4 8 4c1.5 0 2.9.7 4 2 1.1-1.3 2.5-2 4-2 2.6 0 4.8 1.7 4.8 4.7z"
+            ></path>
           </svg>
 
-          <span class="count">0</span>
+          <span class="count">
+            0
+          </span>
 
         </button>
 
 
         <!-- COMMENT -->
+
         <button class="action-btn comment-btn">
 
-          <svg viewBox="0 0 24 24">
+          <svg
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M20 11.5a7.5 7.5 0 0 1-8 7.5c-1.2 0-2.4-.3-3.4-.8L4 20l1.2-3.8A7.2 7.2 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5z"
+            ></path>
 
-            <path d="M20 11.5a8 8 0 0 1-8 8 8.8 8.8 0 0 1-3.8-.9L4 20l1.3-3.5A8 8 0 1 1 20 11.5Z"/>
+            <circle
+              cx="9"
+              cy="11.5"
+              r=".7"
+              fill="currentColor"
+            ></circle>
 
-            <path d="M8 11.5h.01"/>
-            <path d="M12 11.5h.01"/>
-            <path d="M16 11.5h.01"/>
+            <circle
+              cx="12"
+              cy="11.5"
+              r=".7"
+              fill="currentColor"
+            ></circle>
+
+            <circle
+              cx="15"
+              cy="11.5"
+              r=".7"
+              fill="currentColor"
+            ></circle>
 
           </svg>
 
-          <span class="count">0</span>
+          <span class="count">
+            0
+          </span>
 
         </button>
 
 
         <!-- SAVE -->
+
         <button class="action-btn save-btn">
 
-          <svg viewBox="0 0 24 24">
-            <path d="M6 3.5h12v17l-6-3.5-6 3.5v-17Z"/>
+          <svg
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.5L6 21V4.5z"
+            ></path>
           </svg>
 
-          <span class="count">0</span>
+          <span class="count">
+            0
+          </span>
 
         </button>
 
 
         <!-- SHARE -->
+
         <button class="action-btn share-btn">
 
-          <svg viewBox="0 0 24 24">
+          <svg
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M20 4L10.5 13.5"
+            ></path>
 
-            <path d="M12 16V4"/>
-            <path d="m7 9 5-5 5 5"/>
-            <path d="M5 13v6.5h14V13"/>
+            <path
+              d="M20 4l-6 16-3.5-6.5L4 10l16-6z"
+            ></path>
 
           </svg>
 
-          <span class="count">Share</span>
+          <span class="share-text">
+            Share
+          </span>
 
         </button>
 
 
         <!-- SOUND -->
+
         <button class="action-btn sound-btn">
 
-          <svg viewBox="0 0 24 24">
+          <svg
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M4 10v4h4l5 4V6l-5 4H4z"
+            ></path>
 
-            <path d="M4 10v4h4l5 4V6l-5 4H4Z"/>
-
-            <path d="M17 9a4 4 0 0 1 0 6"/>
-
-            <path d="M19.5 6.5a7.5 7.5 0 0 1 0 11"/>
+            <path
+              d="M16 9.5a4 4 0 0 1 0 5"
+            ></path>
 
           </svg>
 
         </button>
+
+      </div>
+
+
+      <!-- VIDEO INFO -->
+
+      <div class="video-info">
+
+        <div class="username">
+          @zylo_creator
+        </div>
+
+        <div class="caption">
+          Welcome to ZYLO 🌍
+        </div>
+
+        <div class="caption">
+          Create • Connect • Grow
+        </div>
+
+        <div class="music">
+          ♪ Original sound - ZYLO
+        </div>
 
       </div>
 
@@ -140,6 +245,7 @@
 
 
     <!-- VIDEO 2 -->
+
     <section class="video-card">
 
       <video
@@ -148,115 +254,156 @@
         loop
         muted
         playsinline
-        preload="metadata">
-      </video>
+        preload="metadata"
+      ></video>
 
       <div class="video-gradient"></div>
 
-      <div class="video-info">
 
-        <div class="username">@zylo_creator</div>
+      <!-- RIGHT ACTIONS -->
 
-        <div class="caption">
-          Your world. Your creativity. 🚀
-        </div>
-
-        <div class="music">
-          ♫ Original sound — ZYLO
-        </div>
-
-      </div>
-
-
-      <!-- RIGHT BUTTONS -->
       <div class="right-actions">
 
-        <!-- PROFILE -->
         <button class="action-btn profile-action">
 
-          <div class="avatar">Z</div>
+          <div class="avatar">
+            Z
+          </div>
 
-          <span class="follow-plus">+</span>
+          <span class="follow-plus">
+            +
+          </span>
 
         </button>
 
 
-        <!-- LIKE -->
         <button class="action-btn like-btn">
 
           <svg viewBox="0 0 24 24">
-
-            <path d="M20.8 8.7c0 5.5-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.7A4.7 4.7 0 0 1 12 6.3a4.7 4.7 0 0 1 8.8 2.4Z"/>
-
+            <path
+              d="M20.8 8.7c0 5.5-8.8 10.2-8.8 10.2S3.2 14.2 3.2 8.7C3.2 5.7 5.4 4 8 4c1.5 0 2.9.7 4 2 1.1-1.3 2.5-2 4-2 2.6 0 4.8 1.7 4.8 4.7z"
+            ></path>
           </svg>
 
-          <span class="count">0</span>
+          <span class="count">
+            0
+          </span>
 
         </button>
 
 
-        <!-- COMMENT -->
         <button class="action-btn comment-btn">
 
           <svg viewBox="0 0 24 24">
 
-            <path d="M20 11.5a8 8 0 0 1-8 8 8.8 8.8 0 0 1-3.8-.9L4 20l1.3-3.5A8 8 0 1 1 20 11.5Z"/>
+            <path
+              d="M20 11.5a7.5 7.5 0 0 1-8 7.5c-1.2 0-2.4-.3-3.4-.8L4 20l1.2-3.8A7.2 7.2 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5z"
+            ></path>
 
-            <path d="M8 11.5h.01"/>
-            <path d="M12 11.5h.01"/>
-            <path d="M16 11.5h.01"/>
+            <circle
+              cx="9"
+              cy="11.5"
+              r=".7"
+              fill="currentColor"
+            ></circle>
+
+            <circle
+              cx="12"
+              cy="11.5"
+              r=".7"
+              fill="currentColor"
+            ></circle>
+
+            <circle
+              cx="15"
+              cy="11.5"
+              r=".7"
+              fill="currentColor"
+            ></circle>
 
           </svg>
 
-          <span class="count">0</span>
+          <span class="count">
+            0
+          </span>
 
         </button>
 
 
-        <!-- SAVE -->
         <button class="action-btn save-btn">
 
           <svg viewBox="0 0 24 24">
-
-            <path d="M6 3.5h12v17l-6-3.5-6 3.5v-17Z"/>
-
+            <path
+              d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.5L6 21V4.5z"
+            ></path>
           </svg>
 
-          <span class="count">0</span>
+          <span class="count">
+            0
+          </span>
 
         </button>
 
 
-        <!-- SHARE -->
         <button class="action-btn share-btn">
 
           <svg viewBox="0 0 24 24">
 
-            <path d="M12 16V4"/>
-            <path d="m7 9 5-5 5 5"/>
-            <path d="M5 13v6.5h14V13"/>
+            <path
+              d="M20 4L10.5 13.5"
+            ></path>
+
+            <path
+              d="M20 4l-6 16-3.5-6.5L4 10l16-6z"
+            ></path>
 
           </svg>
 
-          <span class="count">Share</span>
+          <span class="share-text">
+            Share
+          </span>
 
         </button>
 
 
-        <!-- SOUND -->
         <button class="action-btn sound-btn">
 
           <svg viewBox="0 0 24 24">
 
-            <path d="M4 10v4h4l5 4V6l-5 4H4Z"/>
+            <path
+              d="M4 10v4h4l5 4V6l-5 4H4z"
+            ></path>
 
-            <path d="M17 9a4 4 0 0 1 0 6"/>
-
-            <path d="M19.5 6.5a7.5 7.5 0 0 1 0 11"/>
+            <path
+              d="M16 9.5a4 4 0 0 1 0 5"
+            ></path>
 
           </svg>
 
         </button>
+
+      </div>
+
+
+      <!-- VIDEO INFO -->
+
+      <div class="video-info">
+
+        <div class="username">
+          @zylo_creator
+        </div>
+
+        <div class="caption">
+          Welcome to ZYLO 🌍
+        </div>
+
+        <div class="caption">
+          Create • Connect • Grow
+        </div>
+
+        <div class="music">
+          ♪ Original sound - ZYLO
+        </div>
 
       </div>
 
@@ -265,29 +412,41 @@
   </main>
 
 
-  <!-- UPLOAD MODAL -->
-  <div id="uploadModal" class="upload-modal">
+  <!-- ================= UPLOAD MODAL ================= -->
+
+  <div
+    class="upload-modal"
+    id="uploadModal"
+  >
 
     <div class="upload-box">
 
-      <button id="closeUpload" class="close-upload">
+      <button
+        class="close-upload"
+        id="closeUpload"
+      >
         ×
       </button>
 
-      <h2>Upload to ZYLO</h2>
+      <h2>
+        Upload Video
+      </h2>
 
-      <p>Select your video</p>
+      <p>
+        Select a video to upload to ZYLO.
+      </p>
 
       <input
-        id="videoInput"
         type="file"
+        id="videoInput"
         accept="video/*"
-      >
+      />
 
       <button
-        id="uploadBtn"
-        class="upload-submit">
-        Upload Video
+        class="upload-submit"
+        id="uploadSubmit"
+      >
+        Upload
       </button>
 
       <div id="uploadStatus"></div>
@@ -297,53 +456,87 @@
   </div>
 
 
-  <!-- BOTTOM NAVIGATION -->
+  <!-- ================= BOTTOM NAV ================= -->
+
   <nav class="bottom-nav">
 
     <!-- HOME -->
+
     <button class="nav-button active">
 
       <svg viewBox="0 0 24 24">
 
-        <path d="M3 10.5 12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5v-9Z"/>
+        <path
+          d="M3 10.5L12 3l9 7.5"
+        ></path>
 
-        <path d="M9 21v-6h6v6"/>
+        <path
+          d="M5 9.5V21h14V9.5"
+        ></path>
 
       </svg>
 
-      <span>Home</span>
+      <span>
+        Home
+      </span>
 
     </button>
 
 
     <!-- SEARCH -->
-    <button class="nav-button">
+
+    <button
+      class="nav-button"
+      id="bottomSearch"
+    >
 
       <svg viewBox="0 0 24 24">
 
         <circle
-          cx="10.8"
-          cy="10.8"
-          r="6.5"/>
+          cx="11"
+          cy="11"
+          r="6.5"
+        ></circle>
 
-        <path d="m16 16 5 5"/>
+        <line
+          x1="16"
+          y1="16"
+          x2="21"
+          y2="21"
+        ></line>
 
       </svg>
 
-      <span>Search</span>
+      <span>
+        Search
+      </span>
 
     </button>
 
 
     <!-- UPLOAD -->
+
     <button
+      class="nav-button upload-button"
       id="openUpload"
-      class="nav-button upload-button">
+      aria-label="Upload"
+    >
 
       <svg viewBox="0 0 24 24">
 
-        <path d="M12 5v14"/>
-        <path d="M5 12h14"/>
+        <line
+          x1="12"
+          y1="5"
+          x2="12"
+          y2="19"
+        ></line>
+
+        <line
+          x1="5"
+          y1="12"
+          x2="19"
+          y2="12"
+        ></line>
 
       </svg>
 
@@ -351,22 +544,30 @@
 
 
     <!-- INBOX -->
+
     <button class="nav-button">
 
       <svg viewBox="0 0 24 24">
 
-        <path d="M4 5.5h16v13H4z"/>
+        <path
+          d="M4 5h16v13H4z"
+        ></path>
 
-        <path d="m4 9 8 5 8-5"/>
+        <path
+          d="M4 15h5l2 2h2l2-2h5"
+        ></path>
 
       </svg>
 
-      <span>Inbox</span>
+      <span>
+        Inbox
+      </span>
 
     </button>
 
 
     <!-- PROFILE -->
+
     <button class="nav-button">
 
       <svg viewBox="0 0 24 24">
@@ -374,700 +575,815 @@
         <circle
           cx="12"
           cy="8"
-          r="3.5"/>
+          r="3.5"
+        ></circle>
 
-        <path d="M5 21c.7-4 3-6 7-6s6.3 2 7 6"/>
+        <path
+          d="M5 21c0-4 3-6 7-6s7 2 7 6"
+        ></path>
 
       </svg>
 
-      <span>Profile</span>
+      <span>
+        Profile
+      </span>
 
     </button>
 
   </nav>
 
 
-<script>
+  <!-- ================= JAVASCRIPT ================= -->
 
-/* =====================================
-   VIDEO AUTO PLAY / PAUSE
-===================================== */
+  <script>
 
-const videoFeed = document.getElementById("videoFeed");
+    const videoFeed =
+      document.getElementById("videoFeed");
 
-let videos = document.querySelectorAll(".video");
+    const uploadModal =
+      document.getElementById("uploadModal");
 
-const observer = new IntersectionObserver(
-  (entries) => {
+    const openUpload =
+      document.getElementById("openUpload");
 
-    entries.forEach((entry) => {
+    const closeUpload =
+      document.getElementById("closeUpload");
 
-      const video = entry.target;
+    const videoInput =
+      document.getElementById("videoInput");
 
-      if (entry.isIntersecting) {
+    const uploadSubmit =
+      document.getElementById("uploadSubmit");
 
-        videos.forEach((otherVideo) => {
+    const uploadStatus =
+      document.getElementById("uploadStatus");
 
-          if (otherVideo !== video) {
-            otherVideo.pause();
-          }
+    const topSearch =
+      document.getElementById("topSearch");
 
-        });
-
-        video.play().catch(() => {});
-
-      } else {
-
-        video.pause();
-
-      }
-
-    });
-
-  },
-  {
-    threshold: 0.7
-  }
-);
+    const bottomSearch =
+      document.getElementById("bottomSearch");
 
 
-videos.forEach((video) => {
+    /* ================= SEARCH ================= */
 
-  observer.observe(video);
+    function openSearch() {
 
-  video.addEventListener("click", () => {
-
-    if (video.paused) {
-
-      video.play().catch(() => {});
-
-    } else {
-
-      video.pause();
+      alert("ZYLO Search");
 
     }
 
-  });
+    topSearch.addEventListener(
+      "click",
+      openSearch
+    );
 
-});
+    bottomSearch.addEventListener(
+      "click",
+      openSearch
+    );
 
 
-/* =====================================
-   LIKE
-===================================== */
+    /* ================= UPLOAD MODAL ================= */
 
-function setupLike(button) {
+    openUpload.addEventListener(
+      "click",
+      function () {
 
-  button.addEventListener("click", () => {
+        uploadModal.classList.add("show");
 
-    const count = button.querySelector(".count");
-
-    let number = Number(count.textContent) || 0;
-
-    if (button.classList.contains("active")) {
-
-      button.classList.remove("active");
-
-      number--;
-
-    } else {
-
-      button.classList.add("active");
-
-      number++;
-
-    }
-
-    count.textContent = number;
-
-  });
-
-}
-
-
-document.querySelectorAll(".like-btn")
-.forEach(setupLike);
-
-
-/* =====================================
-   SAVE
-===================================== */
-
-function setupSave(button) {
-
-  button.addEventListener("click", () => {
-
-    const count = button.querySelector(".count");
-
-    let number = Number(count.textContent) || 0;
-
-    if (button.classList.contains("active")) {
-
-      button.classList.remove("active");
-
-      number--;
-
-    } else {
-
-      button.classList.add("active");
-
-      number++;
-
-    }
-
-    count.textContent = number;
-
-  });
-
-}
-
-
-document.querySelectorAll(".save-btn")
-.forEach(setupSave);
-
-
-/* =====================================
-   FOLLOW
-===================================== */
-
-function setupFollow(button) {
-
-  button.addEventListener("click", () => {
-
-    button.classList.toggle("following");
-
-    const plus =
-      button.querySelector(".follow-plus");
-
-    if (button.classList.contains("following")) {
-
-      plus.textContent = "✓";
-
-    } else {
-
-      plus.textContent = "+";
-
-    }
-
-  });
-
-}
-
-
-document.querySelectorAll(".profile-action")
-.forEach(setupFollow);
-
-
-/* =====================================
-   COMMENT
-===================================== */
-
-function setupComment(button) {
-
-  button.addEventListener("click", () => {
-
-    const text =
-      prompt("Write a comment:");
-
-    if (text && text.trim()) {
-
-      const count =
-        button.querySelector(".count");
-
-      let number =
-        Number(count.textContent) || 0;
-
-      count.textContent =
-        number + 1;
-
-    }
-
-  });
-
-}
-
-
-document.querySelectorAll(".comment-btn")
-.forEach(setupComment);
-
-
-/* =====================================
-   SHARE
-===================================== */
-
-function setupShare(button) {
-
-  button.addEventListener("click", async () => {
-
-    const shareData = {
-
-      title: "ZYLO",
-
-      text: "Check out this video on ZYLO!",
-
-      url: window.location.href
-
-    };
-
-
-    try {
-
-      if (navigator.share) {
-
-        await navigator.share(shareData);
-
-      } else {
-
-        await navigator.clipboard.writeText(
-          window.location.href
-        );
-
-        alert("Link copied!");
-
-      }
-
-    } catch (error) {
-
-      console.log("Share cancelled");
-
-    }
-
-  });
-
-}
-
-
-document.querySelectorAll(".share-btn")
-.forEach(setupShare);
-
-
-/* =====================================
-   SOUND
-===================================== */
-
-function setupSound(button) {
-
-  button.addEventListener("click", () => {
-
-    const card =
-      button.closest(".video-card");
-
-    const video =
-      card.querySelector(".video");
-
-    video.muted = !video.muted;
-
-    button.classList.toggle("active");
-
-  });
-
-}
-
-
-document.querySelectorAll(".sound-btn")
-.forEach(setupSound);
-
-
-/* =====================================
-   UPLOAD MODAL
-===================================== */
-
-const uploadModal =
-  document.getElementById("uploadModal");
-
-const openUpload =
-  document.getElementById("openUpload");
-
-const closeUpload =
-  document.getElementById("closeUpload");
-
-const videoInput =
-  document.getElementById("videoInput");
-
-const uploadBtn =
-  document.getElementById("uploadBtn");
-
-const uploadStatus =
-  document.getElementById("uploadStatus");
-
-
-/* Open */
-
-openUpload.addEventListener("click", () => {
-
-  uploadModal.classList.add("show");
-
-});
-
-
-/* Close */
-
-closeUpload.addEventListener("click", () => {
-
-  uploadModal.classList.remove("show");
-
-});
-
-
-/* Close outside */
-
-uploadModal.addEventListener("click", (event) => {
-
-  if (event.target === uploadModal) {
-
-    uploadModal.classList.remove("show");
-
-  }
-
-});
-
-
-/* =====================================
-   VIDEO UPLOAD
-   RENDER BACKEND
-===================================== */
-
-uploadBtn.addEventListener("click", async () => {
-
-  const file =
-    videoInput.files[0];
-
-
-  /* No file */
-
-  if (!file) {
-
-    uploadStatus.textContent =
-      "আগে একটি ভিডিও নির্বাচন করুন।";
-
-    return;
-
-  }
-
-
-  /* Check video */
-
-  if (!file.type.startsWith("video/")) {
-
-    uploadStatus.textContent =
-      "শুধু ভিডিও ফাইল নির্বাচন করুন।";
-
-    return;
-
-  }
-
-
-  /* Maximum 200 MB */
-
-  if (file.size > 200 * 1024 * 1024) {
-
-    uploadStatus.textContent =
-      "ভিডিও 200 MB-এর মধ্যে হতে হবে।";
-
-    return;
-
-  }
-
-
-  /* Form */
-
-  const formData =
-    new FormData();
-
-  formData.append(
-    "video",
-    file
-  );
-
-
-  uploadBtn.disabled = true;
-
-  uploadBtn.textContent =
-    "Uploading...";
-
-  uploadStatus.textContent =
-    "ভিডিও আপলোড হচ্ছে...";
-
-
-  try {
-
-    /*
-      ZYLO Render Backend
-    */
-
-    const response = await fetch(
-      "https://zylo-backend-ec5c.onrender.com/api/upload",
-      {
-        method: "POST",
-        body: formData
       }
     );
 
 
-    const data =
-      await response.json();
+    closeUpload.addEventListener(
+      "click",
+      function () {
+
+        uploadModal.classList.remove("show");
+
+        uploadStatus.textContent = "";
+
+        videoInput.value = "";
+
+      }
+    );
 
 
-    if (!response.ok || !data.success) {
+    uploadModal.addEventListener(
+      "click",
+      function (event) {
 
-      throw new Error(
-        data.message ||
-        "Upload failed"
+        if (event.target === uploadModal) {
+
+          uploadModal.classList.remove("show");
+
+        }
+
+      }
+    );
+
+
+    /* ================= VIDEO PLAY / PAUSE ================= */
+
+    const videos =
+      document.querySelectorAll(".video");
+
+
+    const observer =
+      new IntersectionObserver(
+        function (entries) {
+
+          entries.forEach(
+            function (entry) {
+
+              const video =
+                entry.target;
+
+              if (entry.isIntersecting) {
+
+                videos.forEach(
+                  function (otherVideo) {
+
+                    if (
+                      otherVideo !== video
+                    ) {
+
+                      otherVideo.pause();
+
+                    }
+
+                  }
+                );
+
+                video.play().catch(
+                  function () {}
+                );
+
+              } else {
+
+                video.pause();
+
+              }
+
+            }
+          );
+
+        },
+        {
+          threshold: 0.65
+        }
       );
 
-    }
 
+    videos.forEach(
+      function (video) {
 
-    /* Add uploaded video */
+        observer.observe(video);
 
-    addVideoToFeed(
-      data.video.url
+        video.addEventListener(
+          "click",
+          function () {
+
+            if (video.paused) {
+
+              video.play();
+
+            } else {
+
+              video.pause();
+
+            }
+
+          }
+        );
+
+      }
     );
 
 
-    uploadStatus.textContent =
-      "ভিডিও সফলভাবে আপলোড হয়েছে!";
+    /* ================= LIKE ================= */
+
+    document
+      .querySelectorAll(".like-btn")
+      .forEach(
+        function (button) {
+
+          button.addEventListener(
+            "click",
+            function () {
+
+              button.classList.toggle(
+                "active"
+              );
+
+              const count =
+                button.querySelector(
+                  ".count"
+                );
+
+              count.textContent =
+                button.classList.contains(
+                  "active"
+                )
+                  ? "1"
+                  : "0";
+
+            }
+          );
+
+        }
+      );
 
 
-    videoInput.value = "";
+    /* ================= SAVE ================= */
+
+    document
+      .querySelectorAll(".save-btn")
+      .forEach(
+        function (button) {
+
+          button.addEventListener(
+            "click",
+            function () {
+
+              button.classList.toggle(
+                "active"
+              );
+
+              const count =
+                button.querySelector(
+                  ".count"
+                );
+
+              count.textContent =
+                button.classList.contains(
+                  "active"
+                )
+                  ? "1"
+                  : "0";
+
+            }
+          );
+
+        }
+      );
 
 
-    setTimeout(() => {
+    /* ================= FOLLOW ================= */
 
-      uploadModal.classList.remove("show");
+    document
+      .querySelectorAll(
+        ".profile-action"
+      )
+      .forEach(
+        function (button) {
 
-      uploadStatus.textContent = "";
+          button.addEventListener(
+            "click",
+            function () {
 
-    }, 1200);
+              button.classList.toggle(
+                "following"
+              );
 
+              const plus =
+                button.querySelector(
+                  ".follow-plus"
+                );
 
-  } catch (error) {
+              plus.textContent =
+                button.classList.contains(
+                  "following"
+                )
+                  ? "✓"
+                  : "+";
 
-    console.error(error);
+            }
+          );
 
-    uploadStatus.textContent =
-      "আপলোড ব্যর্থ হয়েছে: " +
-      error.message;
-
-  }
-
-
-  uploadBtn.disabled = false;
-
-  uploadBtn.textContent =
-    "Upload Video";
-
-});
-
-
-/* =====================================
-   ADD NEW VIDEO
-===================================== */
-
-function addVideoToFeed(videoUrl) {
-
-  const card =
-    document.createElement("section");
-
-  card.className =
-    "video-card";
+        }
+      );
 
 
-  card.innerHTML = `
+    /* ================= SOUND ================= */
 
-    <video
-      class="video"
-      src="${videoUrl}"
-      loop
-      muted
-      playsinline
-      preload="metadata">
-    </video>
+    document
+      .querySelectorAll(
+        ".sound-btn"
+      )
+      .forEach(
+        function (button) {
 
-    <div class="video-gradient"></div>
+          button.addEventListener(
+            "click",
+            function () {
+
+              const card =
+                button.closest(
+                  ".video-card"
+                );
+
+              const video =
+                card.querySelector(
+                  ".video"
+                );
+
+              video.muted =
+                !video.muted;
+
+              button.classList.toggle(
+                "active",
+                !video.muted
+              );
+
+            }
+          );
+
+        }
+      );
 
 
-    <div class="video-info">
+    /* ================= SHARE ================= */
 
-      <div class="username">
-        @zylo_creator
-      </div>
+    document
+      .querySelectorAll(
+        ".share-btn"
+      )
+      .forEach(
+        function (button) {
 
-      <div class="caption">
-        New video on ZYLO 🚀
-      </div>
+          button.addEventListener(
+            "click",
+            async function () {
 
-      <div class="music">
-        ♫ Original sound — ZYLO
-      </div>
+              const url =
+                window.location.href;
 
-    </div>
+              if (
+                navigator.share
+              ) {
+
+                try {
+
+                  await navigator.share({
+                    title: "ZYLO",
+                    text:
+                      "Check this video on ZYLO",
+                    url: url
+                  });
+
+                } catch (error) {}
+
+              } else {
+
+                try {
+
+                  await navigator.clipboard.writeText(
+                    url
+                  );
+
+                  alert(
+                    "Link copied!"
+                  );
+
+                } catch (error) {
+
+                  alert(
+                    "Share link: " +
+                    url
+                  );
+
+                }
+
+              }
+
+            }
+          );
+
+        }
+      );
 
 
-    <div class="right-actions">
+    /* ================= UPLOAD ================= */
+
+    uploadSubmit.addEventListener(
+      "click",
+      async function () {
+
+        const file =
+          videoInput.files[0];
+
+        if (!file) {
+
+          uploadStatus.textContent =
+            "Please select a video.";
+
+          return;
+
+        }
 
 
-      <button class="action-btn profile-action">
+        if (
+          !file.type.startsWith(
+            "video/"
+          )
+        ) {
 
-        <div class="avatar">
-          Z
+          uploadStatus.textContent =
+            "Only video files are allowed.";
+
+          return;
+
+        }
+
+
+        if (
+          file.size >
+          200 * 1024 * 1024
+        ) {
+
+          uploadStatus.textContent =
+            "Video must be smaller than 200 MB.";
+
+          return;
+
+        }
+
+
+        uploadSubmit.disabled =
+          true;
+
+        uploadStatus.textContent =
+          "Uploading...";
+
+
+        const formData =
+          new FormData();
+
+        formData.append(
+          "video",
+          file
+        );
+
+
+        try {
+
+          const response =
+            await fetch(
+              "https://zylo-backend-ec5c.onrender.com/api/upload",
+              {
+                method: "POST",
+                body: formData
+              }
+            );
+
+
+          const data =
+            await response.json();
+
+
+          if (!response.ok) {
+
+            throw new Error(
+              data.message ||
+              "Upload failed"
+            );
+
+          }
+
+
+          uploadStatus.textContent =
+            "ভিডিও সফলভাবে আপলোড হয়েছে ✅";
+
+
+          addVideoToFeed(
+            data.video.url
+          );
+
+
+          setTimeout(
+            function () {
+
+              uploadModal.classList.remove(
+                "show"
+              );
+
+              uploadStatus.textContent =
+                "";
+
+              videoInput.value =
+                "";
+
+            },
+            1200
+          );
+
+
+        } catch (error) {
+
+          console.error(error);
+
+          uploadStatus.textContent =
+            "Upload failed: " +
+            error.message;
+
+        }
+
+
+        uploadSubmit.disabled =
+          false;
+
+      }
+    );
+
+
+    /* ================= ADD NEW VIDEO ================= */
+
+    function addVideoToFeed(
+      videoUrl
+    ) {
+
+      const card =
+        document.createElement(
+          "section"
+        );
+
+      card.className =
+        "video-card";
+
+
+      card.innerHTML = `
+
+        <video
+          class="video"
+          src="${videoUrl}"
+          loop
+          muted
+          playsinline
+          preload="metadata"
+        ></video>
+
+        <div class="video-gradient"></div>
+
+        <div class="right-actions">
+
+          <button class="action-btn profile-action">
+
+            <div class="avatar">
+              Z
+            </div>
+
+            <span class="follow-plus">
+              +
+            </span>
+
+          </button>
+
+          <button class="action-btn like-btn">
+
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M20.8 8.7c0 5.5-8.8 10.2-8.8 10.2S3.2 14.2 3.2 8.7C3.2 5.7 5.4 4 8 4c1.5 0 2.9.7 4 2 1.1-1.3 2.5-2 4-2 2.6 0 4.8 1.7 4.8 4.7z"
+              ></path>
+            </svg>
+
+            <span class="count">
+              0
+            </span>
+
+          </button>
+
+          <button class="action-btn comment-btn">
+
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M20 11.5a7.5 7.5 0 0 1-8 7.5c-1.2 0-2.4-.3-3.4-.8L4 20l1.2-3.8A7.2 7.2 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5z"
+              ></path>
+            </svg>
+
+            <span class="count">
+              0
+            </span>
+
+          </button>
+
+          <button class="action-btn save-btn">
+
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.5L6 21V4.5z"
+              ></path>
+            </svg>
+
+            <span class="count">
+              0
+            </span>
+
+          </button>
+
+          <button class="action-btn share-btn">
+
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M20 4L10.5 13.5"
+              ></path>
+
+              <path
+                d="M20 4l-6 16-3.5-6.5L4 10l16-6z"
+              ></path>
+            </svg>
+
+            <span class="share-text">
+              Share
+            </span>
+
+          </button>
+
         </div>
 
-        <span class="follow-plus">
-          +
-        </span>
+        <div class="video-info">
 
-      </button>
+          <div class="username">
+            @zylo_creator
+          </div>
 
+          <div class="caption">
+            New video on ZYLO 🌍
+          </div>
 
-      <button class="action-btn like-btn">
+          <div class="caption">
+            Create • Connect • Grow
+          </div>
 
-        <svg viewBox="0 0 24 24">
+          <div class="music">
+            ♪ Original sound - ZYLO
+          </div>
 
-          <path d="M20.8 8.7c0 5.5-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.7A4.7 4.7 0 0 1 12 6.3a4.7 4.7 0 0 1 8.8 2.4Z"/>
+        </div>
 
-        </svg>
-
-        <span class="count">
-          0
-        </span>
-
-      </button>
-
-
-      <button class="action-btn comment-btn">
-
-        <svg viewBox="0 0 24 24">
-
-          <path d="M20 11.5a8 8 0 0 1-8 8 8.8 8.8 0 0 1-3.8-.9L4 20l1.3-3.5A8 8 0 1 1 20 11.5Z"/>
-
-          <path d="M8 11.5h.01"/>
-          <path d="M12 11.5h.01"/>
-          <path d="M16 11.5h.01"/>
-
-        </svg>
-
-        <span class="count">
-          0
-        </span>
-
-      </button>
+      `;
 
 
-      <button class="action-btn save-btn">
-
-        <svg viewBox="0 0 24 24">
-
-          <path d="M6 3.5h12v17l-6-3.5-6 3.5v-17Z"/>
-
-        </svg>
-
-        <span class="count">
-          0
-        </span>
-
-      </button>
+      videoFeed.prepend(card);
 
 
-      <button class="action-btn share-btn">
-
-        <svg viewBox="0 0 24 24">
-
-          <path d="M12 16V4"/>
-
-          <path d="m7 9 5-5 5 5"/>
-
-          <path d="M5 13v6.5h14V13"/>
-
-        </svg>
-
-        <span class="count">
-          Share
-        </span>
-
-      </button>
+      const newVideo =
+        card.querySelector(
+          ".video"
+        );
 
 
-      <button class="action-btn sound-btn">
-
-        <svg viewBox="0 0 24 24">
-
-          <path d="M4 10v4h4l5 4V6l-5 4H4Z"/>
-
-          <path d="M17 9a4 4 0 0 1 0 6"/>
-
-          <path d="M19.5 6.5a7.5 7.5 0 0 1 0 11"/>
-
-        </svg>
-
-      </button>
+      observer.observe(
+        newVideo
+      );
 
 
-    </div>
-  `;
+      newVideo.addEventListener(
+        "click",
+        function () {
+
+          if (newVideo.paused) {
+
+            newVideo.play();
+
+          } else {
+
+            newVideo.pause();
+
+          }
+
+        }
+      );
 
 
-  videoFeed.prepend(card);
+      const likeButton =
+        card.querySelector(
+          ".like-btn"
+        );
 
 
-  /* New video */
+      likeButton.addEventListener(
+        "click",
+        function () {
 
-  const video =
-    card.querySelector(".video");
+          likeButton.classList.toggle(
+            "active"
+          );
 
+          likeButton.querySelector(
+            ".count"
+          ).textContent =
+            likeButton.classList.contains(
+              "active"
+            )
+              ? "1"
+              : "0";
 
-  observer.observe(video);
-
-
-  /* Buttons */
-
-  setupLike(
-    card.querySelector(".like-btn")
-  );
-
-  setupSave(
-    card.querySelector(".save-btn")
-  );
-
-  setupFollow(
-    card.querySelector(".profile-action")
-  );
-
-  setupComment(
-    card.querySelector(".comment-btn")
-  );
-
-  setupShare(
-    card.querySelector(".share-btn")
-  );
-
-  setupSound(
-    card.querySelector(".sound-btn")
-  );
+        }
+      );
 
 
-  video.addEventListener("click", () => {
+      const saveButton =
+        card.querySelector(
+          ".save-btn"
+        );
 
-    if (video.paused) {
 
-      video.play().catch(() => {});
+      saveButton.addEventListener(
+        "click",
+        function () {
 
-    } else {
+          saveButton.classList.toggle(
+            "active"
+          );
 
-      video.pause();
+          saveButton.querySelector(
+            ".count"
+          ).textContent =
+            saveButton.classList.contains(
+              "active"
+            )
+              ? "1"
+              : "0";
+
+        }
+      );
+
+
+      const followButton =
+        card.querySelector(
+          ".profile-action"
+        );
+
+
+      followButton.addEventListener(
+        "click",
+        function () {
+
+          followButton.classList.toggle(
+            "following"
+          );
+
+          followButton.querySelector(
+            ".follow-plus"
+          ).textContent =
+            followButton.classList.contains(
+              "following"
+            )
+              ? "✓"
+              : "+";
+
+        }
+      );
+
+
+      card
+        .querySelector(
+          ".share-btn"
+        )
+        .addEventListener(
+          "click",
+          async function () {
+
+            if (
+              navigator.share
+            ) {
+
+              try {
+
+                await navigator.share({
+                  title: "ZYLO",
+                  text:
+                    "Check this video on ZYLO",
+                  url: videoUrl
+                });
+
+              } catch (error) {}
+
+            }
+
+          }
+        );
+
+
+      card
+        .querySelector(
+          ".sound-btn"
+        )
+        ?.addEventListener(
+          "click",
+          function () {
+
+            newVideo.muted =
+              !newVideo.muted;
+
+          }
+        );
 
     }
 
-  });
-
-
-  /* Play */
-
-  video.play().catch(() => {});
-
-}
-
-</script>
+  </script>
 
 </body>
 </html>
