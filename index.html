@@ -13,255 +13,421 @@
 
   <style>
     /* =========================
-       CREATE SCREEN
+       ZYLO CREATE / UPLOAD
     ========================= */
 
-    .create-screen {
+    .create-page {
       position: fixed;
       inset: 0;
-      z-index: 300;
-      display: none;
-      flex-direction: column;
+      z-index: 500;
       background: #000;
       color: #fff;
+      display: none;
+      overflow-y: auto;
+      padding-bottom: 30px;
     }
 
-    .create-screen.show {
-      display: flex;
+    .create-page.show {
+      display: block;
     }
 
     .create-header {
-      height: 62px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      height: 70px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 18px;
+      justify-content: center;
+      background: #000;
       border-bottom: 1px solid #222;
-      flex-shrink: 0;
     }
 
-    .create-header h2 {
-      font-size: 19px;
+    .create-header h1 {
+      font-size: 24px;
       margin: 0;
     }
 
     .create-close {
-      width: 42px;
-      height: 42px;
+      position: absolute;
+      left: 16px;
+      top: 12px;
+      width: 46px;
+      height: 46px;
       border: 0;
       border-radius: 50%;
       background: #222;
       color: #fff;
-      font-size: 27px;
-      cursor: pointer;
+      font-size: 30px;
+      line-height: 46px;
     }
 
-    .create-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-    }
+    /* Choose */
 
-    .create-options {
+    .create-choice {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      max-width: 500px;
-      margin: 25px auto;
+      gap: 16px;
+      padding: 28px 18px;
     }
 
-    .create-option {
-      min-height: 145px;
-      border: 1px solid #333;
-      border-radius: 16px;
+    .choice-card {
+      min-height: 190px;
+      border: 1px solid #292929;
+      border-radius: 22px;
       background: #151515;
       color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      font-size: 16px;
-      font-weight: 600;
+      gap: 12px;
       cursor: pointer;
     }
 
-    .create-option:active {
-      transform: scale(.97);
+    .choice-icon {
+      font-size: 55px;
     }
 
-    .create-option-icon {
-      font-size: 42px;
+    .choice-title {
+      font-size: 21px;
+      font-weight: 700;
     }
 
-    .camera-area {
+    .choice-subtitle {
+      font-size: 15px;
+      color: #aaa;
+    }
+
+    /* Editor */
+
+    .upload-editor {
       display: none;
-      max-width: 500px;
-      margin: 0 auto;
+      padding: 18px;
     }
 
-    .camera-area.show {
+    .upload-editor.show {
       display: block;
     }
 
-    #cameraPreview {
+    .video-preview-box {
       width: 100%;
-      height: 58vh;
-      object-fit: cover;
-      border-radius: 16px;
+      max-width: 430px;
+      height: 470px;
+      margin: 0 auto 18px;
+      border-radius: 20px;
+      overflow: hidden;
       background: #111;
+      position: relative;
     }
 
-    .camera-controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 25px;
-      margin-top: 18px;
-    }
-
-    .record-button {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      border: 6px solid #fff;
-      background: #fe2c55;
-      cursor: pointer;
-    }
-
-    .record-button.recording {
-      background: #fff;
-      border-color: #fe2c55;
-    }
-
-    .camera-secondary {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      border: 1px solid #555;
-      background: #222;
-      color: #fff;
-      font-size: 22px;
-    }
-
-    .video-editor {
-      display: none;
-      max-width: 500px;
-      margin: 0 auto;
-    }
-
-    .video-editor.show {
-      display: block;
-    }
-
-    #previewVideo {
+    .video-preview {
       width: 100%;
-      max-height: 55vh;
+      height: 100%;
       object-fit: contain;
+      background: #000;
+    }
+
+    .preview-play {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px;
+      height: 64px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(0,0,0,.65);
+      color: #fff;
+      font-size: 30px;
+    }
+
+    /* Caption */
+
+    .caption-box {
+      background: #171717;
+      border: 1px solid #292929;
       border-radius: 16px;
-      background: #111;
+      padding: 14px;
+      margin-bottom: 14px;
     }
 
-    .editor-form {
-      margin-top: 18px;
-    }
-
-    .caption-input {
+    .caption-box textarea {
       width: 100%;
       min-height: 95px;
       resize: none;
-      padding: 14px;
-      border: 1px solid #444;
-      border-radius: 12px;
-      outline: none;
-      background: #181818;
+      border: 0;
+      outline: 0;
+      background: transparent;
       color: #fff;
-      font-size: 16px;
+      font-size: 17px;
+      line-height: 1.45;
       font-family: Arial, sans-serif;
     }
 
-    .caption-input::placeholder {
-      color: #999;
+    .caption-box textarea::placeholder {
+      color: #888;
     }
 
+    .caption-count {
+      text-align: right;
+      color: #777;
+      font-size: 12px;
+    }
+
+    /* Hashtags */
+
+    .hashtag-box {
+      background: #171717;
+      border: 1px solid #292929;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .hashtag-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .hashtag-box input::placeholder {
+      color: #888;
+    }
+
+    /* Sound */
+
     .sound-row {
+      width: 100%;
+      min-height: 58px;
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 12px;
-      background: #181818;
+      padding: 0 16px;
+      margin-bottom: 14px;
+      border: 0;
+      border-radius: 14px;
+      background: #171717;
+      color: #fff;
+      font-size: 16px;
+      text-align: left;
     }
 
-    .sound-row span {
+    .sound-icon {
+      font-size: 24px;
+    }
+
+    .sound-arrow {
+      margin-left: auto;
+      font-size: 20px;
+      color: #aaa;
+    }
+
+    /* Settings */
+
+    .settings-box {
+      background: #171717;
+      border-radius: 16px;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    .setting-row {
+      min-height: 58px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #292929;
+    }
+
+    .setting-row:last-child {
+      border-bottom: 0;
+    }
+
+    .setting-title {
       font-size: 15px;
     }
 
-    .sound-select {
-      margin-left: auto;
-      border: 0;
-      background: transparent;
-      color: #fff;
+    .setting-value {
+      color: #aaa;
       font-size: 14px;
-      outline: none;
     }
 
-    .post-button {
-      width: 100%;
-      margin-top: 16px;
-      padding: 14px;
+    /* Toggle */
+
+    .switch {
+      position: relative;
+      width: 48px;
+      height: 28px;
+    }
+
+    .switch input {
+      display: none;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #555;
+      border-radius: 20px;
+      transition: .2s;
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .2s;
+    }
+
+    .switch input:checked + .slider {
+      background: #fe2c55;
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Post buttons */
+
+    .editor-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .draft-btn,
+    .post-btn {
+      flex: 1;
+      min-height: 54px;
+      border-radius: 13px;
+      font-size: 16px;
+      font-weight: 700;
       border: 0;
-      border-radius: 12px;
+    }
+
+    .draft-btn {
+      background: #292929;
+      color: #fff;
+    }
+
+    .post-btn {
       background: #fe2c55;
       color: #fff;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
     }
 
-    .post-button:disabled {
-      opacity: .5;
-    }
-
-    .back-create {
-      width: 100%;
-      margin-top: 10px;
-      padding: 12px;
-      border: 1px solid #444;
-      border-radius: 12px;
-      background: transparent;
-      color: #fff;
-      font-size: 15px;
-    }
-
-    #galleryInput {
-      display: none;
+    .post-btn:disabled {
+      opacity: .55;
     }
 
     .upload-progress {
       display: none;
-      margin-top: 12px;
+      margin-top: 14px;
       text-align: center;
+      color: #aaa;
       font-size: 14px;
-      color: #ccc;
     }
 
     .upload-progress.show {
       display: block;
     }
 
+    /* File input hidden */
+
+    #galleryInput,
+    #cameraInput {
+      display: none;
+    }
+
+    /* Sound popup */
+
+    .sound-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 800;
+      display: none;
+      align-items: flex-end;
+      background: rgba(0,0,0,.65);
+    }
+
+    .sound-panel.show {
+      display: flex;
+    }
+
+    .sound-sheet {
+      width: 100%;
+      max-height: 70vh;
+      background: #181818;
+      border-radius: 22px 22px 0 0;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .sound-sheet h2 {
+      margin-bottom: 15px;
+    }
+
+    .sound-option {
+      width: 100%;
+      min-height: 54px;
+      margin-bottom: 8px;
+      border: 0;
+      border-radius: 12px;
+      background: #252525;
+      color: #fff;
+      text-align: left;
+      padding: 0 16px;
+      font-size: 15px;
+    }
+
+    .sound-cancel {
+      width: 100%;
+      height: 52px;
+      margin-top: 8px;
+      border: 0;
+      border-radius: 12px;
+      background: #333;
+      color: #fff;
+      font-weight: 700;
+    }
+
     @media (max-width: 600px) {
-      .create-options {
-        margin-top: 15px;
+      .create-header {
+        height: 64px;
       }
 
-      .create-option {
-        min-height: 130px;
+      .create-header h1 {
+        font-size: 22px;
       }
 
-      #cameraPreview {
-        height: 58vh;
+      .create-choice {
+        gap: 12px;
+        padding: 25px 12px;
+      }
+
+      .choice-card {
+        min-height: 175px;
+      }
+
+      .choice-icon {
+        font-size: 48px;
+      }
+
+      .choice-title {
+        font-size: 19px;
+      }
+
+      .video-preview-box {
+        height: 470px;
       }
     }
   </style>
@@ -270,47 +436,30 @@
 <body>
 
   <!-- =========================
-       TOP BAR
+       HOME FEED
   ========================== -->
 
-  <header class="top-bar">
+  <div class="top-bar">
     <div class="top-tabs">
+      <button class="top-tab">LIVE</button>
+      <button class="top-tab">Following</button>
+      <button class="top-tab active">For You</button>
 
-      <button class="top-tab">
-        LIVE
+      <button
+        class="top-tab"
+        id="searchButton"
+        style="
+          position:absolute;
+          right:14px;
+          top:8px;
+          font-size:34px;
+          border:0;
+        "
+      >
+        ⌕
       </button>
-
-      <button class="top-tab">
-        Following
-      </button>
-
-      <button class="top-tab active">
-        For You
-      </button>
-
     </div>
-
-    <button
-      class="search-button"
-      id="searchButton"
-      aria-label="Search"
-      style="
-        position:absolute;
-        right:18px;
-        border:0;
-        background:transparent;
-        color:white;
-        font-size:32px;
-      "
-    >
-      ⌕
-    </button>
-  </header>
-
-
-  <!-- =========================
-       VIDEO FEED
-  ========================== -->
+  </div>
 
   <main class="video-feed" id="videoFeed">
 
@@ -349,7 +498,6 @@
 
       </div>
 
-
       <div class="right-actions">
 
         <button class="action-btn profile-action">
@@ -358,48 +506,28 @@
         </button>
 
         <button class="action-btn like-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M20.8 8.9c0 5.5-8.8 10.1-8.8 10.1S3.2 14.4 3.2 8.9A4.9 4.9 0 0 1 8.1 4c1.6 0 3 .8 3.9 2 0.9-1.2 2.3-2 3.9-2a4.9 4.9 0 0 1 4.9 4.9Z"/>
-          </svg>
+          ♡
           <span class="count">0</span>
         </button>
 
-        <button class="action-btn comment-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H8l-4 3v-5.5A7.5 7.5 0 1 1 20 11.5Z"/>
-            <circle cx="8" cy="11.5" r=".7"/>
-            <circle cx="12" cy="11.5" r=".7"/>
-            <circle cx="16" cy="11.5" r=".7"/>
-          </svg>
+        <button class="action-btn">
+          💬
           <span class="count">0</span>
         </button>
 
         <button class="action-btn save-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M6 3h12v18l-6-4-6 4V3Z"/>
-          </svg>
+          ♧
           <span class="count">0</span>
         </button>
 
-        <button class="action-btn share-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M22 2 11 13"/>
-            <path d="m22 2-7 20-4-9-9-4Z"/>
-          </svg>
-          <span>Share</span>
-        </button>
-
-        <button class="action-btn sound-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M4 9v6h4l5 4V5L8 9H4Z"/>
-            <path d="M16 9a4 4 0 0 1 0 6"/>
-          </svg>
+        <button class="action-btn">
+          ➤
+          <span class="count">Share</span>
         </button>
 
       </div>
 
     </section>
-
 
     <!-- VIDEO 2 -->
 
@@ -423,11 +551,7 @@
         </div>
 
         <div class="caption">
-          Discover amazing moments 🌍
-        </div>
-
-        <div class="caption">
-          Create • Connect • Grow
+          Create • Connect • Grow 🌎
         </div>
 
         <div class="music">
@@ -435,7 +559,6 @@
         </div>
 
       </div>
-
 
       <div class="right-actions">
 
@@ -445,42 +568,23 @@
         </button>
 
         <button class="action-btn like-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M20.8 8.9c0 5.5-8.8 10.1-8.8 10.1S3.2 14.4 3.2 8.9A4.9 4.9 0 0 1 8.1 4c1.6 0 3 .8 3.9 2 0.9-1.2 2.3-2 3.9-2a4.9 4.9 0 0 1 4.9 4.9Z"/>
-          </svg>
+          ♡
           <span class="count">0</span>
         </button>
 
-        <button class="action-btn comment-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H8l-4 3v-5.5A7.5 7.5 0 1 1 20 11.5Z"/>
-            <circle cx="8" cy="11.5" r=".7"/>
-            <circle cx="12" cy="11.5" r=".7"/>
-            <circle cx="16" cy="11.5" r=".7"/>
-          </svg>
+        <button class="action-btn">
+          💬
           <span class="count">0</span>
         </button>
 
         <button class="action-btn save-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M6 3h12v18l-6-4-6 4V3Z"/>
-          </svg>
+          ♧
           <span class="count">0</span>
         </button>
 
-        <button class="action-btn share-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M22 2 11 13"/>
-            <path d="m22 2-7 20-4-9-9-4Z"/>
-          </svg>
-          <span>Share</span>
-        </button>
-
-        <button class="action-btn sound-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M4 9v6h4l5 4V5L8 9H4Z"/>
-            <path d="M16 9a4 4 0 0 1 0 6"/>
-          </svg>
+        <button class="action-btn">
+          ➤
+          <span class="count">Share</span>
         </button>
 
       </div>
@@ -489,7 +593,6 @@
 
   </main>
 
-
   <!-- =========================
        BOTTOM NAV
   ========================== -->
@@ -497,47 +600,29 @@
   <nav class="bottom-nav">
 
     <button class="nav-button active">
-      <svg viewBox="0 0 24 24">
-        <path d="m3 11 9-8 9 8"/>
-        <path d="M5 10v10h14V10"/>
-      </svg>
+      <span style="font-size:26px;">⌂</span>
       <span>Home</span>
     </button>
 
     <button class="nav-button">
-      <svg viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="7"/>
-        <path d="m20 20-4-4"/>
-      </svg>
+      <span style="font-size:27px;">⌕</span>
       <span>Search</span>
     </button>
 
-    <!-- CREATE -->
-
     <button
       class="nav-button upload-button"
-      id="openCreate"
-      aria-label="Create"
+      id="createButton"
     >
-      <svg viewBox="0 0 24 24">
-        <path d="M12 5v14"/>
-        <path d="M5 12h14"/>
-      </svg>
+      <span style="font-size:32px;">+</span>
     </button>
 
     <button class="nav-button">
-      <svg viewBox="0 0 24 24">
-        <rect x="3" y="5" width="18" height="14" rx="2"/>
-        <path d="m3 7 9 6 9-6"/>
-      </svg>
+      <span style="font-size:25px;">▱</span>
       <span>Inbox</span>
     </button>
 
     <button class="nav-button">
-      <svg viewBox="0 0 24 24">
-        <circle cx="12" cy="8" r="4"/>
-        <path d="M4 21c0-4 3-7 8-7s8 3 8 7"/>
-      </svg>
+      <span style="font-size:25px;">♙</span>
       <span>Profile</span>
     </button>
 
@@ -545,214 +630,280 @@
 
 
   <!-- =========================
-       CREATE SCREEN
+       CREATE PAGE
   ========================== -->
 
   <section
-    class="create-screen"
-    id="createScreen"
+    class="create-page"
+    id="createPage"
   >
 
     <header class="create-header">
 
       <button
         class="create-close"
-        id="closeCreate"
+        id="createClose"
       >
         ×
       </button>
 
-      <h2>Create</h2>
-
-      <div style="width:42px;"></div>
+      <h1>Create</h1>
 
     </header>
 
 
-    <div class="create-body">
+    <!-- STEP 1 -->
 
-      <!-- CREATE OPTIONS -->
+    <div
+      class="create-choice"
+      id="createChoice"
+    >
 
-      <div
-        class="create-options"
-        id="createOptions"
+      <button
+        class="choice-card"
+        id="cameraButton"
       >
 
-        <button
-          class="create-option"
-          id="cameraButton"
-        >
-          <div class="create-option-icon">
-            📹
-          </div>
-
-          <div>
-            Camera
-          </div>
-
-          <small>
-            Record video
-          </small>
-        </button>
-
-
-        <button
-          class="create-option"
-          id="galleryButton"
-        >
-          <div class="create-option-icon">
-            🖼️
-          </div>
-
-          <div>
-            Upload
-          </div>
-
-          <small>
-            From gallery
-          </small>
-        </button>
-
-      </div>
-
-
-      <!-- GALLERY INPUT -->
-
-      <input
-        type="file"
-        id="galleryInput"
-        accept="video/*"
-      />
-
-
-      <!-- CAMERA -->
-
-      <div
-        class="camera-area"
-        id="cameraArea"
-      >
-
-        <video
-          id="cameraPreview"
-          autoplay
-          muted
-          playsinline
-        ></video>
-
-        <div class="camera-controls">
-
-          <button
-            class="camera-secondary"
-            id="cameraBack"
-          >
-            ←
-          </button>
-
-          <button
-            class="record-button"
-            id="recordButton"
-          ></button>
-
-          <button
-            class="camera-secondary"
-            id="switchCamera"
-          >
-            🔄
-          </button>
-
+        <div class="choice-icon">
+          📹
         </div>
 
-        <div
-          id="cameraStatus"
-          style="
-            text-align:center;
-            margin-top:12px;
-            color:#aaa;
-          "
-        >
-          Tap the button to record
+        <div class="choice-title">
+          Camera
         </div>
 
-      </div>
+        <div class="choice-subtitle">
+          Record video
+        </div>
+
+      </button>
 
 
-      <!-- VIDEO EDITOR -->
-
-      <div
-        class="video-editor"
-        id="videoEditor"
+      <button
+        class="choice-card"
+        id="uploadButton"
       >
+
+        <div class="choice-icon">
+          🖼️
+        </div>
+
+        <div class="choice-title">
+          Upload
+        </div>
+
+        <div class="choice-subtitle">
+          From gallery
+        </div>
+
+      </button>
+
+    </div>
+
+
+    <!-- Hidden inputs -->
+
+    <input
+      id="galleryInput"
+      type="file"
+      accept="video/*"
+    />
+
+    <input
+      id="cameraInput"
+      type="file"
+      accept="video/*"
+      capture="environment"
+    />
+
+
+    <!-- STEP 2 -->
+
+    <div
+      class="upload-editor"
+      id="uploadEditor"
+    >
+
+      <!-- Video -->
+
+      <div class="video-preview-box">
 
         <video
           id="previewVideo"
-          controls
+          class="video-preview"
           playsinline
+          controls
         ></video>
 
+        <button
+          class="preview-play"
+          id="previewPlay"
+        >
+          ▶
+        </button>
 
-        <div class="editor-form">
-
-          <textarea
-            id="captionInput"
-            class="caption-input"
-            maxlength="2200"
-            placeholder="Write a caption..."
-          ></textarea>
+      </div>
 
 
-          <div class="sound-row">
+      <!-- Caption -->
 
-            <span>🎵</span>
+      <div class="caption-box">
 
-            <span>
-              Sound
-            </span>
+        <textarea
+          id="captionInput"
+          maxlength="2200"
+          placeholder="Write a caption..."
+        ></textarea>
 
-            <select
-              class="sound-select"
-              id="soundSelect"
-            >
-              <option value="Original sound - ZYLO">
-                Original sound - ZYLO
-              </option>
+        <div class="caption-count">
+          <span id="captionCount">0</span>/2200
+        </div>
 
-              <option value="Trending sound">
-                Trending sound
-              </option>
+      </div>
 
-              <option value="My original sound">
-                My original sound
-              </option>
-            </select>
 
+      <!-- Hashtags -->
+
+      <div class="hashtag-box">
+
+        <input
+          id="hashtagInput"
+          type="text"
+          placeholder="Add hashtags  #ZYLO #ForYou"
+        />
+
+      </div>
+
+
+      <!-- Sound -->
+
+      <button
+        class="sound-row"
+        id="soundButton"
+      >
+
+        <span class="sound-icon">
+          🎵
+        </span>
+
+        <span id="soundName">
+          Original sound - ZYLO
+        </span>
+
+        <span class="sound-arrow">
+          ›
+        </span>
+
+      </button>
+
+
+      <!-- Settings -->
+
+      <div class="settings-box">
+
+        <div class="setting-row">
+
+          <div class="setting-title">
+            Who can view this video
           </div>
 
-
-          <button
-            class="post-button"
-            id="postButton"
+          <select
+            id="privacySelect"
+            style="
+              background:#171717;
+              color:#aaa;
+              border:0;
+              outline:0;
+              font-size:14px;
+            "
           >
-            Post
-          </button>
 
+            <option value="public">
+              Everyone
+            </option>
 
-          <button
-            class="back-create"
-            id="backCreate"
-          >
-            Choose another video
-          </button>
+            <option value="friends">
+              Friends
+            </option>
 
+            <option value="private">
+              Only me
+            </option>
 
-          <div
-            class="upload-progress"
-            id="uploadProgress"
-          >
-            ভিডিও আপলোড হচ্ছে...
-          </div>
+          </select>
 
         </div>
 
+
+        <div class="setting-row">
+
+          <div class="setting-title">
+            Allow comments
+          </div>
+
+          <label class="switch">
+
+            <input
+              type="checkbox"
+              id="commentsToggle"
+              checked
+            />
+
+            <span class="slider"></span>
+
+          </label>
+
+        </div>
+
+
+        <div class="setting-row">
+
+          <div class="setting-title">
+            Allow downloads
+          </div>
+
+          <label class="switch">
+
+            <input
+              type="checkbox"
+              id="downloadsToggle"
+            />
+
+            <span class="slider"></span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <!-- Buttons -->
+
+      <div class="editor-actions">
+
+        <button
+          class="draft-btn"
+          id="draftButton"
+        >
+          Draft
+        </button>
+
+        <button
+          class="post-btn"
+          id="postButton"
+        >
+          Post
+        </button>
+
+      </div>
+
+
+      <div
+        class="upload-progress"
+        id="uploadProgress"
+      >
+        Uploading video...
       </div>
 
     </div>
@@ -761,551 +912,396 @@
 
 
   <!-- =========================
-       JAVASCRIPT
+       SOUND PANEL
   ========================== -->
+
+  <div
+    class="sound-panel"
+    id="soundPanel"
+  >
+
+    <div class="sound-sheet">
+
+      <h2>
+        Select sound
+      </h2>
+
+      <button
+        class="sound-option"
+        data-sound="Original sound - ZYLO"
+      >
+        🎵 Original sound - ZYLO
+      </button>
+
+      <button
+        class="sound-option"
+        data-sound="Trending sound"
+      >
+        🔥 Trending sound
+      </button>
+
+      <button
+        class="sound-option"
+        data-sound="Popular sound"
+      >
+        ⭐ Popular sound
+      </button>
+
+      <button
+        class="sound-option"
+        data-sound="My original sound"
+      >
+        🎧 My original sound
+      </button>
+
+      <button
+        class="sound-cancel"
+        id="soundCancel"
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
 
   <script>
 
-    const BACKEND_URL =
-      "https://zylo-backend-ec5c.onrender.com";
+    /* =========================
+       CREATE PAGE
+    ========================== */
+
+    const createButton =
+      document.getElementById("createButton");
+
+    const createPage =
+      document.getElementById("createPage");
+
+    const createClose =
+      document.getElementById("createClose");
+
+    const createChoice =
+      document.getElementById("createChoice");
+
+    const uploadEditor =
+      document.getElementById("uploadEditor");
+
+
+    createButton.addEventListener("click", () => {
+
+      createPage.classList.add("show");
+
+      createChoice.style.display = "grid";
+
+      uploadEditor.classList.remove("show");
+
+    });
+
+
+    createClose.addEventListener("click", () => {
+
+      createPage.classList.remove("show");
+
+      resetUpload();
+
+    });
 
 
     /* =========================
-       ELEMENTS
+       FILE INPUT
     ========================== */
 
-    const videoFeed =
-      document.getElementById("videoFeed");
-
-    const createScreen =
-      document.getElementById("createScreen");
-
-    const createOptions =
-      document.getElementById("createOptions");
-
-    const cameraArea =
-      document.getElementById("cameraArea");
-
-    const videoEditor =
-      document.getElementById("videoEditor");
-
-    const openCreate =
-      document.getElementById("openCreate");
-
-    const closeCreate =
-      document.getElementById("closeCreate");
+    const uploadButton =
+      document.getElementById("uploadButton");
 
     const cameraButton =
       document.getElementById("cameraButton");
 
-    const galleryButton =
-      document.getElementById("galleryButton");
-
     const galleryInput =
       document.getElementById("galleryInput");
 
-    const cameraPreview =
-      document.getElementById("cameraPreview");
+    const cameraInput =
+      document.getElementById("cameraInput");
 
     const previewVideo =
       document.getElementById("previewVideo");
 
-    const recordButton =
-      document.getElementById("recordButton");
 
-    const cameraBack =
-      document.getElementById("cameraBack");
-
-    const switchCamera =
-      document.getElementById("switchCamera");
-
-    const cameraStatus =
-      document.getElementById("cameraStatus");
-
-    const captionInput =
-      document.getElementById("captionInput");
-
-    const soundSelect =
-      document.getElementById("soundSelect");
-
-    const postButton =
-      document.getElementById("postButton");
-
-    const backCreate =
-      document.getElementById("backCreate");
-
-    const uploadProgress =
-      document.getElementById("uploadProgress");
-
-
-    let cameraStream = null;
-    let mediaRecorder = null;
-    let recordedChunks = [];
-
-    let selectedVideoFile = null;
-    let cameraFacing = "user";
-
-
-    /* =========================
-       OPEN CREATE
-    ========================= */
-
-    openCreate.addEventListener("click", () => {
-
-      createScreen.classList.add("show");
-
-      createOptions.style.display = "grid";
-      cameraArea.classList.remove("show");
-      videoEditor.classList.remove("show");
-
-      stopCamera();
-
-    });
-
-
-    /* =========================
-       CLOSE CREATE
-    ========================= */
-
-    closeCreate.addEventListener("click", () => {
-
-      createScreen.classList.remove("show");
-
-      stopCamera();
-
-      if (previewVideo.src) {
-        URL.revokeObjectURL(previewVideo.src);
-        previewVideo.removeAttribute("src");
-        previewVideo.load();
-      }
-
-    });
-
-
-    /* =========================
-       GALLERY
-    ========================= */
-
-    galleryButton.addEventListener("click", () => {
-
+    uploadButton.addEventListener("click", () => {
       galleryInput.click();
-
     });
 
 
-    galleryInput.addEventListener("change", (event) => {
+    cameraButton.addEventListener("click", () => {
+      cameraInput.click();
+    });
 
-      const file = event.target.files[0];
 
-      if (!file) {
-        return;
-      }
+    galleryInput.addEventListener(
+      "change",
+      handleVideo
+    );
+
+
+    cameraInput.addEventListener(
+      "change",
+      handleVideo
+    );
+
+
+    let selectedVideo = null;
+
+
+    function handleVideo(event) {
+
+      const file =
+        event.target.files[0];
+
+      if (!file) return;
 
 
       if (!file.type.startsWith("video/")) {
 
-        alert("শুধু ভিডিও নির্বাচন করুন");
-
-        galleryInput.value = "";
+        alert("Please select a video.");
 
         return;
       }
 
 
-      const maxSize =
-        200 * 1024 * 1024;
-
-
-      if (file.size > maxSize) {
+      if (file.size > 200 * 1024 * 1024) {
 
         alert(
-          "ভিডিও সর্বোচ্চ 200 MB হতে পারবে"
+          "Maximum video size is 200 MB."
         );
-
-        galleryInput.value = "";
 
         return;
       }
 
 
-      selectedVideoFile = file;
-
-      showVideoEditor(file);
-
-    });
-
-
-    /* =========================
-       SHOW VIDEO EDITOR
-    ========================= */
-
-    function showVideoEditor(file) {
-
-      stopCamera();
-
-      createOptions.style.display = "none";
-
-      cameraArea.classList.remove("show");
-
-      videoEditor.classList.add("show");
+      selectedVideo = file;
 
 
       const videoURL =
         URL.createObjectURL(file);
 
+
       previewVideo.src = videoURL;
 
       previewVideo.load();
 
-      previewVideo.play().catch(() => {});
 
+      createChoice.style.display =
+        "none";
 
-      captionInput.value = "";
-
-      soundSelect.value =
-        "Original sound - ZYLO";
-
-    }
-
-
-    /* =========================
-       CAMERA
-    ========================= */
-
-    cameraButton.addEventListener(
-      "click",
-      startCamera
-    );
-
-
-    async function startCamera() {
-
-      try {
-
-        createOptions.style.display =
-          "none";
-
-        videoEditor.classList.remove("show");
-
-        cameraArea.classList.add("show");
-
-
-        stopCamera();
-
-
-        cameraStream =
-          await navigator.mediaDevices.getUserMedia({
-
-            video: {
-              facingMode: cameraFacing,
-              width: {
-                ideal: 1080
-              },
-              height: {
-                ideal: 1920
-              }
-            },
-
-            audio: true
-
-          });
-
-
-        cameraPreview.srcObject =
-          cameraStream;
-
-
-        cameraStatus.textContent =
-          "Tap the red button to record";
-
-      } catch (error) {
-
-        console.error(error);
-
-        alert(
-          "Camera চালু করা যায়নি। Browser permission দিন।"
-        );
-
-        backToCreateOptions();
-
-      }
-
-    }
-
-
-    /* =========================
-       RECORD VIDEO
-    ========================= */
-
-    recordButton.addEventListener(
-      "click",
-      () => {
-
-        if (
-          mediaRecorder &&
-          mediaRecorder.state === "recording"
-        ) {
-
-          stopRecording();
-
-        } else {
-
-          startRecording();
-
-        }
-
-      }
-    );
-
-
-    function startRecording() {
-
-      if (!cameraStream) {
-        return;
-      }
-
-
-      recordedChunks = [];
-
-
-      let options = {
-        mimeType: "video/webm"
-      };
-
-
-      if (
-        !MediaRecorder.isTypeSupported(
-          "video/webm"
-        )
-      ) {
-
-        options = {};
-
-      }
-
-
-      mediaRecorder =
-        new MediaRecorder(
-          cameraStream,
-          options
-        );
-
-
-      mediaRecorder.ondataavailable =
-        (event) => {
-
-          if (event.data.size > 0) {
-
-            recordedChunks.push(
-              event.data
-            );
-
-          }
-
-        };
-
-
-      mediaRecorder.onstop =
-        () => {
-
-          const blob =
-            new Blob(
-              recordedChunks,
-              {
-                type:
-                  "video/webm"
-              }
-            );
-
-
-          selectedVideoFile =
-            new File(
-              [blob],
-              "zylo-camera-video.webm",
-              {
-                type:
-                  "video/webm"
-              }
-            );
-
-
-          showVideoEditor(
-            selectedVideoFile
-          );
-
-        };
-
-
-      mediaRecorder.start();
-
-
-      recordButton.classList.add(
-        "recording"
-      );
-
-
-      cameraStatus.textContent =
-        "Recording... Tap again to stop";
-
-    }
-
-
-    function stopRecording() {
-
-      if (
-        mediaRecorder &&
-        mediaRecorder.state === "recording"
-      ) {
-
-        mediaRecorder.stop();
-
-      }
-
-
-      recordButton.classList.remove(
-        "recording"
+      uploadEditor.classList.add(
+        "show"
       );
 
     }
 
 
     /* =========================
-       CAMERA SWITCH
-    ========================= */
+       PREVIEW PLAY
+    ========================== */
 
-    switchCamera.addEventListener(
+    const previewPlay =
+      document.getElementById("previewPlay");
+
+
+    previewPlay.addEventListener(
       "click",
       async () => {
 
-        cameraFacing =
-          cameraFacing === "user"
-            ? "environment"
-            : "user";
+        if (previewVideo.paused) {
 
-        await startCamera();
+          await previewVideo.play();
 
-      }
-    );
+          previewPlay.textContent = "❚❚";
 
+        } else {
 
-    /* =========================
-       CAMERA BACK
-    ========================= */
+          previewVideo.pause();
 
-    cameraBack.addEventListener(
-      "click",
-      () => {
-
-        stopCamera();
-
-        backToCreateOptions();
-
-      }
-    );
-
-
-    function backToCreateOptions() {
-
-      createOptions.style.display =
-        "grid";
-
-      cameraArea.classList.remove(
-        "show"
-      );
-
-      videoEditor.classList.remove(
-        "show"
-      );
-
-    }
-
-
-    /* =========================
-       STOP CAMERA
-    ========================= */
-
-    function stopCamera() {
-
-      if (cameraStream) {
-
-        cameraStream
-          .getTracks()
-          .forEach(
-            track => track.stop()
-          );
-
-        cameraStream = null;
-
-      }
-
-      cameraPreview.srcObject = null;
-
-    }
-
-
-    /* =========================
-       BACK / CHANGE VIDEO
-    ========================= */
-
-    backCreate.addEventListener(
-      "click",
-      () => {
-
-        selectedVideoFile = null;
-
-        if (previewVideo.src) {
-
-          URL.revokeObjectURL(
-            previewVideo.src
-          );
+          previewPlay.textContent = "▶";
 
         }
 
-        previewVideo.removeAttribute(
-          "src"
-        );
+      }
+    );
 
-        previewVideo.load();
 
-        galleryInput.value = "";
+    previewVideo.addEventListener(
+      "play",
+      () => {
+        previewPlay.textContent = "❚❚";
+      }
+    );
 
-        backToCreateOptions();
+
+    previewVideo.addEventListener(
+      "pause",
+      () => {
+        previewPlay.textContent = "▶";
+      }
+    );
+
+
+    /* =========================
+       CAPTION COUNTER
+    ========================== */
+
+    const captionInput =
+      document.getElementById(
+        "captionInput"
+      );
+
+    const captionCount =
+      document.getElementById(
+        "captionCount"
+      );
+
+
+    captionInput.addEventListener(
+      "input",
+      () => {
+
+        captionCount.textContent =
+          captionInput.value.length;
 
       }
     );
 
 
     /* =========================
-       POST VIDEO
-    ========================= */
+       SOUND
+    ========================== */
+
+    const soundButton =
+      document.getElementById(
+        "soundButton"
+      );
+
+    const soundPanel =
+      document.getElementById(
+        "soundPanel"
+      );
+
+    const soundCancel =
+      document.getElementById(
+        "soundCancel"
+      );
+
+    const soundName =
+      document.getElementById(
+        "soundName"
+      );
+
+
+    soundButton.addEventListener(
+      "click",
+      () => {
+
+        soundPanel.classList.add(
+          "show"
+        );
+
+      }
+    );
+
+
+    soundCancel.addEventListener(
+      "click",
+      () => {
+
+        soundPanel.classList.remove(
+          "show"
+        );
+
+      }
+    );
+
+
+    document
+      .querySelectorAll(".sound-option")
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            soundName.textContent =
+              button.dataset.sound;
+
+            soundPanel.classList.remove(
+              "show"
+            );
+
+          }
+        );
+
+      });
+
+
+    /* =========================
+       POST
+    ========================== */
+
+    const postButton =
+      document.getElementById(
+        "postButton"
+      );
+
+    const uploadProgress =
+      document.getElementById(
+        "uploadProgress"
+      );
+
 
     postButton.addEventListener(
       "click",
       async () => {
 
-        if (!selectedVideoFile) {
+        if (!selectedVideo) {
 
-          alert(
-            "আগে একটি ভিডিও নির্বাচন করুন"
-          );
+          alert("Please select a video.");
 
           return;
         }
 
 
-        postButton.disabled = true;
-
-        uploadProgress.classList.add(
-          "show"
-        );
-
-
         const caption =
           captionInput.value.trim();
 
+        const hashtags =
+          document
+            .getElementById(
+              "hashtagInput"
+            )
+            .value.trim();
 
-        const sound =
-          soundSelect.value;
+        const privacy =
+          document
+            .getElementById(
+              "privacySelect"
+            )
+            .value;
+
+
+        const comments =
+          document
+            .getElementById(
+              "commentsToggle"
+            )
+            .checked;
+
+
+        const downloads =
+          document
+            .getElementById(
+              "downloadsToggle"
+            )
+            .checked;
 
 
         const formData =
@@ -1314,16 +1310,61 @@
 
         formData.append(
           "video",
-          selectedVideoFile
+          selectedVideo
         );
+
+
+        formData.append(
+          "caption",
+          caption
+        );
+
+
+        formData.append(
+          "hashtags",
+          hashtags
+        );
+
+
+        formData.append(
+          "sound",
+          soundName.textContent
+        );
+
+
+        formData.append(
+          "privacy",
+          privacy
+        );
+
+
+        formData.append(
+          "comments",
+          comments
+        );
+
+
+        formData.append(
+          "downloads",
+          downloads
+        );
+
+
+        postButton.disabled = true;
+
+        uploadProgress.classList.add(
+          "show"
+        );
+
+        uploadProgress.textContent =
+          "ভিডিও আপলোড হচ্ছে...";
 
 
         try {
 
           const response =
             await fetch(
-              BACKEND_URL +
-              "/api/upload",
+              "https://zylo-backend-ec5c.onrender.com/api/upload",
               {
                 method: "POST",
                 body: formData
@@ -1345,54 +1386,52 @@
           }
 
 
+          uploadProgress.textContent =
+            "ভিডিও সফলভাবে পোস্ট হয়েছে ✓";
+
+
+          /* Add uploaded video to feed */
+
           if (
-            data.success &&
-            data.video
+            data.video &&
+            data.video.url
           ) {
 
             addVideoToFeed(
               data.video.url,
               caption,
-              sound
-            );
-
-
-            alert(
-              "ভিডিও সফলভাবে পোস্ট হয়েছে 🎉"
-            );
-
-
-            createScreen.classList.remove(
-              "show"
-            );
-
-
-            resetCreateScreen();
-
-          } else {
-
-            throw new Error(
-              "ভিডিও আপলোড করা যায়নি"
+              soundName.textContent
             );
 
           }
+
+
+          setTimeout(() => {
+
+            createPage.classList.remove(
+              "show"
+            );
+
+            resetUpload();
+
+          }, 1000);
+
 
         } catch (error) {
 
           console.error(error);
 
+          uploadProgress.textContent =
+            "Upload failed: " +
+            error.message;
+
           alert(
-            "Upload error: " +
-            error.message
+            "ভিডিও আপলোড হয়নি। আবার চেষ্টা করুন।"
           );
 
         } finally {
 
           postButton.disabled = false;
-
-          uploadProgress.classList.remove(
-            "show"
-          );
 
         }
 
@@ -1402,7 +1441,7 @@
 
     /* =========================
        ADD VIDEO TO FEED
-    ========================= */
+    ========================== */
 
     function addVideoToFeed(
       videoURL,
@@ -1428,7 +1467,7 @@
           loop
           muted
           playsinline
-          autoplay
+          preload="metadata"
         ></video>
 
         <div class="video-gradient"></div>
@@ -1468,9 +1507,7 @@
 
           <button class="action-btn like-btn">
 
-            <svg viewBox="0 0 24 24">
-              <path d="M20.8 8.9c0 5.5-8.8 10.1-8.8 10.1S3.2 14.4 3.2 8.9A4.9 4.9 0 0 1 8.1 4c1.6 0 3 .8 3.9 2 0.9-1.2 2.3-2 3.9-2a4.9 4.9 0 0 1 4.9 4.9Z"/>
-            </svg>
+            ♡
 
             <span class="count">
               0
@@ -1478,14 +1515,9 @@
 
           </button>
 
-          <button class="action-btn comment-btn">
+          <button class="action-btn">
 
-            <svg viewBox="0 0 24 24">
-              <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H8l-4 3v-5.5A7.5 7.5 0 1 1 20 11.5Z"/>
-              <circle cx="8" cy="11.5" r=".7"/>
-              <circle cx="12" cy="11.5" r=".7"/>
-              <circle cx="16" cy="11.5" r=".7"/>
-            </svg>
+            💬
 
             <span class="count">
               0
@@ -1495,9 +1527,7 @@
 
           <button class="action-btn save-btn">
 
-            <svg viewBox="0 0 24 24">
-              <path d="M6 3h12v18l-6-4-6 4V3Z"/>
-            </svg>
+            ♧
 
             <span class="count">
               0
@@ -1505,25 +1535,13 @@
 
           </button>
 
-          <button class="action-btn share-btn">
+          <button class="action-btn">
 
-            <svg viewBox="0 0 24 24">
-              <path d="M22 2 11 13"/>
-              <path d="m22 2-7 20-4-9-9-4Z"/>
-            </svg>
+            ➤
 
-            <span>
+            <span class="count">
               Share
             </span>
-
-          </button>
-
-          <button class="action-btn sound-btn">
-
-            <svg viewBox="0 0 24 24">
-              <path d="M4 9v6h4l5 4V5L8 9H4Z"/>
-              <path d="M16 9a4 4 0 0 1 0 6"/>
-            </svg>
 
           </button>
 
@@ -1535,32 +1553,17 @@
       videoFeed.prepend(card);
 
 
-      setupCardEvents(card);
-
-
-      videoFeed.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-
-
-      const video =
-        card.querySelector(".video");
-
-
-      video.play().catch(() => {});
+      setupVideoObserver();
 
     }
 
 
-    /* =========================
-       ESCAPE HTML
-    ========================= */
-
     function escapeHTML(text) {
 
       const div =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       div.textContent = text;
 
@@ -1570,39 +1573,36 @@
 
 
     /* =========================
-       RESET CREATE
-    ========================= */
+       DRAFT
+    ========================== */
 
-    function resetCreateScreen() {
-
-      stopCamera();
-
-      selectedVideoFile = null;
-
-      recordedChunks = [];
-
-      galleryInput.value = "";
-
-      captionInput.value = "";
-
-      createOptions.style.display =
-        "grid";
-
-      cameraArea.classList.remove(
-        "show"
+    const draftButton =
+      document.getElementById(
+        "draftButton"
       );
 
-      videoEditor.classList.remove(
-        "show"
-      );
 
-      if (previewVideo.src) {
+    draftButton.addEventListener(
+      "click",
+      () => {
 
-        URL.revokeObjectURL(
-          previewVideo.src
+        alert(
+          "Draft system পরের ধাপে যুক্ত করা হবে।"
         );
 
       }
+    );
+
+
+    /* =========================
+       RESET
+    ========================== */
+
+    function resetUpload() {
+
+      selectedVideo = null;
+
+      previewVideo.pause();
 
       previewVideo.removeAttribute(
         "src"
@@ -1610,290 +1610,242 @@
 
       previewVideo.load();
 
+
+      galleryInput.value = "";
+
+      cameraInput.value = "";
+
+
+      captionInput.value = "";
+
+      captionCount.textContent = "0";
+
+
+      document.getElementById(
+        "hashtagInput"
+      ).value = "";
+
+
+      soundName.textContent =
+        "Original sound - ZYLO";
+
+
+      document.getElementById(
+        "privacySelect"
+      ).value = "public";
+
+
+      document.getElementById(
+        "commentsToggle"
+      ).checked = true;
+
+
+      document.getElementById(
+        "downloadsToggle"
+      ).checked = false;
+
+
+      uploadProgress.classList.remove(
+        "show"
+      );
+
+
+      createChoice.style.display =
+        "grid";
+
+      uploadEditor.classList.remove(
+        "show"
+      );
+
     }
 
 
     /* =========================
-       LIKE / SAVE / FOLLOW
-    ========================= */
+       VIDEO AUTOPLAY
+    ========================== */
 
-    function setupCardEvents(card) {
+    function setupVideoObserver() {
 
-      const like =
-        card.querySelector(
-          ".like-btn"
-        );
-
-      const save =
-        card.querySelector(
-          ".save-btn"
-        );
-
-      const follow =
-        card.querySelector(
-          ".profile-action"
-        );
-
-
-      like.addEventListener(
-        "click",
-        () => {
-
-          like.classList.toggle(
-            "active"
-          );
-
-          const count =
-            like.querySelector(
-              ".count"
-            );
-
-          count.textContent =
-            like.classList.contains(
-              "active"
-            )
-              ? "1"
-              : "0";
-
-        }
-      );
-
-
-      save.addEventListener(
-        "click",
-        () => {
-
-          save.classList.toggle(
-            "active"
-          );
-
-          const count =
-            save.querySelector(
-              ".count"
-            );
-
-          count.textContent =
-            save.classList.contains(
-              "active"
-            )
-              ? "1"
-              : "0";
-
-        }
-      );
-
-
-      follow.addEventListener(
-        "click",
-        () => {
-
-          follow.classList.toggle(
-            "following"
-          );
-
-          const plus =
-            follow.querySelector(
-              ".follow-plus"
-            );
-
-          plus.textContent =
-            follow.classList.contains(
-              "following"
-            )
-              ? "✓"
-              : "+";
-
-        }
-      );
-
-
-      const sound =
-        card.querySelector(
-          ".sound-btn"
-        );
-
-
-      const video =
-        card.querySelector(
+      const videos =
+        document.querySelectorAll(
           ".video"
         );
 
 
-      sound.addEventListener(
-        "click",
-        () => {
+      const observer =
+        new IntersectionObserver(
+          entries => {
 
-          video.muted =
-            !video.muted;
+            entries.forEach(
+              entry => {
 
-          sound.classList.toggle(
-            "active",
-            !video.muted
-          );
-
-        }
-      );
+                const video =
+                  entry.target;
 
 
-      const share =
-        card.querySelector(
-          ".share-btn"
+                if (
+                  entry.isIntersecting &&
+                  entry.intersectionRatio > 0.6
+                ) {
+
+                  videos.forEach(v => {
+
+                    if (v !== video) {
+
+                      v.pause();
+
+                    }
+
+                  });
+
+
+                  video.play()
+                    .catch(() => {});
+
+
+                } else {
+
+                  video.pause();
+
+                }
+
+              }
+            );
+
+          },
+          {
+            threshold: [0.6]
+          }
         );
 
 
-      share.addEventListener(
-        "click",
-        async () => {
+      videos.forEach(video => {
 
-          try {
+        observer.observe(video);
 
-            if (
-              navigator.share
-            ) {
-
-              await navigator.share({
-                title: "ZYLO",
-                text: "Watch this video on ZYLO",
-                url: location.href
-              });
-
-            } else {
-
-              await navigator.clipboard.writeText(
-                location.href
-              );
-
-              alert(
-                "Link copied"
-              );
-
-            }
-
-          } catch (error) {}
-
-        }
-      );
+      });
 
     }
 
 
-    /* =========================
-       EXISTING CARDS
-    ========================= */
-
-    document
-      .querySelectorAll(
-        ".video-card"
-      )
-      .forEach(
-        setupCardEvents
-      );
+    setupVideoObserver();
 
 
     /* =========================
-       AUTO PLAY / PAUSE
-    ========================= */
+       LIKE
+    ========================== */
 
-    const observer =
-      new IntersectionObserver(
-        entries => {
+    document.addEventListener(
+      "click",
+      event => {
 
-          entries.forEach(
-            entry => {
-
-              const video =
-                entry.target.querySelector(
-                  ".video"
-                );
-
-              if (!video) {
-                return;
-              }
-
-
-              if (
-                entry.isIntersecting &&
-                entry.intersectionRatio >= 0.65
-              ) {
-
-                video.play().catch(
-                  () => {}
-                );
-
-              } else {
-
-                video.pause();
-
-              }
-
-            }
+        const button =
+          event.target.closest(
+            ".like-btn"
           );
 
-        },
-        {
-          threshold: [
-            0.65
-          ]
-        }
-      );
+
+        if (!button) return;
 
 
-    document
-      .querySelectorAll(
-        ".video-card"
-      )
-      .forEach(
-        card =>
-          observer.observe(card)
-      );
+        button.classList.toggle(
+          "active"
+        );
 
 
-    /* =========================
-       INITIALIZE
-    ========================= */
-
-    document
-      .querySelectorAll(
-        ".video-card"
-      )
-      .forEach(
-        card => {
-
-          const video =
-            card.querySelector(
-              ".video"
-            );
-
-          if (video) {
-
-            video.play().catch(
-              () => {}
-            );
-
-          }
-
-        }
-      );
-
-
-    /* =========================
-       SEARCH BUTTON
-    ========================= */
-
-    document
-      .getElementById(
-        "searchButton"
-      )
-      .addEventListener(
-        "click",
-        () => {
-
-          alert(
-            "ZYLO Search — Coming Soon"
+        const count =
+          button.querySelector(
+            ".count"
           );
 
+
+        if (
+          button.classList.contains(
+            "active"
+          )
+        ) {
+
+          count.textContent = "1";
+
+        } else {
+
+          count.textContent = "0";
+
         }
-      );
+
+      }
+    );
+
+
+    /* =========================
+       SAVE
+    ========================== */
+
+    document.addEventListener(
+      "click",
+      event => {
+
+        const button =
+          event.target.closest(
+            ".save-btn"
+          );
+
+
+        if (!button) return;
+
+
+        button.classList.toggle(
+          "active"
+        );
+
+
+        const count =
+          button.querySelector(
+            ".count"
+          );
+
+
+        count.textContent =
+          button.classList.contains(
+            "active"
+          )
+            ? "1"
+            : "0";
+
+      }
+    );
+
+
+    /* =========================
+       VIDEO TAP PLAY / PAUSE
+    ========================== */
+
+    document.addEventListener(
+      "click",
+      event => {
+
+        const video =
+          event.target.closest(
+            ".video-card .video"
+          );
+
+
+        if (!video) return;
+
+
+        if (video.paused) {
+
+          video.play()
+            .catch(() => {});
+
+        } else {
+
+          video.pause();
+
+        }
+
+      }
+    );
 
   </script>
 
