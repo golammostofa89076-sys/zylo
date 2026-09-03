@@ -1,3 +1,7 @@
+/* =========================================================
+   ZYLO — FINAL MOBILE SHORT VIDEO UI
+   ========================================================= */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -13,11 +17,16 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+body {
+    color: #fff;
+}
+
 button {
     font-family: inherit;
     border: 0;
     outline: 0;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .app {
@@ -29,7 +38,9 @@ button {
 }
 
 
-/* ================= TOP ================= */
+/* =========================================================
+   TOP BAR
+   ========================================================= */
 
 .top-bar {
     position: fixed;
@@ -37,134 +48,156 @@ button {
     left: 0;
 
     width: 100%;
-    height: 62px;
+    height: 64px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    z-index: 100;
+    z-index: 1000;
 
     background: linear-gradient(
         to bottom,
-        rgba(0,0,0,.55),
+        rgba(0, 0, 0, .55),
+        rgba(0, 0, 0, .15),
         transparent
     );
+
+    pointer-events: none;
 }
 
-.live-btn {
-    position: absolute;
-    left: 12px;
-
-    padding: 7px 11px;
-
-    border-radius: 5px;
-
-    background: rgba(0,0,0,.45);
-    color: white;
-
-    font-size: 12px;
-    font-weight: 700;
-
+.top-tabs {
     display: flex;
     align-items: center;
-    gap: 6px;
-}
-
-.live-dot {
-    width: 7px;
-    height: 7px;
-    background: #ff1744;
-    border-radius: 50%;
-}
-
-.feed-tabs {
-    display: flex;
+    justify-content: center;
     gap: 20px;
+
+    pointer-events: auto;
 }
 
-.feed-tabs button {
-    color: rgba(255,255,255,.7);
+.top-tab {
+    position: relative;
+
     background: transparent;
+    color: rgba(255, 255, 255, .72);
 
     font-size: 16px;
     font-weight: 600;
+
+    padding: 6px 0;
 }
 
-.feed-tabs button.active {
+.top-tab.active {
     color: #fff;
-    position: relative;
 }
 
-.feed-tabs button.active::after {
+.top-tab.active::after {
     content: "";
 
     position: absolute;
 
     left: 50%;
-    bottom: -8px;
+    bottom: -5px;
 
-    width: 25px;
+    width: 26px;
     height: 2px;
+
+    border-radius: 2px;
 
     background: #fff;
 
     transform: translateX(-50%);
 }
 
+.live-tab {
+    color: #fff;
+}
+
 .search-btn {
     position: absolute;
-    right: 14px;
 
-    width: 38px;
-    height: 38px;
+    right: 12px;
+    top: 12px;
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     background: transparent;
+
+    pointer-events: auto;
 }
 
 .search-btn svg {
-    width: 25px;
-    height: 25px;
+    width: 27px;
+    height: 27px;
 
     fill: none;
     stroke: #fff;
-    stroke-width: 2;
+    stroke-width: 2.2;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    filter: drop-shadow(
+        0 2px 3px rgba(0, 0, 0, .65)
+    );
 }
 
 
-/* ================= FEED ================= */
+/* =========================================================
+   VIDEO FEED
+   ========================================================= */
 
 .video-feed {
-    width: 100%;
-    height: 100%;
+    position: relative;
 
-    overflow-y: scroll;
+    width: 100%;
+    height: 100dvh;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
     scroll-snap-type: y mandatory;
 
     scrollbar-width: none;
+
+    background: #000;
 }
 
 .video-feed::-webkit-scrollbar {
     display: none;
 }
 
+
+/* =========================================================
+   VIDEO PAGE
+   ========================================================= */
+
 .video-page {
     position: relative;
 
     width: 100%;
     height: 100dvh;
-
-    scroll-snap-align: start;
+    min-height: 100dvh;
 
     overflow: hidden;
+
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
 
     background: #000;
 }
 
 
-/* ================= VIDEO ================= */
+/* =========================================================
+   VIDEO
+   ========================================================= */
 
-.video {
+.video-player {
     position: absolute;
 
     inset: 0;
@@ -172,39 +205,53 @@ button {
     width: 100%;
     height: 100%;
 
+    display: block;
+
     object-fit: cover;
+    object-position: center;
 
     background: #000;
+
+    z-index: 1;
 }
 
 
-/* dark gradient */
+/* =========================================================
+   VIDEO DARK OVERLAY
+   ========================================================= */
 
-.video-gradient {
+.video-page::after {
+    content: "";
+
     position: absolute;
 
     inset: 0;
+
+    z-index: 2;
 
     pointer-events: none;
 
     background:
         linear-gradient(
             to bottom,
-            rgba(0,0,0,.4),
-            transparent 20%,
-            transparent 62%,
-            rgba(0,0,0,.72) 100%
+            rgba(0, 0, 0, .42) 0%,
+            rgba(0, 0, 0, .08) 18%,
+            transparent 43%,
+            rgba(0, 0, 0, .08) 60%,
+            rgba(0, 0, 0, .72) 100%
         );
 }
 
 
-/* ================= RIGHT ACTIONS ================= */
+/* =========================================================
+   RIGHT ACTIONS
+   ========================================================= */
 
 .right-actions {
     position: absolute;
 
-    right: 9px;
-    bottom: 105px;
+    right: 8px;
+    bottom: 102px;
 
     width: 58px;
 
@@ -212,82 +259,103 @@ button {
     flex-direction: column;
     align-items: center;
 
-    gap: 17px;
+    gap: 13px;
 
-    z-index: 30;
+    z-index: 50;
 }
 
 
-/* every action */
+/* Every right-side button */
 
 .action-btn,
 .profile-action,
 .music-btn {
-
     position: relative;
 
     width: 54px;
     min-height: 55px;
 
-    background: transparent;
-
-    color: white;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    background: transparent;
+
+    color: #fff;
+
+    padding: 0;
 }
 
 
-/* SVG */
+/* =========================================================
+   RIGHT SIDE SVG
+   ========================================================= */
 
-.action-svg {
-    width: 43px;
-    height: 43px;
+.action-btn svg {
+    width: 40px;
+    height: 40px;
+
+    display: block;
 
     fill: #fff;
 
     stroke: none;
 
     filter:
-        drop-shadow(0 2px 3px rgba(0,0,0,.65));
+        drop-shadow(0 2px 3px rgba(0, 0, 0, .65));
 
-    transition: transform .15s ease;
+    transition:
+        transform .15s ease,
+        fill .15s ease;
 }
 
 
-/* comment */
+/* Like */
 
-.action-btn:nth-child(3) .action-svg {
-    fill: #fff;
-}
-
-
-/* save */
-
-.save-svg {
-    width: 39px;
+.like-btn svg {
+    width: 43px;
     height: 43px;
 }
 
 
-/* share */
+/* Comment */
 
-.share-svg {
-    fill: none;
-
-    stroke: #fff;
-    stroke-width: 3.3;
-
-    stroke-linecap: round;
-    stroke-linejoin: round;
+.action-btn[aria-label="Comments"] svg {
+    width: 42px;
+    height: 42px;
 }
 
 
-/* count */
+/* Save */
+
+.save-btn svg {
+    width: 39px;
+    height: 43px;
+
+    fill: #fff;
+}
+
+
+/* Share */
+
+.share-btn svg {
+    width: 42px;
+    height: 42px;
+
+    fill: #fff;
+
+    stroke: none;
+}
+
+
+/* =========================================================
+   COUNTS
+   ========================================================= */
 
 .action-count {
+    display: block;
+
     margin-top: 2px;
 
     color: #fff;
@@ -297,107 +365,170 @@ button {
 
     font-weight: 600;
 
+    text-align: center;
+
     text-shadow:
-        0 1px 4px rgba(0,0,0,.9);
+        0 1px 4px rgba(0, 0, 0, .95);
 }
 
 
-/* liked */
+/* =========================================================
+   SAVE / SHARE TEXT
+   ========================================================= */
 
-.like-btn.liked .action-svg {
+.action-text {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #fff;
+
+    font-size: 12px;
+    line-height: 15px;
+
+    font-weight: 500;
+
+    text-align: center;
+
+    text-shadow:
+        0 1px 4px rgba(0, 0, 0, .95);
+}
+
+
+/* =========================================================
+   LIKE ACTIVE
+   ========================================================= */
+
+.like-btn.liked svg {
     fill: #fe2c55;
 
     transform: scale(1.12);
 }
 
 
-/* saved */
+/* =========================================================
+   SAVE ACTIVE
+   ========================================================= */
 
-.save-btn.saved .save-svg {
+.save-btn.saved svg {
     fill: #fe2c55;
 
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
 
-/* ================= PROFILE ================= */
+/* =========================================================
+   PROFILE
+   ========================================================= */
 
 .profile-action {
-    height: 64px;
+    height: 67px;
+
+    justify-content: flex-start;
+
+    padding-top: 1px;
 }
 
-.profile-action img {
+.profile-circle {
     width: 51px;
     height: 51px;
 
-    object-fit: cover;
-
     border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #222;
 
     border: 2px solid #fff;
 
+    color: #fff;
+
+    font-size: 20px;
+    font-weight: 700;
+
     box-shadow:
-        0 2px 7px rgba(0,0,0,.6);
+        0 2px 7px rgba(0, 0, 0, .65);
 }
 
-.follow-plus {
+.follow-badge {
     position: absolute;
 
-    bottom: -2px;
-
     left: 50%;
-
-    transform: translateX(-50%);
+    bottom: 8px;
 
     width: 23px;
     height: 23px;
 
     border-radius: 50%;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transform: translateX(-50%);
+
     background: #fe2c55;
 
     border: 2px solid #fff;
 
-    color: white;
+    color: #fff;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
+
+    line-height: 1;
+}
+
+.action-label {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #fff;
+
+    font-size: 12px;
+    line-height: 15px;
+
+    font-weight: 500;
+
+    text-shadow:
+        0 1px 4px rgba(0, 0, 0, .95);
 }
 
 
-/* ================= MUSIC ================= */
+/* =========================================================
+   MUSIC BUTTON
+   ========================================================= */
 
 .music-btn {
     margin-top: 2px;
+
+    min-height: 54px;
 }
 
 .music-disc {
-
-    width: 46px;
-    height: 46px;
+    width: 47px;
+    height: 47px;
 
     border-radius: 50%;
-
-    background: #111;
-
-    border: 2px solid rgba(255,255,255,.8);
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    box-shadow:
-        0 2px 8px rgba(0,0,0,.65);
+    background: #111;
 
-    animation: spin 4s linear infinite;
+    border: 2px solid rgba(255, 255, 255, .9);
+
+    box-shadow:
+        0 2px 9px rgba(0, 0, 0, .7);
+
+    animation: zyloSpin 4s linear infinite;
 }
 
 .music-disc svg {
-
     width: 27px;
     height: 27px;
 
@@ -410,8 +541,7 @@ button {
     stroke-linejoin: round;
 }
 
-@keyframes spin {
-
+@keyframes zyloSpin {
     from {
         transform: rotate(0deg);
     }
@@ -422,52 +552,103 @@ button {
 }
 
 
-/* ================= VIDEO INFO ================= */
+/* =========================================================
+   VIDEO INFORMATION
+   ========================================================= */
 
 .video-info {
-
     position: absolute;
 
-    left: 14px;
-    right: 80px;
-    bottom: 85px;
+    left: 15px;
+    right: 82px;
+    bottom: 82px;
+
+    z-index: 40;
 
     color: #fff;
 
-    z-index: 20;
+    pointer-events: none;
 }
 
 .username {
+    margin-bottom: 7px;
 
-    font-size: 17px;
+    font-size: 18px;
+    line-height: 22px;
 
     font-weight: 700;
 
-    margin-bottom: 7px;
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, .8);
+}
+
+.verified {
+    display: inline-block;
+
+    margin-left: 2px;
+
+    color: #fff;
+
+    font-size: 17px;
 }
 
 .caption {
+    margin-bottom: 6px;
 
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 21px;
 
-    line-height: 20px;
+    font-weight: 500;
 
-    margin-bottom: 7px;
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, .8);
 }
 
-.music-name {
+.tagline {
+    margin-bottom: 3px;
 
+    font-size: 16px;
+    line-height: 21px;
+
+    font-weight: 500;
+
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, .8);
+}
+
+.hashtags {
+    margin-bottom: 9px;
+
+    font-size: 15px;
+    line-height: 20px;
+
+    font-weight: 500;
+
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, .8);
+}
+
+.music-info {
     display: flex;
     align-items: center;
 
     gap: 6px;
 
-    font-size: 13px;
+    font-size: 14px;
+    line-height: 19px;
 
-    font-weight: 600;
+    font-weight: 500;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, .8);
 }
 
-.music-name svg {
+.music-info svg {
+    flex: 0 0 auto;
 
     width: 18px;
     height: 18px;
@@ -478,170 +659,180 @@ button {
     stroke-width: 1.8;
 
     stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 
-/* ================= FULLSCREEN ================= */
+/* =========================================================
+   FULLSCREEN
+   ========================================================= */
 
 .fullscreen-btn {
-
     position: absolute;
 
     left: 12px;
     top: 72px;
 
-    width: 38px;
-    height: 38px;
+    width: 48px;
+    height: 48px;
 
-    background: rgba(0,0,0,.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, .30);
 
     border-radius: 50%;
 
-    z-index: 30;
+    z-index: 60;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, .35);
 }
 
 .fullscreen-btn svg {
-
-    width: 22px;
-    height: 22px;
+    width: 25px;
+    height: 25px;
 
     fill: none;
 
     stroke: #fff;
-    stroke-width: 2;
+    stroke-width: 2.2;
 
     stroke-linecap: round;
+    stroke-linejoin: round;
+
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, .6));
 }
 
 
-/* ================= BOTTOM NAV ================= */
+/* =========================================================
+   BOTTOM NAVIGATION
+   ========================================================= */
 
 .bottom-nav {
-
     position: fixed;
 
     left: 0;
     bottom: 0;
 
     width: 100%;
-    height: 66px;
+    height: 68px;
 
-    z-index: 100;
+    z-index: 1000;
 
     display: flex;
     align-items: center;
     justify-content: space-around;
 
-    background: rgba(0,0,0,.92);
-
     padding: 0 4px;
 
-    border-top: 1px solid rgba(255,255,255,.06);
+    background: rgba(0, 0, 0, .94);
+
+    border-top:
+        1px solid rgba(255, 255, 255, .06);
 }
 
 
-/* nav */
+/* =========================================================
+   NAV ITEMS
+   ========================================================= */
 
 .nav-item {
-
     position: relative;
 
     width: 62px;
-
-    height: 60px;
-
-    background: transparent;
-
-    color: #aaa;
+    height: 62px;
 
     display: flex;
     flex-direction: column;
-
     align-items: center;
     justify-content: center;
 
     gap: 3px;
+
+    background: transparent;
+
+    color: #aaa;
 }
 
 .nav-item svg {
-
-    width: 25px;
-    height: 25px;
+    width: 26px;
+    height: 26px;
 
     fill: none;
 
     stroke: currentColor;
-
-    stroke-width: 1.8;
+    stroke-width: 1.9;
 
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
 .nav-item span {
-
     font-size: 10px;
+    line-height: 12px;
 
     font-weight: 500;
 }
 
 .nav-item.active {
-
     color: #fff;
 }
 
 
-/* ================= CREATE ================= */
+/* =========================================================
+   CREATE BUTTON
+   ========================================================= */
 
 .create-btn {
-
     position: relative;
 
-    width: 55px;
-    height: 40px;
-
-    background: transparent;
+    width: 58px;
+    height: 44px;
 
     display: flex;
     align-items: center;
     justify-content: center;
+
+    background: transparent;
+
+    padding: 0;
 }
 
 .create-center {
-
     position: relative;
 
     z-index: 3;
 
     width: 44px;
-    height: 32px;
+    height: 34px;
 
     border-radius: 9px;
-
-    background: #fff;
 
     display: flex;
     align-items: center;
     justify-content: center;
+
+    background: #fff;
 }
 
 .create-center svg {
-
     width: 25px;
     height: 25px;
 
     fill: none;
 
     stroke: #000;
-
     stroke-width: 2.2;
 
     stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .create-left,
 .create-right {
-
     position: absolute;
 
     width: 28px;
@@ -651,7 +842,6 @@ button {
 }
 
 .create-left {
-
     left: 2px;
 
     background: #25f4ee;
@@ -660,7 +850,6 @@ button {
 }
 
 .create-right {
-
     right: 2px;
 
     background: #fe2c55;
@@ -669,56 +858,40 @@ button {
 }
 
 
-/* ================= PRESS ================= */
+/* =========================================================
+   PRESS EFFECT
+   ========================================================= */
 
 .action-btn:active,
 .profile-action:active,
 .music-btn:active,
 .nav-item:active,
-.create-btn:active {
-
-    transform: scale(.9);
+.create-btn:active,
+.search-btn:active,
+.fullscreen-btn:active,
+.top-tab:active {
+    transform: scale(.92);
 }
 
 
-/* ================= MOBILE ================= */
-
-@media (max-width: 480px) {
-
-    .right-actions {
-        right: 6px;
-        bottom: 102px;
-        gap: 15px;
-    }
-
-    .action-svg {
-        width: 41px;
-        height: 41px;
-    }
-
-    .profile-action img {
-        width: 49px;
-        height: 49px;
-    }
-
-    .video-info {
-        bottom: 83px;
-    }
-}
-
-/* ============================= */
-/* ZYLO VIDEO UPLOAD MODAL */
-/* ============================= */
+/* =========================================================
+   UPLOAD MODAL
+   ========================================================= */
 
 .upload-box {
     position: fixed;
+
     inset: 0;
-    background: rgba(0, 0, 0, 0.78);
+
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+
     padding: 20px;
+
+    background: rgba(0, 0, 0, .78);
+
+    z-index: 9999;
 }
 
 .upload-box.show {
@@ -726,86 +899,268 @@ button {
 }
 
 .upload-content {
-    width: min(420px, 100%);
-    background: #111;
-    border: 1px solid #333;
-    border-radius: 22px;
-    padding: 30px 24px;
-    text-align: center;
     position: relative;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+    width: min(420px, 100%);
+
+    padding: 30px 24px;
+
+    text-align: center;
+
+    background: #111;
+
+    border:
+        1px solid #333;
+
+    border-radius: 22px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, .6);
 }
 
 .upload-close {
     position: absolute;
+
     top: 12px;
     right: 12px;
+
     width: 40px;
     height: 40px;
-    border: 0;
-    border-radius: 50%;
-    background: #222;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+
+    border-radius: 50%;
+
+    background: #222;
 }
 
 .upload-close svg {
     width: 22px;
     height: 22px;
+
     fill: none;
+
     stroke: #fff;
     stroke-width: 2;
+
     stroke-linecap: round;
 }
 
 .upload-icon {
     width: 70px;
     height: 70px;
+
     margin: 10px auto 18px;
-    border-radius: 50%;
-    background: #222;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
+    border-radius: 50%;
+
+    background: #222;
 }
 
 .upload-icon svg {
     width: 34px;
     height: 34px;
+
     fill: none;
+
     stroke: #fff;
     stroke-width: 1.8;
+
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
 .upload-content h2 {
-    color: #fff;
     margin: 0 0 8px;
+
+    color: #fff;
+
     font-size: 24px;
 }
 
 .upload-content p {
-    color: #aaa;
     margin: 0 0 22px;
+
+    color: #aaa;
+
     font-size: 14px;
 }
 
 .select-video-btn {
     width: 100%;
-    border: 0;
-    border-radius: 12px;
+
     padding: 14px;
+
+    border-radius: 12px;
+
     background: #fff;
     color: #000;
+
     font-size: 16px;
     font-weight: 700;
-    cursor: pointer;
 }
 
 .select-video-btn:disabled {
-    opacity: 0.5;
+    opacity: .5;
+
     cursor: not-allowed;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .top-bar {
+        height: 60px;
+    }
+
+    .top-tabs {
+        gap: 18px;
+    }
+
+    .top-tab {
+        font-size: 15px;
+    }
+
+    .search-btn {
+        right: 8px;
+        top: 9px;
+    }
+
+    .right-actions {
+        right: 5px;
+        bottom: 100px;
+
+        gap: 12px;
+    }
+
+    .action-btn,
+    .profile-action,
+    .music-btn {
+        width: 52px;
+    }
+
+    .action-btn svg {
+        width: 39px;
+        height: 39px;
+    }
+
+    .like-btn svg {
+        width: 42px;
+        height: 42px;
+    }
+
+    .action-btn[aria-label="Comments"] svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .save-btn svg {
+        width: 38px;
+        height: 41px;
+    }
+
+    .share-btn svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .profile-circle {
+        width: 49px;
+        height: 49px;
+    }
+
+    .video-info {
+        left: 14px;
+        right: 78px;
+        bottom: 81px;
+    }
+
+    .username {
+        font-size: 17px;
+    }
+
+    .caption,
+    .tagline {
+        font-size: 15px;
+    }
+
+    .hashtags {
+        font-size: 14px;
+    }
+
+    .music-info {
+        font-size: 13px;
+    }
+
+    .fullscreen-btn {
+        left: 10px;
+        top: 70px;
+
+        width: 46px;
+        height: 46px;
+    }
+
+    .bottom-nav {
+        height: 66px;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-height: 700px) {
+
+    .right-actions {
+        bottom: 91px;
+        gap: 8px;
+    }
+
+    .video-info {
+        bottom: 73px;
+    }
+
+    .bottom-nav {
+        height: 62px;
+    }
+
+    .nav-item {
+        height: 58px;
+    }
+}
+
+
+/* =========================================================
+   LANDSCAPE SAFETY
+   ========================================================= */
+
+@media (orientation: landscape) and (max-height: 500px) {
+
+    .right-actions {
+        bottom: 70px;
+        gap: 5px;
+    }
+
+    .video-info {
+        bottom: 62px;
+    }
+
+    .bottom-nav {
+        height: 56px;
+    }
+
+    .nav-item {
+        height: 52px;
+    }
 }
