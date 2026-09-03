@@ -297,3 +297,175 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+/* ============================= */
+/* ZYLO VIDEO UPLOAD SYSTEM */
+/* ============================= */
+
+const API_BASE_URL = "https://zylo-backend-ec5c.onrender.com";
+
+const createBtn = document.getElementById("createBtn");
+const videoInput = document.getElementById("videoInput");
+const uploadBox = document.getElementById("uploadBox");
+const closeUpload = document.getElementById("closeUpload");
+const selectVideo = document.getElementById("selectVideo");
+const uploadStatus = document.getElementById("uploadStatus");
+
+/* Open upload window */
+if (createBtn) {
+    createBtn.addEventListener("click", () => {
+        uploadBox.classList.add("show");
+    });
+}
+
+/* Close upload window */
+if (closeUpload) {
+    closeUpload.addEventListener("click", () => {
+        uploadBox.classList.remove("show");
+        videoInput.value = "";
+        uploadStatus.textContent = "আপনার ভিডিও নির্বাচন করুন";
+    });
+}
+
+/* Click Select Video */
+if (selectVideo) {
+    selectVideo.addEventListener("click", () => {
+        videoInput.click();
+    });
+}
+
+/* Select video */
+if (videoInput) {
+    videoInput.addEventListener("change", async () => {
+
+        const file = videoInput.files[0];
+
+        if (!file) return;
+
+        /* Check video */
+        if (!file.type.startsWith("video/")) {
+            uploadStatus.textContent = "শুধু ভিডিও ফাইল নির্বাচন করুন";
+            return;
+        }
+
+        /* 200 MB limit */
+        if (file.size > 200 * 1024 * 1024) {
+            uploadStatus.textContent =
+                "ভিডিও 200 MB-এর বেশি হতে পারবে না";
+            return;
+        }
+
+        uploadStatus.textContent = "ভিডিও আপলোড হচ্ছে...";
+        selectVideo.disabled = true;
+        selectVideo.textContent = "Uploading...";
+
+        try {
+
+            const formData = new FormData();
+
+            formData.append("video", file);
+
+            const response = await fetch(
+                `${API_BASE_URL}/api/upload`,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(
+                    data.message || "Upload failed"
+                );
+            }
+
+            console.log("ZYLO Upload:", data);
+
+            uploadStatus.textContent =
+                "ভিডিও সফলভাবে আপলোড হয়েছে ✓";
+
+            selectVideo.textContent = "Uploaded ✓";
+
+            /*
+             * Uploaded video URL
+             */
+            const videoUrl = data.video.url;
+
+            console.log("Video URL:", videoUrl);
+
+            /*
+             * নতুন ভিডিও feed-এ যোগ করা
+             */
+            addUploadedVideo(videoUrl);
+
+            setTimeout(() => {
+                uploadBox.classList.remove("show");
+
+                videoInput.value = "";
+
+                uploadStatus.textContent =
+                    "আপনার ভিডিও নির্বাচন করুন";
+
+                selectVideo.disabled = false;
+                selectVideo.textContent = "Select Video";
+
+            }, 1000);
+
+        } catch (error) {
+
+            console.error(error);
+
+            uploadStatus.textContent =
+                "ভিডিও আপলোড করা যায়নি";
+
+            selectVideo.disabled = false;
+            selectVideo.textContent = "Try Again";
+        }
+    });
+}
+
+
+/* ============================= */
+/* ADD UPLOADED VIDEO TO FEED */
+/* ============================= */
+
+function addUploadedVideo(videoUrl) {
+
+    const videoFeed = document.querySelector(".video-feed");
+
+    if (!videoFeed) return;
+
+    const page = document.createElement("section");
+
+    page.className = "video-page";
+
+    page.innerHTML = `
+        <video
+            class="video-player"
+            src="${videoUrl}"
+            loop
+            playsinline
+            preload="metadata">
+        </video>
+
+        <div class="video-info">
+            <strong>@zylo_creator</strong>
+            <p>New video on ZYLO</p>
+            <p>Create • Connect • Grow</p>
+        </div>
+    `;
+
+    videoFeed.prepend(page);
+
+    const newVideo = page.querySelector("video");
+
+    if (newVideo) {
+        newVideo.play().catch(() => {});
+    }
+
+    page.scrollIntoView({
+        behavior: "smooth"
+    });
+}
