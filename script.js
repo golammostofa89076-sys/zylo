@@ -2774,3 +2774,418 @@ if (
 } else {
   initializeZYLO();
 }
+
+/* =========================================================
+   ZYLO CREATOR PROFILE
+   Right-side Z+ opens Creator Profile
+========================================================= */
+
+function showCreatorProfile(page) {
+
+    // Remove previous creator profile
+    const oldProfile =
+        document.getElementById("zyloCreatorProfile");
+
+    if (oldProfile) {
+        oldProfile.remove();
+    }
+
+    const profile =
+        page.querySelector(".profile-action");
+
+    const creatorName =
+        page.querySelector(".video-username");
+
+    const username =
+        creatorName
+            ? creatorName.textContent.trim()
+            : "@zylo_creator";
+
+    const creatorProfile = document.createElement("div");
+
+    creatorProfile.id = "zyloCreatorProfile";
+
+    creatorProfile.innerHTML = `
+        <div class="zylo-creator-backdrop"></div>
+
+        <div class="zylo-creator-panel">
+
+            <button
+                class="zylo-creator-close"
+                aria-label="Close"
+            >
+                <svg viewBox="0 0 24 24">
+                    <path d="M6 6L18 18"></path>
+                    <path d="M18 6L6 18"></path>
+                </svg>
+            </button>
+
+            <div class="zylo-creator-avatar">
+                Z
+            </div>
+
+            <h2>ZYLO Creator ✓</h2>
+
+            <p class="zylo-creator-username">
+                ${username}
+            </p>
+
+            <p class="zylo-creator-bio">
+                Create • Connect • Grow
+            </p>
+
+            <div class="zylo-creator-stats">
+
+                <div>
+                    <strong>1</strong>
+                    <span>Following</span>
+                </div>
+
+                <div>
+                    <strong>0</strong>
+                    <span>Followers</span>
+                </div>
+
+                <div>
+                    <strong>5</strong>
+                    <span>Likes</span>
+                </div>
+
+            </div>
+
+            <button
+                class="zylo-creator-follow"
+                type="button"
+            >
+                Follow
+            </button>
+
+        </div>
+    `;
+
+    document.body.appendChild(creatorProfile);
+
+    /* -----------------------------------------
+       Follow state
+    ----------------------------------------- */
+
+    const followButton =
+        creatorProfile.querySelector(
+            ".zylo-creator-follow"
+        );
+
+    const profileKey =
+        username.toLowerCase();
+
+    const followed =
+        follows[profileKey] === true;
+
+    if (followed) {
+        followButton.textContent = "Following";
+        followButton.classList.add("following");
+    }
+
+    followButton.addEventListener(
+        "click",
+        function () {
+
+            const currentlyFollowing =
+                follows[profileKey] === true;
+
+            follows[profileKey] =
+                !currentlyFollowing;
+
+            setStorage(
+                STORAGE_KEYS.follows,
+                follows
+            );
+
+            if (follows[profileKey]) {
+
+                followButton.textContent =
+                    "Following";
+
+                followButton.classList.add(
+                    "following"
+                );
+
+            } else {
+
+                followButton.textContent =
+                    "Follow";
+
+                followButton.classList.remove(
+                    "following"
+                );
+            }
+
+            // Update Z+ badge
+            const badge =
+                profile
+                    ? profile.querySelector(
+                        ".follow-badge"
+                    )
+                    : null;
+
+            if (badge) {
+                badge.textContent =
+                    follows[profileKey]
+                        ? "✓"
+                        : "+";
+            }
+        }
+    );
+
+    /* -----------------------------------------
+       Close button
+    ----------------------------------------- */
+
+    const closeButton =
+        creatorProfile.querySelector(
+            ".zylo-creator-close"
+        );
+
+    const backdrop =
+        creatorProfile.querySelector(
+            ".zylo-creator-backdrop"
+        );
+
+    function closeCreatorProfile() {
+        creatorProfile.remove();
+    }
+
+    closeButton.addEventListener(
+        "click",
+        closeCreatorProfile
+    );
+
+    backdrop.addEventListener(
+        "click",
+        closeCreatorProfile
+    );
+
+    /* -----------------------------------------
+       ESC key
+    ----------------------------------------- */
+
+    document.addEventListener(
+        "keydown",
+        function creatorEscape(event) {
+
+            if (event.key === "Escape") {
+                closeCreatorProfile();
+
+                document.removeEventListener(
+                    "keydown",
+                    creatorEscape
+                );
+            }
+        }
+    );
+}
+
+
+/* =========================================================
+   Z+ CLICK HANDLER
+   Works for existing AND newly uploaded videos
+========================================================= */
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        const profileButton =
+            event.target.closest(
+                ".video-page .profile-action"
+            );
+
+        if (!profileButton) {
+            return;
+        }
+
+        const page =
+            profileButton.closest(
+                ".video-page"
+            );
+
+        if (!page) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        showCreatorProfile(page);
+    },
+    true
+);
+
+
+/* =========================================================
+   CREATOR PROFILE STYLE
+   Added automatically — style.css stays unchanged
+========================================================= */
+
+(function addCreatorProfileStyle() {
+
+    if (
+        document.getElementById(
+            "zyloCreatorProfileStyle"
+        )
+    ) {
+        return;
+    }
+
+    const style =
+        document.createElement("style");
+
+    style.id =
+        "zyloCreatorProfileStyle";
+
+    style.textContent = `
+
+        #zyloCreatorProfile {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .zylo-creator-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,.72);
+        }
+
+        .zylo-creator-panel {
+            position: relative;
+            z-index: 2;
+            width: min(100%, 520px);
+            background: #111;
+            color: #fff;
+            border-radius: 28px 28px 0 0;
+            padding: 34px 24px 42px;
+            text-align: center;
+            box-sizing: border-box;
+            animation: zyloCreatorUp .25s ease;
+        }
+
+        @keyframes zyloCreatorUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .zylo-creator-close {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            width: 48px;
+            height: 48px;
+            border: 0;
+            border-radius: 50%;
+            background: #292929;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zylo-creator-close svg {
+            width: 25px;
+            height: 25px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+        }
+
+        .zylo-creator-avatar {
+            width: 112px;
+            height: 112px;
+            margin: 12px auto 18px;
+            border-radius: 50%;
+            background: #222;
+            border: 3px solid #777;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 54px;
+            font-weight: 700;
+        }
+
+        .zylo-creator-panel h2 {
+            margin: 0 0 7px;
+            font-size: 27px;
+        }
+
+        .zylo-creator-username {
+            margin: 0;
+            font-size: 18px;
+            opacity: .85;
+        }
+
+        .zylo-creator-bio {
+            margin: 12px 0 25px;
+            font-size: 18px;
+        }
+
+        .zylo-creator-stats {
+            display: flex;
+            justify-content: center;
+            gap: 45px;
+            margin-bottom: 28px;
+        }
+
+        .zylo-creator-stats div {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .zylo-creator-stats strong {
+            font-size: 22px;
+        }
+
+        .zylo-creator-stats span {
+            font-size: 14px;
+            opacity: .7;
+        }
+
+        .zylo-creator-follow {
+            width: 100%;
+            height: 54px;
+            border: 0;
+            border-radius: 12px;
+            background: #fff;
+            color: #111;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .zylo-creator-follow.following {
+            background: #333;
+            color: #fff;
+        }
+
+        @media (max-width: 480px) {
+
+            .zylo-creator-panel {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .zylo-creator-stats {
+                gap: 28px;
+            }
+        }
+    `;
+
+    document.head.appendChild(style);
+
+})();
