@@ -1164,3 +1164,20 @@ button {
         height: 52px;
     }
 }
+/* PROFILE — Z + only */
+.profile-action .action-label {
+    display: none;
+}
+
+.profile-action {
+    height: 58px;
+}
+
+.profile-circle {
+    width: 51px;
+    height: 51px;
+}
+
+.follow-badge {
+    bottom: -2px;
+}
