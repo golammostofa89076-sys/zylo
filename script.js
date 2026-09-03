@@ -1,15 +1,20 @@
 "use strict";
 
 /* =========================================================
-   ZYLO — FINAL SHORT VIDEO APP SCRIPT
-   UI/design is controlled by index.html + style.css.
-   This file handles functionality.
+   ZYLO — STABLE FUNCTION SYSTEM
+   index.html + style.css untouched
 ========================================================= */
 
-const API_BASE_URL = "https://zylo-backend-ec5c.onrender.com";
+const API_BASE_URL =
+  "https://zylo-backend-ec5c.onrender.com";
 
 const CDN_VIDEO_URL =
   "https://cdn.jsdelivr.net/gh/golammostofa89076-sys/zylo@main/backend/uploads/video1.mp4";
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
 
 const STORAGE_KEYS = {
   likes: "zylo_likes",
@@ -20,26 +25,107 @@ const STORAGE_KEYS = {
   uploadedVideos: "zylo_uploaded_videos"
 };
 
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function getStorage(key, fallback) {
+function readStorage(key, fallback) {
   try {
-    const value = localStorage.getItem(key);
-    return value ? JSON.parse(value) : fallback;
-  } catch (error) {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : fallback;
+  } catch {
     return fallback;
   }
 }
 
-function setStorage(key, value) {
+function writeStorage(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
     console.warn("ZYLO storage error:", error);
   }
+}
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+const state = {
+  likes: readStorage(STORAGE_KEYS.likes, {}),
+  saves: readStorage(STORAGE_KEYS.saves, {}),
+  follows: readStorage(STORAGE_KEYS.follows, {}),
+  comments: readStorage(STORAGE_KEYS.comments, {}),
+  profile: readStorage(STORAGE_KEYS.profile, {
+    username: "zylo_creator",
+    displayName: "ZYLO Creator",
+    bio: "Create • Connect • Grow"
+  }),
+  uploadedVideos: readStorage(
+    STORAGE_KEYS.uploadedVideos,
+    []
+  ),
+  feedMode: "for-you"
+};
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const videoFeed =
+  document.getElementById("videoFeed");
+
+const createBtn =
+  document.getElementById("createBtn");
+
+const videoInput =
+  document.getElementById("videoInput");
+
+const uploadBox =
+  document.getElementById("uploadBox");
+
+const closeUpload =
+  document.getElementById("closeUpload");
+
+const selectVideo =
+  document.getElementById("selectVideo");
+
+const uploadStatus =
+  document.getElementById("uploadStatus");
+
+const searchBtn =
+  document.querySelector(".search-btn");
+
+
+/* =========================================================
+   BASIC HELPERS
+========================================================= */
+
+function formatCount(number) {
+  const n = Number(number) || 0;
+
+  if (n >= 1000000000) {
+    return (
+      (n / 1000000000)
+        .toFixed(1)
+        .replace(".0", "") + "B"
+    );
+  }
+
+  if (n >= 1000000) {
+    return (
+      (n / 1000000)
+        .toFixed(1)
+        .replace(".0", "") + "M"
+    );
+  }
+
+  if (n >= 1000) {
+    return (
+      (n / 1000)
+        .toFixed(1)
+        .replace(".0", "") + "K"
+    );
+  }
+
+  return String(n);
 }
 
 function escapeHTML(value) {
@@ -51,73 +137,15 @@ function escapeHTML(value) {
     .replace(/'/g, "&#039;");
 }
 
-function escapeAttribute(value) {
-  return escapeHTML(value);
-}
-
-function formatCount(number) {
-  const n = Number(number) || 0;
-
-  if (n >= 1000000000) {
-    return (n / 1000000000).toFixed(1).replace(".0", "") + "B";
-  }
-
-  if (n >= 1000000) {
-    return (n / 1000000).toFixed(1).replace(".0", "") + "M";
-  }
-
-  if (n >= 1000) {
-    return (n / 1000).toFixed(1).replace(".0", "") + "K";
-  }
-
-  return String(n);
-}
-
-
-/* =========================================================
-   DOM
-========================================================= */
-
-const videoFeed = document.getElementById("videoFeed");
-const createBtn = document.getElementById("createBtn");
-const videoInput = document.getElementById("videoInput");
-const uploadBox = document.getElementById("uploadBox");
-const closeUpload = document.getElementById("closeUpload");
-const selectVideo = document.getElementById("selectVideo");
-const uploadStatus = document.getElementById("uploadStatus");
-const searchBtn = document.querySelector(".search-btn");
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let likes = getStorage(STORAGE_KEYS.likes, {});
-let saves = getStorage(STORAGE_KEYS.saves, {});
-let follows = getStorage(STORAGE_KEYS.follows, {});
-let comments = getStorage(STORAGE_KEYS.comments, {});
-let profile = getStorage(STORAGE_KEYS.profile, {
-  username: "zylo_creator",
-  displayName: "ZYLO Creator",
-  bio: "Create • Connect • Grow",
-  followers: 0,
-  following: 0
-});
-
-let activeFeedMode = "for-you";
-
-
-/* =========================================================
-   VIDEO ID
-========================================================= */
-
 function getVideoId(page) {
   if (!page.dataset.videoId) {
     page.dataset.videoId =
-      "video_" +
+      "zylo_" +
       Date.now() +
       "_" +
-      Math.random().toString(36).slice(2, 8);
+      Math.random()
+        .toString(36)
+        .slice(2, 9);
   }
 
   return page.dataset.videoId;
@@ -125,50 +153,110 @@ function getVideoId(page) {
 
 
 /* =========================================================
+   CREATOR ID
+========================================================= */
+
+function getCreatorId(page) {
+  const usernameElement =
+    page.querySelector(".username");
+
+  let username =
+    usernameElement?.textContent?.trim() ||
+    "zylo_creator";
+
+  username = username
+    .replace("✓", "")
+    .trim()
+    .replace(/^@/, "");
+
+  return (
+    username.toLowerCase() ||
+    "zylo_creator"
+  );
+}
+
+
+/* =========================================================
+   INITIALIZE ALL
+========================================================= */
+
+function initializeZYLO() {
+  injectFunctionalCSS();
+
+  initializeVideos();
+  setupTopTabs();
+  setupBottomNavigation();
+  setupUpload();
+  setupSearch();
+  setupVisibility();
+  setupGlobalEscape();
+
+  setupObserver();
+
+  setTimeout(() => {
+    playVisibleVideo();
+  }, 500);
+}
+
+
+/* =========================================================
    VIDEO INITIALIZATION
 ========================================================= */
 
-function initializeAllVideos() {
+function initializeVideos() {
   if (!videoFeed) return;
 
-  const pages = videoFeed.querySelectorAll(".video-page");
+  const pages =
+    videoFeed.querySelectorAll(".video-page");
 
   pages.forEach((page) => {
-    initializeVideoPage(page);
+    initializeVideo(page);
   });
 
   restoreUploadedVideos();
 }
 
-function initializeVideoPage(page) {
-  if (!page || page.dataset.zyloReady === "true") return;
+function initializeVideo(page) {
+  if (!page) return;
 
-  page.dataset.zyloReady = "true";
+  if (page.dataset.zyloInitialized === "true") {
+    return;
+  }
 
-  const video = page.querySelector("video");
+  page.dataset.zyloInitialized = "true";
+
+  const video =
+    page.querySelector("video");
+
   if (!video) return;
 
-  const videoId = getVideoId(page);
+  const videoId =
+    getVideoId(page);
 
   video.loop = true;
-  video.muted = true;
   video.playsInline = true;
 
+  /*
+    Feed videos start muted so mobile browsers
+    allow autoplay.
+  */
+  video.muted = true;
+
   setupVideoFallback(video);
-  setupVideoClick(video);
+  setupVideoTap(video);
 
-  updateLikeUI(page, videoId);
-  updateSaveUI(page, videoId);
-  updateFollowUI(page, videoId);
-  updateCommentUI(page, videoId);
+  setupLike(page, videoId);
+  setupSave(page, videoId);
+  setupComment(page, videoId);
+  setupShare(page);
+  setupCreatorProfile(page);
+  setupMusic(page, video);
+  setupFullscreen(page);
 
-  setupLikeButton(page, videoId);
-  setupSaveButton(page, videoId);
-  setupCommentButton(page, videoId);
-  setupShareButton(page, videoId);
-  setupProfileButton(page, videoId);
-  setupMusicButton(page, video);
-  setupFullscreenButton(page);
+  updateLike(page, videoId);
+  updateSave(page, videoId);
+  updateFollowBadge(page);
+  updateCommentCount(page, videoId);
 }
 
 
@@ -177,17 +265,27 @@ function initializeVideoPage(page) {
 ========================================================= */
 
 function setupVideoFallback(video) {
-  video.addEventListener("error", function () {
-    if (video.dataset.fallbackUsed === "true") return;
+  if (video.dataset.fallbackReady === "true") {
+    return;
+  }
 
-    video.dataset.fallbackUsed = "true";
+  video.dataset.fallbackReady = "true";
 
-    const current =
+  video.addEventListener("error", () => {
+    if (
+      video.dataset.cdnFallback === "true"
+    ) {
+      return;
+    }
+
+    video.dataset.cdnFallback = "true";
+
+    const source =
       video.currentSrc ||
       video.src ||
       "";
 
-    if (!current.includes("jsdelivr")) {
+    if (!source.includes("jsdelivr")) {
       video.src = CDN_VIDEO_URL;
       video.load();
 
@@ -198,13 +296,15 @@ function setupVideoFallback(video) {
 
 
 /* =========================================================
-   VIDEO PLAY / PAUSE
+   VIDEO TAP
 ========================================================= */
 
-function setupVideoClick(video) {
-  if (video.dataset.clickReady === "true") return;
+function setupVideoTap(video) {
+  if (video.dataset.tapReady === "true") {
+    return;
+  }
 
-  video.dataset.clickReady = "true";
+  video.dataset.tapReady = "true";
 
   video.addEventListener("click", () => {
     if (video.paused) {
@@ -220,46 +320,102 @@ function setupVideoClick(video) {
    LIKE
 ========================================================= */
 
-function setupLikeButton(page, videoId) {
-  const button = page.querySelector(".like-btn");
+function setupLike(page, videoId) {
+  const button =
+    page.querySelector(".like-btn");
 
-  if (!button || button.dataset.ready === "true") return;
+  if (!button) return;
+
+  if (button.dataset.ready === "true") {
+    return;
+  }
 
   button.dataset.ready = "true";
 
   button.addEventListener("click", (event) => {
     event.stopPropagation();
 
-    likes[videoId] = !likes[videoId];
+    state.likes[videoId] =
+      !state.likes[videoId];
 
-    setStorage(STORAGE_KEYS.likes, likes);
+    writeStorage(
+      STORAGE_KEYS.likes,
+      state.likes
+    );
 
-    updateLikeUI(page, videoId);
+    updateLike(page, videoId);
   });
 }
 
-function updateLikeUI(page, videoId) {
-  const button = page.querySelector(".like-btn");
+function updateLike(page, videoId) {
+  const button =
+    page.querySelector(".like-btn");
+
   if (!button) return;
 
-  const count = page.querySelector(".like-btn .action-count");
+  const count =
+    button.querySelector(".action-count");
 
   const base =
     Number(button.dataset.baseCount || 0);
 
-  if (likes[videoId]) {
-    button.classList.add("active");
+  const liked =
+    !!state.likes[videoId];
 
-    if (count) {
-      count.textContent = formatCount(base + 1);
-    }
-  } else {
-    button.classList.remove("active");
+  button.classList.toggle(
+    "active",
+    liked
+  );
 
-    if (count) {
-      count.textContent = formatCount(base);
-    }
+  if (count) {
+    count.textContent =
+      formatCount(
+        base + (liked ? 1 : 0)
+      );
   }
+}
+
+
+/* =========================================================
+   DOUBLE TAP LIKE
+========================================================= */
+
+function setupDoubleTap(page) {
+  if (
+    page.dataset.doubleTapReady === "true"
+  ) {
+    return;
+  }
+
+  page.dataset.doubleTapReady = "true";
+
+  let lastTap = 0;
+
+  page.addEventListener(
+    "touchend",
+    () => {
+      const now = Date.now();
+
+      if (now - lastTap < 300) {
+        const videoId =
+          getVideoId(page);
+
+        state.likes[videoId] = true;
+
+        writeStorage(
+          STORAGE_KEYS.likes,
+          state.likes
+        );
+
+        updateLike(page, videoId);
+
+        showBigHeart(page);
+      }
+
+      lastTap = now;
+    },
+    { passive: true }
+  );
 }
 
 
@@ -267,42 +423,53 @@ function updateLikeUI(page, videoId) {
    SAVE
 ========================================================= */
 
-function setupSaveButton(page, videoId) {
-  const button = page.querySelector(".save-btn");
+function setupSave(page, videoId) {
+  const button =
+    page.querySelector(".save-btn");
 
-  if (!button || button.dataset.ready === "true") return;
+  if (!button) return;
+
+  if (button.dataset.ready === "true") {
+    return;
+  }
 
   button.dataset.ready = "true";
 
   button.addEventListener("click", (event) => {
     event.stopPropagation();
 
-    saves[videoId] = !saves[videoId];
+    state.saves[videoId] =
+      !state.saves[videoId];
 
-    setStorage(STORAGE_KEYS.saves, saves);
+    writeStorage(
+      STORAGE_KEYS.saves,
+      state.saves
+    );
 
-    updateSaveUI(page, videoId);
+    updateSave(page, videoId);
   });
 }
 
-function updateSaveUI(page, videoId) {
-  const button = page.querySelector(".save-btn");
+function updateSave(page, videoId) {
+  const button =
+    page.querySelector(".save-btn");
+
   if (!button) return;
 
-  const text = button.querySelector(".action-text");
+  const text =
+    button.querySelector(".action-text");
 
-  if (saves[videoId]) {
-    button.classList.add("active");
+  const saved =
+    !!state.saves[videoId];
 
-    if (text) {
-      text.textContent = "Saved";
-    }
-  } else {
-    button.classList.remove("active");
+  button.classList.toggle(
+    "active",
+    saved
+  );
 
-    if (text) {
-      text.textContent = "Save";
-    }
+  if (text) {
+    text.textContent =
+      saved ? "Saved" : "Save";
   }
 }
 
@@ -311,80 +478,126 @@ function updateSaveUI(page, videoId) {
    FOLLOW
 ========================================================= */
 
-function updateFollowUI(page, videoId) {
-  const badge = page.querySelector(".follow-badge");
+function updateFollowBadge(page) {
+  const badge =
+    page.querySelector(".follow-badge");
 
   if (!badge) return;
 
-  badge.textContent = follows[videoId] ? "✓" : "+";
+  const creatorId =
+    getCreatorId(page);
+
+  badge.textContent =
+    state.follows[creatorId]
+      ? "✓"
+      : "+";
 }
 
-function toggleFollow(videoId, page = null) {
-  follows[videoId] = !follows[videoId];
+function toggleCreatorFollow(
+  creatorId,
+  page = null
+) {
+  state.follows[creatorId] =
+    !state.follows[creatorId];
 
-  setStorage(STORAGE_KEYS.follows, follows);
+  writeStorage(
+    STORAGE_KEYS.follows,
+    state.follows
+  );
+
+  /*
+    Update every video belonging to
+    the same creator.
+  */
+  document
+    .querySelectorAll(".video-page")
+    .forEach((item) => {
+      if (
+        getCreatorId(item) === creatorId
+      ) {
+        updateFollowBadge(item);
+      }
+    });
 
   if (page) {
-    updateFollowUI(page, videoId);
+    updateFollowBadge(page);
   }
 
-  return follows[videoId];
+  return state.follows[creatorId];
 }
 
 
 /* =========================================================
-   CREATOR PROFILE
+   CREATOR PROFILE — Z+
 ========================================================= */
 
-function setupProfileButton(page, videoId) {
-  const button = page.querySelector(".profile-action");
+function setupCreatorProfile(page) {
+  const button =
+    page.querySelector(
+      ".profile-action"
+    );
 
-  if (!button || button.dataset.ready === "true") return;
+  if (!button) return;
+
+  if (button.dataset.ready === "true") {
+    return;
+  }
 
   button.dataset.ready = "true";
 
   button.addEventListener("click", (event) => {
     event.stopPropagation();
 
-    showCreatorProfile(page, videoId);
+    showCreatorProfile(page);
   });
 }
 
-function getCreatorData(page) {
-  const username =
-    page.querySelector(".username")?.textContent?.trim() ||
+function showCreatorProfile(page) {
+  removeOverlay(
+    ".zylo-creator-profile"
+  );
+
+  const creatorId =
+    getCreatorId(page);
+
+  const usernameElement =
+    page.querySelector(".username");
+
+  let username =
+    usernameElement?.textContent?.trim() ||
     "@zylo_creator";
 
-  const cleanUsername = username.replace(/^@/, "");
+  username =
+    username
+      .replace("✓", "")
+      .trim();
+
+  const cleanUsername =
+    username.replace(/^@/, "");
 
   const caption =
-    page.querySelector(".caption")?.textContent?.trim() ||
+    page.querySelector(".caption")
+      ?.textContent
+      ?.trim() ||
     "Create • Connect • Grow";
 
-  return {
-    username: cleanUsername,
-    displayName:
-      cleanUsername === "zylo_creator"
-        ? "ZYLO Creator"
-        : cleanUsername,
-    bio: caption
-  };
-}
+  const following =
+    !!state.follows[creatorId];
 
-function showCreatorProfile(page, videoId) {
-  removeOverlay("zylo-creator-profile");
+  const overlay =
+    document.createElement("div");
 
-  const creator = getCreatorData(page);
-  const isFollowing = !!follows[videoId];
-
-  const overlay = document.createElement("div");
-
-  overlay.className = "zylo-overlay zylo-creator-profile";
+  overlay.className =
+    "zylo-overlay zylo-creator-profile";
 
   overlay.innerHTML = `
     <div class="zylo-panel creator-panel">
 
-      <button class="zylo-close" data-close-profile aria-label="Close">
+      <button
+        class="zylo-close"
+        data-close
+        aria-label="Close"
+      >
         <svg viewBox="0 0 24 24">
           <path d="M6 6L18 18"></path>
           <path d="M18 6L6 18"></path>
@@ -393,24 +606,27 @@ function showCreatorProfile(page, videoId) {
 
       <div class="creator-avatar">Z</div>
 
-      <h2>${escapeHTML(creator.displayName)}</h2>
+      <h2>
+        ${escapeHTML(cleanUsername)}
+      </h2>
 
       <div class="creator-username">
-        @${escapeHTML(creator.username)}
+        @${escapeHTML(cleanUsername)}
       </div>
 
       <p class="creator-bio">
-        ${escapeHTML(creator.bio)}
+        ${escapeHTML(caption)}
       </p>
 
       <div class="creator-stats">
+
         <div>
           <strong>0</strong>
           <span>Following</span>
         </div>
 
         <div>
-          <strong>${formatCount(profile.followers)}</strong>
+          <strong>0</strong>
           <span>Followers</span>
         </div>
 
@@ -418,16 +634,26 @@ function showCreatorProfile(page, videoId) {
           <strong>0</strong>
           <span>Likes</span>
         </div>
+
       </div>
 
       <button
-        class="creator-follow-button ${isFollowing ? "following" : ""}"
-        data-creator-follow
+        class="creator-follow-button ${
+          following ? "following" : ""
+        }"
+        data-follow
       >
-        ${isFollowing ? "Following" : "Follow"}
+        ${
+          following
+            ? "Following"
+            : "Follow"
+        }
       </button>
 
-      <button class="creator-message-button" data-creator-message>
+      <button
+        class="creator-message-button"
+        data-message
+      >
         Message
       </button>
 
@@ -440,43 +666,68 @@ function showCreatorProfile(page, videoId) {
     overlay.classList.add("show");
   });
 
-  overlay.querySelector("[data-close-profile]")
-    ?.addEventListener("click", () => {
-      closeOverlay(overlay);
-    });
+  overlay
+    .querySelector("[data-close]")
+    ?.addEventListener(
+      "click",
+      () => closeOverlay(overlay)
+    );
 
-  overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) {
-      closeOverlay(overlay);
+  overlay.addEventListener(
+    "click",
+    (event) => {
+      if (event.target === overlay) {
+        closeOverlay(overlay);
+      }
     }
-  });
+  );
 
-  overlay.querySelector("[data-creator-follow]")
-    ?.addEventListener("click", () => {
-      const state = toggleFollow(videoId, page);
+  overlay
+    .querySelector("[data-follow]")
+    ?.addEventListener(
+      "click",
+      () => {
+        const result =
+          toggleCreatorFollow(
+            creatorId,
+            page
+          );
 
-      const followButton =
-        overlay.querySelector("[data-creator-follow]");
+        const followButton =
+          overlay.querySelector(
+            "[data-follow]"
+          );
 
-      if (followButton) {
-        followButton.textContent =
-          state ? "Following" : "Follow";
+        if (followButton) {
+          followButton.textContent =
+            result
+              ? "Following"
+              : "Follow";
 
-        followButton.classList.toggle(
-          "following",
-          state
+          followButton.classList.toggle(
+            "following",
+            result
+          );
+        }
+
+        showToast(
+          result
+            ? "Following creator"
+            : "Unfollowed"
         );
       }
+    );
 
-      showToast(
-        state ? "Following creator" : "Unfollowed"
-      );
-    });
-
-  overlay.querySelector("[data-creator-message]")
-    ?.addEventListener("click", () => {
-      showToast("Messaging is ready");
-    });
+  overlay
+    .querySelector("[data-message]")
+    ?.addEventListener(
+      "click",
+      () => {
+        showToast(
+          "Messaging is ready"
+        );
+      }
+    );
 }
 
 
@@ -484,18 +735,31 @@ function showCreatorProfile(page, videoId) {
    COMMENTS
 ========================================================= */
 
-function setupCommentButton(page, videoId) {
-  const button = page.querySelector(
-    ".action-btn:not(.like-btn):not(.save-btn):not(.share-btn)"
-  );
+function getComments(videoId) {
+  if (
+    !Array.isArray(
+      state.comments[videoId]
+    )
+  ) {
+    state.comments[videoId] = [];
+  }
 
-  if (!button || button.dataset.commentReady === "true") return;
+  return state.comments[videoId];
+}
 
-  const svg = button.querySelector("svg");
+function setupComment(page, videoId) {
+  const button =
+    page.querySelector(".comment-btn");
 
-  if (!svg) return;
+  if (!button) {
+    return;
+  }
 
-  button.dataset.commentReady = "true";
+  if (button.dataset.ready === "true") {
+    return;
+  }
+
+  button.dataset.ready = "true";
 
   button.addEventListener("click", (event) => {
     event.stopPropagation();
@@ -504,48 +768,52 @@ function setupCommentButton(page, videoId) {
   });
 }
 
-function getComments(videoId) {
-  if (!Array.isArray(comments[videoId])) {
-    comments[videoId] = [];
-  }
-
-  return comments[videoId];
-}
-
-function updateCommentUI(page, videoId) {
-  const button = page.querySelector(
-    ".action-btn:not(.like-btn):not(.save-btn):not(.share-btn)"
-  );
+function updateCommentCount(
+  page,
+  videoId
+) {
+  const button =
+    page.querySelector(".comment-btn");
 
   if (!button) return;
 
-  const count = button.querySelector(".action-count");
+  const count =
+    button.querySelector(".action-count");
 
-  if (!count) return;
-
-  const list = getComments(videoId);
-
-  count.textContent = formatCount(list.length);
+  if (count) {
+    count.textContent =
+      formatCount(
+        getComments(videoId).length
+      );
+  }
 }
 
 function showComments(page, videoId) {
-  removeOverlay("zylo-comments");
+  removeOverlay(
+    ".zylo-comments"
+  );
 
-  const list = getComments(videoId);
+  const list =
+    getComments(videoId);
 
-  const overlay = document.createElement("div");
+  const overlay =
+    document.createElement("div");
 
-  overlay.className = "zylo-overlay zylo-comments";
+  overlay.className =
+    "zylo-overlay zylo-comments";
 
   overlay.innerHTML = `
     <div class="zylo-sheet">
 
       <div class="zylo-sheet-header">
-        <strong>Comments</strong>
+
+        <strong>
+          Comments
+        </strong>
 
         <button
           class="zylo-close"
-          data-close-comments
+          data-close
           aria-label="Close"
         >
           <svg viewBox="0 0 24 24">
@@ -553,30 +821,48 @@ function showComments(page, videoId) {
             <path d="M18 6L6 18"></path>
           </svg>
         </button>
+
       </div>
 
       <div class="zylo-comment-list">
+
         ${
           list.length
-            ? list.map((item) => `
-              <div class="zylo-comment">
-                <div class="zylo-comment-avatar">Z</div>
-                <div>
-                  <strong>
-                    ${escapeHTML(item.username || "You")}
-                  </strong>
-                  <p>
-                    ${escapeHTML(item.text)}
-                  </p>
-                </div>
-              </div>
-            `).join("")
+            ? list
+                .map(
+                  (comment) => `
+                    <div class="zylo-comment">
+
+                      <div class="zylo-comment-avatar">
+                        Z
+                      </div>
+
+                      <div>
+                        <strong>
+                          ${escapeHTML(
+                            comment.username ||
+                              "You"
+                          )}
+                        </strong>
+
+                        <p>
+                          ${escapeHTML(
+                            comment.text
+                          )}
+                        </p>
+                      </div>
+
+                    </div>
+                  `
+                )
+                .join("")
             : `
               <div class="zylo-empty">
                 No comments yet
               </div>
             `
         }
+
       </div>
 
       <form class="zylo-comment-form">
@@ -603,45 +889,71 @@ function showComments(page, videoId) {
     overlay.classList.add("show");
   });
 
-  overlay.querySelector("[data-close-comments]")
-    ?.addEventListener("click", () => {
-      closeOverlay(overlay);
-    });
+  overlay
+    .querySelector("[data-close]")
+    ?.addEventListener(
+      "click",
+      () => closeOverlay(overlay)
+    );
 
-  overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) {
-      closeOverlay(overlay);
+  overlay.addEventListener(
+    "click",
+    (event) => {
+      if (event.target === overlay) {
+        closeOverlay(overlay);
+      }
     }
-  });
+  );
 
   const form =
-    overlay.querySelector(".zylo-comment-form");
+    overlay.querySelector(
+      ".zylo-comment-form"
+    );
 
-  const input = form?.querySelector("input");
+  const input =
+    form?.querySelector("input");
 
-  form?.addEventListener("submit", (event) => {
-    event.preventDefault();
+  input?.focus();
 
-    const text = input?.value.trim();
+  form?.addEventListener(
+    "submit",
+    (event) => {
+      event.preventDefault();
 
-    if (!text) return;
+      const text =
+        input.value.trim();
 
-    list.push({
-      username: profile.username || "You",
-      text,
-      createdAt: Date.now()
-    });
+      if (!text) return;
 
-    comments[videoId] = list;
+      list.push({
+        username:
+          state.profile.username ||
+          "You",
+        text,
+        createdAt: Date.now()
+      });
 
-    setStorage(STORAGE_KEYS.comments, comments);
+      state.comments[videoId] =
+        list;
 
-    updateCommentUI(page, videoId);
+      writeStorage(
+        STORAGE_KEYS.comments,
+        state.comments
+      );
 
-    closeOverlay(overlay);
+      updateCommentCount(
+        page,
+        videoId
+      );
 
-    showComments(page, videoId);
-  });
+      closeOverlay(overlay);
+
+      showComments(
+        page,
+        videoId
+      );
+    }
+  );
 }
 
 
@@ -649,48 +961,81 @@ function showComments(page, videoId) {
    SHARE
 ========================================================= */
 
-function setupShareButton(page, videoId) {
-  const button = page.querySelector(".share-btn");
+function setupShare(page) {
+  const button =
+    page.querySelector(".share-btn");
 
-  if (!button || button.dataset.ready === "true") return;
+  if (!button) return;
+
+  if (button.dataset.ready === "true") {
+    return;
+  }
 
   button.dataset.ready = "true";
 
-  button.addEventListener("click", async (event) => {
-    event.stopPropagation();
+  button.addEventListener(
+    "click",
+    async (event) => {
+      event.stopPropagation();
 
-    const video = page.querySelector("video");
+      const data = {
+        title: "ZYLO",
+        text: "Watch this video on ZYLO",
+        url: window.location.href
+      };
 
-    const shareData = {
-      title: "ZYLO",
-      text: "Watch this video on ZYLO",
-      url: window.location.href
-    };
+      try {
+        if (navigator.share) {
+          await navigator.share(data);
+          return;
+        }
 
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(
+        await copyText(
           window.location.href
         );
 
         showToast("Link copied");
-      }
-    } catch (error) {
-      if (error?.name !== "AbortError") {
-        try {
-          await navigator.clipboard.writeText(
-            window.location.href
+      } catch (error) {
+        if (
+          error?.name !==
+          "AbortError"
+        ) {
+          showToast(
+            "Unable to share"
           );
-
-          showToast("Link copied");
-        } catch {
-          showToast("Share link is ready");
         }
       }
     }
-  });
+  );
+}
+
+async function copyText(text) {
+  if (
+    navigator.clipboard &&
+    window.isSecureContext
+  ) {
+    await navigator.clipboard.writeText(
+      text
+    );
+    return;
+  }
+
+  const textarea =
+    document.createElement("textarea");
+
+  textarea.value = text;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+
+  document.body.appendChild(
+    textarea
+  );
+
+  textarea.select();
+
+  document.execCommand("copy");
+
+  textarea.remove();
 }
 
 
@@ -698,17 +1043,23 @@ function setupShareButton(page, videoId) {
    MUSIC
 ========================================================= */
 
-function setupMusicButton(page, video) {
-  const button = page.querySelector(".music-btn");
+function setupMusic(page, video) {
+  const button =
+    page.querySelector(".music-btn");
 
-  if (!button || button.dataset.ready === "true") return;
+  if (!button) return;
+
+  if (button.dataset.ready === "true") {
+    return;
+  }
 
   button.dataset.ready = "true";
 
   button.addEventListener("click", (event) => {
     event.stopPropagation();
 
-    video.muted = !video.muted;
+    video.muted =
+      !video.muted;
 
     button.classList.toggle(
       "music-muted",
@@ -729,90 +1080,640 @@ function setupMusicButton(page, video) {
    FULLSCREEN
 ========================================================= */
 
-function setupFullscreenButton(page) {
-  const button = page.querySelector(".fullscreen-btn");
+function setupFullscreen(page) {
+  const button =
+    page.querySelector(
+      ".fullscreen-btn"
+    );
 
-  if (!button || button.dataset.ready === "true") return;
+  if (!button) return;
+
+  if (button.dataset.ready === "true") {
+    return;
+  }
 
   button.dataset.ready = "true";
 
-  button.addEventListener("click", async (event) => {
-    event.stopPropagation();
+  button.addEventListener(
+    "click",
+    async (event) => {
+      event.stopPropagation();
 
-    const video = page.querySelector("video");
+      const video =
+        page.querySelector("video");
 
-    try {
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
-        return;
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+          return;
+        }
+
+        if (page.requestFullscreen) {
+          await page.requestFullscreen();
+          return;
+        }
+
+        if (
+          video &&
+          video.webkitEnterFullscreen
+        ) {
+          video.webkitEnterFullscreen();
+          return;
+        }
+
+        if (
+          video &&
+          video.requestFullscreen
+        ) {
+          await video.requestFullscreen();
+        }
+
+      } catch (error) {
+        console.warn(
+          "Fullscreen error:",
+          error
+        );
       }
-
-      if (page.requestFullscreen) {
-        await page.requestFullscreen();
-        return;
-      }
-
-      if (video?.webkitEnterFullscreen) {
-        video.webkitEnterFullscreen();
-        return;
-      }
-
-      if (video?.requestFullscreen) {
-        await video.requestFullscreen();
-      }
-    } catch (error) {
-      console.warn("Fullscreen error:", error);
     }
-  });
+  );
 }
 
 
 /* =========================================================
-   CREATE / UPLOAD
+   TOP TABS
+========================================================= */
+
+function setupTopTabs() {
+  document
+    .querySelectorAll(".top-tab")
+    .forEach((tab) => {
+
+      if (
+        tab.dataset.ready === "true"
+      ) {
+        return;
+      }
+
+      tab.dataset.ready = "true";
+
+      tab.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(
+              ".top-tab"
+            )
+            .forEach((item) => {
+              item.classList.remove(
+                "active"
+              );
+            });
+
+          tab.classList.add("active");
+
+          const name =
+            tab.textContent
+              .trim()
+              .toLowerCase();
+
+          if (name === "following") {
+            state.feedMode =
+              "following";
+
+            showFollowingFeed();
+          }
+
+          else if (name === "for you") {
+            state.feedMode =
+              "for-you";
+
+            showAllFeed();
+          }
+
+          else if (name === "live") {
+            state.feedMode =
+              "live";
+
+            showToast(
+              "LIVE is coming soon"
+            );
+          }
+        }
+      );
+    });
+}
+
+
+/* =========================================================
+   FEED FILTER
+========================================================= */
+
+function showAllFeed() {
+  document
+    .querySelectorAll(".video-page")
+    .forEach((page) => {
+      page.style.display = "";
+    });
+
+  playVisibleVideo();
+}
+
+function showFollowingFeed() {
+  let found = false;
+
+  document
+    .querySelectorAll(".video-page")
+    .forEach((page) => {
+
+      const creatorId =
+        getCreatorId(page);
+
+      const visible =
+        !!state.follows[creatorId];
+
+      page.style.display =
+        visible ? "" : "none";
+
+      if (visible) {
+        found = true;
+      }
+    });
+
+  if (!found) {
+    showToast(
+      "Follow creators to see their videos"
+    );
+
+    setTimeout(() => {
+      showAllFeed();
+    }, 500);
+  }
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+function setupSearch() {
+  if (!searchBtn) return;
+
+  if (searchBtn.dataset.ready === "true") {
+    return;
+  }
+
+  searchBtn.dataset.ready = "true";
+
+  searchBtn.addEventListener(
+    "click",
+    showSearch
+  );
+}
+
+function showSearch() {
+  removeOverlay(
+    ".zylo-search"
+  );
+
+  const overlay =
+    document.createElement("div");
+
+  overlay.className =
+    "zylo-overlay zylo-search";
+
+  overlay.innerHTML = `
+    <div class="zylo-panel search-panel">
+
+      <button
+        class="zylo-close"
+        data-close
+        aria-label="Close"
+      >
+        <svg viewBox="0 0 24 24">
+          <path d="M6 6L18 18"></path>
+          <path d="M18 6L6 18"></path>
+        </svg>
+      </button>
+
+      <h2>
+        Search ZYLO
+      </h2>
+
+      <div class="zylo-search-box">
+
+        <svg viewBox="0 0 24 24">
+          <circle
+            cx="10.8"
+            cy="10.8"
+            r="6.8"
+          ></circle>
+
+          <path
+            d="M16 16L21 21"
+          ></path>
+        </svg>
+
+        <input
+          type="search"
+          placeholder="Search creators, videos..."
+          autocomplete="off"
+        >
+
+      </div>
+
+      <div class="zylo-search-results">
+        Search creators or videos
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => {
+    overlay.classList.add("show");
+  });
+
+  const input =
+    overlay.querySelector("input");
+
+  const results =
+    overlay.querySelector(
+      ".zylo-search-results"
+    );
+
+  input?.focus();
+
+  input?.addEventListener(
+    "input",
+    () => {
+
+      const query =
+        input.value
+          .trim()
+          .toLowerCase();
+
+      if (!query) {
+        results.textContent =
+          "Search creators or videos";
+        return;
+      }
+
+      const pages =
+        [
+          ...document.querySelectorAll(
+            ".video-page"
+          )
+        ];
+
+      const matches =
+        pages.filter((page) =>
+          page.textContent
+            .toLowerCase()
+            .includes(query)
+        );
+
+      results.textContent =
+        matches.length
+          ? `${matches.length} video${
+              matches.length > 1
+                ? "s"
+                : ""
+            } found`
+          : "No results found";
+    }
+  );
+
+  overlay
+    .querySelector("[data-close]")
+    ?.addEventListener(
+      "click",
+      () => closeOverlay(overlay)
+    );
+
+  overlay.addEventListener(
+    "click",
+    (event) => {
+      if (event.target === overlay) {
+        closeOverlay(overlay);
+      }
+    }
+  );
+}
+
+
+/* =========================================================
+   BOTTOM NAV
+========================================================= */
+
+function setupBottomNavigation() {
+  document
+    .querySelectorAll("[data-nav]")
+    .forEach((item) => {
+
+      if (
+        item.dataset.ready === "true"
+      ) {
+        return;
+      }
+
+      item.dataset.ready = "true";
+
+      item.addEventListener(
+        "click",
+        () => {
+
+          const nav =
+            item.dataset.nav;
+
+          if (nav === "home") {
+            showAllFeed();
+
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+
+          if (nav === "discover") {
+            showSearch();
+          }
+
+          if (nav === "inbox") {
+            showInbox();
+          }
+
+          if (nav === "profile") {
+            showOwnProfile();
+          }
+        }
+      );
+    });
+}
+
+
+/* =========================================================
+   OWN PROFILE
+========================================================= */
+
+function showOwnProfile() {
+  removeOverlay(
+    ".zylo-own-profile"
+  );
+
+  const followingCount =
+    Object.values(
+      state.follows
+    ).filter(Boolean).length;
+
+  const likedCount =
+    Object.values(
+      state.likes
+    ).filter(Boolean).length;
+
+  const overlay =
+    document.createElement("div");
+
+  overlay.className =
+    "zylo-overlay zylo-own-profile";
+
+  overlay.innerHTML = `
+    <div class="zylo-panel own-profile-panel">
+
+      <button
+        class="zylo-close"
+        data-close
+        aria-label="Close"
+      >
+        <svg viewBox="0 0 24 24">
+          <path d="M6 6L18 18"></path>
+          <path d="M18 6L6 18"></path>
+        </svg>
+      </button>
+
+      <div class="own-avatar">
+        Z
+      </div>
+
+      <h2>
+        ${escapeHTML(
+          state.profile.displayName ||
+          "ZYLO Creator"
+        )}
+      </h2>
+
+      <div class="creator-username">
+        @${escapeHTML(
+          state.profile.username ||
+          "zylo_creator"
+        )}
+      </div>
+
+      <p class="creator-bio">
+        ${escapeHTML(
+          state.profile.bio ||
+          "Create • Connect • Grow"
+        )}
+      </p>
+
+      <div class="creator-stats">
+
+        <div>
+          <strong>
+            ${formatCount(
+              followingCount
+            )}
+          </strong>
+          <span>Following</span>
+        </div>
+
+        <div>
+          <strong>0</strong>
+          <span>Followers</span>
+        </div>
+
+        <div>
+          <strong>
+            ${formatCount(
+              likedCount
+            )}
+          </strong>
+          <span>Likes</span>
+        </div>
+
+      </div>
+
+      <button
+        class="creator-follow-button"
+        data-edit
+      >
+        Edit Profile
+      </button>
+
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => {
+    overlay.classList.add("show");
+  });
+
+  overlay
+    .querySelector("[data-close]")
+    ?.addEventListener(
+      "click",
+      () => closeOverlay(overlay)
+    );
+
+  overlay.addEventListener(
+    "click",
+    (event) => {
+      if (event.target === overlay) {
+        closeOverlay(overlay);
+      }
+    }
+  );
+
+  overlay
+    .querySelector("[data-edit]")
+    ?.addEventListener(
+      "click",
+      () => {
+        showToast(
+          "Profile editing is ready"
+        );
+      }
+    );
+}
+
+
+/* =========================================================
+   INBOX
+========================================================= */
+
+function showInbox() {
+  removeOverlay(
+    ".zylo-inbox"
+  );
+
+  const overlay =
+    document.createElement("div");
+
+  overlay.className =
+    "zylo-overlay zylo-inbox";
+
+  overlay.innerHTML = `
+    <div class="zylo-panel inbox-panel">
+
+      <button
+        class="zylo-close"
+        data-close
+        aria-label="Close"
+      >
+        <svg viewBox="0 0 24 24">
+          <path d="M6 6L18 18"></path>
+          <path d="M18 6L6 18"></path>
+        </svg>
+      </button>
+
+      <h2>
+        Inbox
+      </h2>
+
+      <div class="zylo-inbox-item">
+
+        <div class="inbox-avatar">
+          Z
+        </div>
+
+        <div>
+          <strong>
+            Welcome to ZYLO
+          </strong>
+
+          <p>
+            Create • Connect • Grow
+          </p>
+        </div>
+
+      </div>
+
+      <div class="zylo-empty">
+        Your notifications will appear here.
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => {
+    overlay.classList.add("show");
+  });
+
+  overlay
+    .querySelector("[data-close]")
+    ?.addEventListener(
+      "click",
+      () => closeOverlay(overlay)
+    );
+
+  overlay.addEventListener(
+    "click",
+    (event) => {
+      if (event.target === overlay) {
+        closeOverlay(overlay);
+      }
+    }
+  );
+}
+
+
+/* =========================================================
+   UPLOAD
 ========================================================= */
 
 function setupUpload() {
-  if (createBtn && createBtn.dataset.ready !== "true") {
-    createBtn.dataset.ready = "true";
+  createBtn?.addEventListener(
+    "click",
+    openUpload,
+    { once: true }
+  );
 
-    createBtn.addEventListener("click", () => {
-      openUploadModal();
-    });
-  }
-
-  if (selectVideo && selectVideo.dataset.ready !== "true") {
-    selectVideo.dataset.ready = "true";
-
-    selectVideo.addEventListener("click", () => {
+  selectVideo?.addEventListener(
+    "click",
+    () => {
       videoInput?.click();
-    });
-  }
-
-  if (videoInput && videoInput.dataset.ready !== "true") {
-    videoInput.dataset.ready = "true";
-
-    videoInput.addEventListener("change", handleVideoUpload);
-  }
-
-  if (closeUpload && closeUpload.dataset.ready !== "true") {
-    closeUpload.dataset.ready = "true";
-
-    closeUpload.addEventListener("click", () => {
-      closeUploadModal();
-    });
-  }
-
-  uploadBox?.addEventListener("click", (event) => {
-    if (event.target === uploadBox) {
-      closeUploadModal();
     }
-  });
+  );
+
+  videoInput?.addEventListener(
+    "change",
+    uploadVideo
+  );
+
+  closeUpload?.addEventListener(
+    "click",
+    closeUploadModal
+  );
+
+  uploadBox?.addEventListener(
+    "click",
+    (event) => {
+      if (event.target === uploadBox) {
+        closeUploadModal();
+      }
+    }
+  );
 }
 
-function openUploadModal() {
+function openUpload() {
   if (!uploadBox) return;
 
-  uploadBox.style.display = "flex";
+  uploadBox.style.display =
+    "flex";
 
   requestAnimationFrame(() => {
     uploadBox.classList.add("show");
@@ -822,10 +1723,13 @@ function openUploadModal() {
 function closeUploadModal() {
   if (!uploadBox) return;
 
-  uploadBox.classList.remove("show");
+  uploadBox.classList.remove(
+    "show"
+  );
 
   setTimeout(() => {
-    uploadBox.style.display = "none";
+    uploadBox.style.display =
+      "none";
   }, 200);
 
   if (videoInput) {
@@ -835,129 +1739,168 @@ function closeUploadModal() {
   setUploadStatus("");
 }
 
-async function handleVideoUpload() {
-  const file = videoInput?.files?.[0];
+async function uploadVideo() {
+  const file =
+    videoInput?.files?.[0];
 
   if (!file) return;
 
-  if (!file.type.startsWith("video/")) {
-    setUploadStatus("Please select a video file.");
+  if (
+    !file.type.startsWith("video/")
+  ) {
+    setUploadStatus(
+      "Please select a video file."
+    );
     return;
   }
 
-  if (file.size > 200 * 1024 * 1024) {
-    setUploadStatus("Maximum video size is 200 MB.");
+  if (
+    file.size >
+    200 * 1024 * 1024
+  ) {
+    setUploadStatus(
+      "Maximum video size is 200 MB."
+    );
     return;
   }
 
-  setUploadStatus("Uploading video...");
+  setUploadStatus(
+    "Uploading video..."
+  );
 
   try {
-    const formData = new FormData();
+    const formData =
+      new FormData();
 
-    formData.append("video", file);
-
-    const response = await fetch(
-      `${API_BASE_URL}/api/upload`,
-      {
-        method: "POST",
-        body: formData
-      }
+    formData.append(
+      "video",
+      file
     );
+
+    const response =
+      await fetch(
+        `${API_BASE_URL}/api/upload`,
+        {
+          method: "POST",
+          body: formData
+        }
+      );
 
     if (!response.ok) {
       throw new Error(
-        "Upload failed: " + response.status
+        "Upload failed"
       );
     }
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
-    const videoUrl =
+    const returnedUrl =
       data.videoUrl ||
       data.url ||
       data.fileUrl ||
       data.path;
 
-    if (!videoUrl) {
-      throw new Error("No video URL returned");
+    if (!returnedUrl) {
+      throw new Error(
+        "Video URL missing"
+      );
     }
 
-    const finalUrl =
-      videoUrl.startsWith("http")
-        ? videoUrl
-        : `${API_BASE_URL}${videoUrl.startsWith("/") ? "" : "/"}${videoUrl}`;
+    const videoUrl =
+      returnedUrl.startsWith("http")
+        ? returnedUrl
+        : `${API_BASE_URL}${
+            returnedUrl.startsWith("/")
+              ? ""
+              : "/"
+          }${returnedUrl}`;
 
-    saveUploadedVideo(finalUrl, file.name);
+    saveUploadedVideo(
+      videoUrl,
+      file.name
+    );
 
-    addUploadedVideo(finalUrl, {
-      fileName: file.name
-    });
+    addUploadedVideo(
+      videoUrl,
+      file.name
+    );
 
-    setUploadStatus("Upload successful!");
+    setUploadStatus(
+      "Upload successful!"
+    );
 
-    setTimeout(() => {
-      closeUploadModal();
-    }, 700);
+    setTimeout(
+      closeUploadModal,
+      700
+    );
 
   } catch (error) {
     console.error(error);
 
     setUploadStatus(
-      "Upload failed. Please check the backend."
+      "Upload failed. Please try again."
     );
   }
 }
 
 function setUploadStatus(message) {
   if (uploadStatus) {
-    uploadStatus.textContent = message;
+    uploadStatus.textContent =
+      message;
   }
 }
 
 
 /* =========================================================
-   UPLOADED VIDEOS
+   UPLOADED VIDEO STORAGE
 ========================================================= */
 
-function saveUploadedVideo(url, fileName = "") {
-  const list = getStorage(
-    STORAGE_KEYS.uploadedVideos,
-    []
-  );
-
-  list.unshift({
+function saveUploadedVideo(
+  url,
+  fileName
+) {
+  state.uploadedVideos.unshift({
     url,
     fileName,
     createdAt: Date.now()
   });
 
-  setStorage(
+  state.uploadedVideos =
+    state.uploadedVideos
+      .slice(0, 20);
+
+  writeStorage(
     STORAGE_KEYS.uploadedVideos,
-    list.slice(0, 20)
+    state.uploadedVideos
   );
 }
 
 function restoreUploadedVideos() {
-  const list = getStorage(
-    STORAGE_KEYS.uploadedVideos,
-    []
-  );
+  if (!videoFeed) return;
 
-  if (!list.length) return;
+  const videos =
+    [...state.uploadedVideos]
+      .reverse();
 
-  list.reverse().forEach((item) => {
-    if (
-      item?.url &&
-      !document.querySelector(
-        `[data-upload-url="${escapeAttribute(item.url)}"]`
-      )
-    ) {
+  videos.forEach((item) => {
+    if (!item?.url) return;
+
+    const alreadyExists =
+      [
+        ...document.querySelectorAll(
+          ".video-page"
+        )
+      ].some(
+        (page) =>
+          page.dataset.uploadUrl ===
+          item.url
+      );
+
+    if (!alreadyExists) {
       addUploadedVideo(
         item.url,
-        {
-          fileName: item.fileName
-        },
+        item.fileName,
         true
       );
     }
@@ -965,21 +1908,24 @@ function restoreUploadedVideos() {
 }
 
 function addUploadedVideo(
-  videoUrl,
-  data = {},
+  url,
+  fileName = "Welcome to ZYLO",
   restoring = false
 ) {
-  if (!videoFeed || !videoUrl) return;
+  if (!videoFeed) return;
 
-  const page = document.createElement("section");
+  const page =
+    document.createElement("section");
 
-  page.className = "video-page";
+  page.className =
+    "video-page";
 
-  page.dataset.uploadUrl = videoUrl;
+  page.dataset.uploadUrl =
+    url;
 
   page.innerHTML = `
     <video
-      src="${escapeAttribute(videoUrl)}"
+      src="${escapeHTML(url)}"
       loop
       muted
       playsinline
@@ -1006,8 +1952,13 @@ function addUploadedVideo(
         class="profile-action"
         aria-label="Profile"
       >
-        <span class="profile-circle">Z</span>
-        <span class="follow-badge">+</span>
+        <span class="profile-circle">
+          Z
+        </span>
+
+        <span class="follow-badge">
+          +
+        </span>
       </button>
 
       <button
@@ -1018,7 +1969,10 @@ function addUploadedVideo(
         <svg viewBox="0 0 24 24">
           <path d="M12 21S4 15.5 4 9.5C4 6.5 6.1 4 9 4c1.7 0 3 .9 3 2.3C12 4.9 13.3 4 15 4c2.9 0 5 2.5 5 5.5C20 15.5 12 21 12 21z"></path>
         </svg>
-        <span class="action-count">0</span>
+
+        <span class="action-count">
+          0
+        </span>
       </button>
 
       <button
@@ -1028,7 +1982,10 @@ function addUploadedVideo(
         <svg viewBox="0 0 24 24">
           <path d="M20 11.5a7.5 7.5 0 0 1-8 7.5H8l-4 3v-6a7.5 7.5 0 1 1 16-4.5z"></path>
         </svg>
-        <span class="action-count">0</span>
+
+        <span class="action-count">
+          0
+        </span>
       </button>
 
       <button
@@ -1038,7 +1995,10 @@ function addUploadedVideo(
         <svg viewBox="0 0 24 24">
           <path d="M6 3h12v18l-6-4-6 4V3z"></path>
         </svg>
-        <span class="action-text">Save</span>
+
+        <span class="action-text">
+          Save
+        </span>
       </button>
 
       <button
@@ -1049,7 +2009,10 @@ function addUploadedVideo(
           <path d="M21 3L10 14"></path>
           <path d="M21 3l-7 18-4-7-7-4 18-7z"></path>
         </svg>
-        <span class="action-text">Share</span>
+
+        <span class="action-text">
+          Share
+        </span>
       </button>
 
       <button
@@ -1057,8 +2020,17 @@ function addUploadedVideo(
         aria-label="Music"
       >
         <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="7"></circle>
-          <circle cx="12" cy="12" r="2"></circle>
+          <circle
+            cx="12"
+            cy="12"
+            r="7"
+          ></circle>
+
+          <circle
+            cx="12"
+            cy="12"
+            r="2"
+          ></circle>
         </svg>
       </button>
 
@@ -1067,15 +2039,17 @@ function addUploadedVideo(
     <div class="video-info">
 
       <div class="username">
-        @${escapeHTML(profile.username)}
-        <span class="verified">✓</span>
+        @${escapeHTML(
+          state.profile.username ||
+          "zylo_creator"
+        )}
+        <span class="verified">
+          ✓
+        </span>
       </div>
 
       <div class="caption">
-        ${escapeHTML(
-          data.fileName ||
-          "Welcome to ZYLO"
-        )}
+        ${escapeHTML(fileName)}
       </div>
 
       <div class="caption">
@@ -1083,17 +2057,15 @@ function addUploadedVideo(
       </div>
 
       <div class="hashtags">
-        #ZYLO #CreateConnectGrow
+        #ZYLO #Create #Connect #Grow
       </div>
 
       <div class="music-info">
-        Original sound • ZYLO
+        Original sound - ZYLO
       </div>
 
     </div>
   `;
-
-  page.dataset.uploadUrl = videoUrl;
 
   if (restoring) {
     videoFeed.appendChild(page);
@@ -1101,7 +2073,8 @@ function addUploadedVideo(
     videoFeed.prepend(page);
   }
 
-  initializeVideoPage(page);
+  initializeVideo(page);
+  setupDoubleTap(page);
 
   if (!restoring) {
     page.scrollIntoView({
@@ -1110,552 +2083,182 @@ function addUploadedVideo(
     });
   }
 
-  setupVideoObserver();
+  setupObserver();
 }
 
 
 /* =========================================================
-   TOP TABS
+   INTERSECTION OBSERVER
 ========================================================= */
 
-function setupTopTabs() {
-  const tabs = document.querySelectorAll(".top-tab");
+let observer = null;
 
-  tabs.forEach((tab) => {
-    if (tab.dataset.ready === "true") return;
-
-    tab.dataset.ready = "true";
-
-    tab.addEventListener("click", () => {
-      tabs.forEach((item) => {
-        item.classList.remove("active");
-      });
-
-      tab.classList.add("active");
-
-      const text =
-        tab.textContent.trim().toLowerCase();
-
-      if (text === "following") {
-        activeFeedMode = "following";
-        filterFollowingFeed();
-      } else if (text === "for you") {
-        activeFeedMode = "for-you";
-        showAllVideos();
-      } else if (text === "live") {
-        activeFeedMode = "live";
-        showLiveMessage();
-      }
-    });
-  });
-}
-
-function showAllVideos() {
-  document
-    .querySelectorAll(".video-page")
-    .forEach((page) => {
-      page.style.display = "";
-    });
-
-  playVisibleVideo();
-}
-
-function filterFollowingFeed() {
-  const pages =
-    [...document.querySelectorAll(".video-page")];
-
-  let found = false;
-
-  pages.forEach((page) => {
-    const id = getVideoId(page);
-
-    if (follows[id]) {
-      page.style.display = "";
-      found = true;
-    } else {
-      page.style.display = "none";
-    }
-  });
-
-  if (!found) {
-    showToast("You are not following any creators yet");
-    showAllVideos();
-  }
-}
-
-function showLiveMessage() {
-  showToast("LIVE is coming soon");
-}
-
-
-/* =========================================================
-   SEARCH
-========================================================= */
-
-function setupSearch() {
-  if (!searchBtn || searchBtn.dataset.ready === "true") {
-    return;
-  }
-
-  searchBtn.dataset.ready = "true";
-
-  searchBtn.addEventListener("click", () => {
-    showSearch();
-  });
-}
-
-function showSearch() {
-  removeOverlay("zylo-search");
-
-  const overlay = document.createElement("div");
-
-  overlay.className = "zylo-overlay zylo-search";
-
-  overlay.innerHTML = `
-    <div class="zylo-panel search-panel">
-
-      <button
-        class="zylo-close"
-        data-close-search
-        aria-label="Close"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M6 6L18 18"></path>
-          <path d="M18 6L6 18"></path>
-        </svg>
-      </button>
-
-      <h2>Search ZYLO</h2>
-
-      <div class="zylo-search-box">
-
-        <svg viewBox="0 0 24 24">
-          <circle cx="10.8" cy="10.8" r="6.8"></circle>
-          <path d="M16 16L21 21"></path>
-        </svg>
-
-        <input
-          type="search"
-          placeholder="Search creators, videos..."
-          autocomplete="off"
-        >
-
-      </div>
-
-      <div class="zylo-search-results">
-        Search ZYLO
-      </div>
-
-    </div>
-  `;
-
-  document.body.appendChild(overlay);
-
-  requestAnimationFrame(() => {
-    overlay.classList.add("show");
-  });
-
-  const input =
-    overlay.querySelector("input");
-
-  const results =
-    overlay.querySelector(".zylo-search-results");
-
-  input?.focus();
-
-  input?.addEventListener("input", () => {
-    const query =
-      input.value.trim().toLowerCase();
-
-    if (!query) {
-      results.textContent = "Search ZYLO";
-      return;
-    }
-
-    const pages =
-      [...document.querySelectorAll(".video-page")];
-
-    const matches = pages.filter((page) => {
-      return page.textContent
-        .toLowerCase()
-        .includes(query);
-    });
-
-    results.innerHTML = matches.length
-      ? `${matches.length} video${
-          matches.length > 1 ? "s" : ""
-        } found`
-      : "No results found";
-  });
-
-  overlay.querySelector("[data-close-search]")
-    ?.addEventListener("click", () => {
-      closeOverlay(overlay);
-    });
-
-  overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) {
-      closeOverlay(overlay);
-    }
-  });
-}
-
-
-/* =========================================================
-   BOTTOM NAVIGATION
-========================================================= */
-
-function setupBottomNavigation() {
-  const navItems =
-    document.querySelectorAll("[data-nav]");
-
-  navItems.forEach((item) => {
-    if (item.dataset.ready === "true") return;
-
-    item.dataset.ready = "true";
-
-    item.addEventListener("click", () => {
-      const nav = item.dataset.nav;
-
-      if (nav === "home") {
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        });
-
-        activeFeedMode = "for-you";
-      }
-
-      if (nav === "discover") {
-        showSearch();
-      }
-
-      if (nav === "inbox") {
-        showInbox();
-      }
-
-      if (nav === "profile") {
-        showProfile();
-      }
-    });
-  });
-}
-
-
-/* =========================================================
-   OWN PROFILE
-========================================================= */
-
-function showProfile() {
-  removeOverlay("zylo-own-profile");
-
-  const overlay = document.createElement("div");
-
-  overlay.className =
-    "zylo-overlay zylo-own-profile";
-
-  const followerCount =
-    Number(profile.followers) || 0;
-
-  const followingCount =
-    Object.values(follows)
-      .filter(Boolean).length;
-
-  const likeCount =
-    Object.values(likes)
-      .filter(Boolean).length;
-
-  overlay.innerHTML = `
-    <div class="zylo-panel own-profile-panel">
-
-      <button
-        class="zylo-close"
-        data-close-profile
-        aria-label="Close"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M6 6L18 18"></path>
-          <path d="M18 6L6 18"></path>
-        </svg>
-      </button>
-
-      <div class="own-avatar">Z</div>
-
-      <h2>
-        ${escapeHTML(
-          profile.displayName ||
-          "ZYLO Creator"
-        )}
-      </h2>
-
-      <div class="creator-username">
-        @${escapeHTML(
-          profile.username ||
-          "zylo_creator"
-        )}
-      </div>
-
-      <p class="creator-bio">
-        ${escapeHTML(
-          profile.bio ||
-          "Create • Connect • Grow"
-        )}
-      </p>
-
-      <div class="creator-stats">
-
-        <div>
-          <strong>${formatCount(followingCount)}</strong>
-          <span>Following</span>
-        </div>
-
-        <div>
-          <strong>${formatCount(followerCount)}</strong>
-          <span>Followers</span>
-        </div>
-
-        <div>
-          <strong>${formatCount(likeCount)}</strong>
-          <span>Likes</span>
-        </div>
-
-      </div>
-
-      <button
-        class="creator-follow-button"
-        data-edit-profile
-      >
-        Edit Profile
-      </button>
-
-    </div>
-  `;
-
-  document.body.appendChild(overlay);
-
-  requestAnimationFrame(() => {
-    overlay.classList.add("show");
-  });
-
-  overlay.querySelector("[data-close-profile]")
-    ?.addEventListener("click", () => {
-      closeOverlay(overlay);
-    });
-
-  overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) {
-      closeOverlay(overlay);
-    }
-  });
-
-  overlay.querySelector("[data-edit-profile]")
-    ?.addEventListener("click", () => {
-      showToast("Profile editing is ready");
-    });
-}
-
-
-/* =========================================================
-   INBOX
-========================================================= */
-
-function showInbox() {
-  removeOverlay("zylo-inbox");
-
-  const overlay = document.createElement("div");
-
-  overlay.className = "zylo-overlay zylo-inbox";
-
-  overlay.innerHTML = `
-    <div class="zylo-panel inbox-panel">
-
-      <button
-        class="zylo-close"
-        data-close-inbox
-        aria-label="Close"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M6 6L18 18"></path>
-          <path d="M18 6L6 18"></path>
-        </svg>
-      </button>
-
-      <h2>Inbox</h2>
-
-      <div class="zylo-inbox-item">
-        <div class="inbox-avatar">Z</div>
-
-        <div>
-          <strong>Welcome to ZYLO</strong>
-          <p>Create • Connect • Grow</p>
-        </div>
-      </div>
-
-      <div class="zylo-empty">
-        Your notifications will appear here.
-      </div>
-
-    </div>
-  `;
-
-  document.body.appendChild(overlay);
-
-  requestAnimationFrame(() => {
-    overlay.classList.add("show");
-  });
-
-  overlay.querySelector("[data-close-inbox]")
-    ?.addEventListener("click", () => {
-      closeOverlay(overlay);
-    });
-
-  overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) {
-      closeOverlay(overlay);
-    }
-  });
-}
-
-
-/* =========================================================
-   VIDEO OBSERVER
-========================================================= */
-
-let videoObserver = null;
-
-function setupVideoObserver() {
+function setupObserver() {
   if (!videoFeed) return;
 
-  if (videoObserver) {
-    videoObserver.disconnect();
+  if (observer) {
+    observer.disconnect();
   }
 
-  videoObserver =
+  observer =
     new IntersectionObserver(
       (entries) => {
+
         entries.forEach((entry) => {
-          const page = entry.target;
-          const video = page.querySelector("video");
+
+          const video =
+            entry.target.querySelector(
+              "video"
+            );
 
           if (!video) return;
 
           if (
             entry.isIntersecting &&
-            entry.intersectionRatio >= 0.65
+            entry.intersectionRatio >=
+              0.65
           ) {
+
             document
-              .querySelectorAll(".video-page video")
+              .querySelectorAll(
+                ".video-page video"
+              )
               .forEach((other) => {
-                if (other !== video) {
+                if (
+                  other !== video
+                ) {
                   other.pause();
                 }
               });
 
-            video.play().catch(() => {});
+            video.play().catch(
+              () => {}
+            );
+
           } else {
             video.pause();
           }
         });
       },
       {
-        threshold: [0, 0.65, 1]
+        threshold: [
+          0,
+          0.65,
+          1
+        ]
       }
     );
 
   document
-    .querySelectorAll(".video-page")
+    .querySelectorAll(
+      ".video-page"
+    )
     .forEach((page) => {
-      videoObserver.observe(page);
+      observer.observe(page);
+
+      setupDoubleTap(page);
     });
 }
 
 function playVisibleVideo() {
-  const pages =
-    [...document.querySelectorAll(".video-page")];
-
-  let bestPage = null;
+  let best = null;
   let bestRatio = 0;
 
-  pages.forEach((page) => {
-    if (page.style.display === "none") return;
+  document
+    .querySelectorAll(
+      ".video-page"
+    )
+    .forEach((page) => {
 
-    const rect = page.getBoundingClientRect();
+      if (
+        page.style.display ===
+        "none"
+      ) {
+        return;
+      }
 
-    const visibleTop =
-      Math.max(rect.top, 0);
+      const rect =
+        page.getBoundingClientRect();
 
-    const visibleBottom =
-      Math.min(rect.bottom, window.innerHeight);
+      const top =
+        Math.max(
+          rect.top,
+          0
+        );
 
-    const visible =
-      Math.max(0, visibleBottom - visibleTop);
+      const bottom =
+        Math.min(
+          rect.bottom,
+          window.innerHeight
+        );
 
-    const ratio =
-      visible / Math.max(1, rect.height);
+      const visible =
+        Math.max(
+          0,
+          bottom - top
+        );
 
-    if (ratio > bestRatio) {
-      bestRatio = ratio;
-      bestPage = page;
-    }
-  });
+      const ratio =
+        visible /
+        Math.max(
+          1,
+          rect.height
+        );
 
-  if (bestPage) {
+      if (ratio > bestRatio) {
+        bestRatio = ratio;
+        best = page;
+      }
+    });
+
+  if (best) {
     const video =
-      bestPage.querySelector("video");
+      best.querySelector("video");
 
-    video?.play().catch(() => {});
+    video?.play().catch(
+      () => {}
+    );
   }
 }
 
 
 /* =========================================================
-   DOUBLE TAP LIKE
+   VISIBILITY
 ========================================================= */
 
-function setupDoubleTap() {
-  document
-    .querySelectorAll(".video-page")
-    .forEach((page) => {
-      if (page.dataset.doubleTapReady === "true") {
-        return;
+function setupVisibility() {
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+
+      if (document.hidden) {
+
+        document
+          .querySelectorAll(
+            ".video-page video"
+          )
+          .forEach((video) => {
+            video.pause();
+          });
+
+      } else {
+        playVisibleVideo();
       }
-
-      page.dataset.doubleTapReady = "true";
-
-      let lastTap = 0;
-
-      page.addEventListener(
-        "touchend",
-        (event) => {
-          const now = Date.now();
-
-          if (now - lastTap < 300) {
-            const videoId = getVideoId(page);
-
-            likes[videoId] = true;
-
-            setStorage(
-              STORAGE_KEYS.likes,
-              likes
-            );
-
-            updateLikeUI(page, videoId);
-
-            showBigHeart(page);
-          }
-
-          lastTap = now;
-        },
-        { passive: true }
-      );
-    });
+    }
+  );
 }
+
+
+/* =========================================================
+   BIG HEART
+========================================================= */
 
 function showBigHeart(page) {
   const heart =
     document.createElement("div");
 
-  heart.className = "zylo-big-heart";
+  heart.className =
+    "zylo-big-heart";
 
   heart.innerHTML = `
     <svg viewBox="0 0 24 24">
@@ -1672,56 +2275,49 @@ function showBigHeart(page) {
 
 
 /* =========================================================
-   VISIBILITY
+   OVERLAY
 ========================================================= */
 
-document.addEventListener(
-  "visibilitychange",
-  () => {
-    if (document.hidden) {
-      document
-        .querySelectorAll(".video-page video")
-        .forEach((video) => video.pause());
-    } else {
-      playVisibleVideo();
-    }
-  }
-);
-
-
-/* =========================================================
-   ESCAPE KEY
-========================================================= */
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    document
-      .querySelectorAll(".zylo-overlay.show")
-      .forEach((overlay) => {
-        closeOverlay(overlay);
-      });
-  }
-});
-
-
-/* =========================================================
-   OVERLAY HELPERS
-========================================================= */
-
-function removeOverlay(className) {
+function removeOverlay(selector) {
   document
-    .querySelectorAll("." + className)
-    .forEach((element) => element.remove());
+    .querySelectorAll(selector)
+    .forEach((element) => {
+      element.remove();
+    });
 }
 
 function closeOverlay(overlay) {
   if (!overlay) return;
 
-  overlay.classList.remove("show");
+  overlay.classList.remove(
+    "show"
+  );
 
   setTimeout(() => {
     overlay.remove();
   }, 200);
+}
+
+function setupGlobalEscape() {
+  document.addEventListener(
+    "keydown",
+    (event) => {
+
+      if (
+        event.key !== "Escape"
+      ) {
+        return;
+      }
+
+      document
+        .querySelectorAll(
+          ".zylo-overlay.show"
+        )
+        .forEach((overlay) => {
+          closeOverlay(overlay);
+        });
+    }
+  );
 }
 
 
@@ -1731,19 +2327,30 @@ function closeOverlay(overlay) {
 
 function showToast(message) {
   let toast =
-    document.querySelector(".zylo-toast");
+    document.querySelector(
+      ".zylo-toast"
+    );
 
   if (!toast) {
-    toast = document.createElement("div");
+    toast =
+      document.createElement(
+        "div"
+      );
 
-    toast.className = "zylo-toast";
+    toast.className =
+      "zylo-toast";
 
-    document.body.appendChild(toast);
+    document.body.appendChild(
+      toast
+    );
   }
 
-  toast.textContent = message;
+  toast.textContent =
+    message;
 
-  toast.classList.add("show");
+  toast.classList.add(
+    "show"
+  );
 
   clearTimeout(
     toast._timer
@@ -1751,25 +2358,32 @@ function showToast(message) {
 
   toast._timer =
     setTimeout(() => {
-      toast.classList.remove("show");
+      toast.classList.remove(
+        "show"
+      );
     }, 1800);
 }
 
 
 /* =========================================================
-   DYNAMIC FUNCTIONAL CSS
-   Does NOT modify your existing style.css.
+   FUNCTIONAL CSS
+   Does NOT change style.css.
 ========================================================= */
 
 function injectFunctionalCSS() {
-  if (document.getElementById("zylo-functional-css")) {
+  if (
+    document.getElementById(
+      "zylo-functional-css"
+    )
+  ) {
     return;
   }
 
   const style =
     document.createElement("style");
 
-  style.id = "zylo-functional-css";
+  style.id =
+    "zylo-functional-css";
 
   style.textContent = `
 
@@ -1783,8 +2397,9 @@ function injectFunctionalCSS() {
       background: rgba(0,0,0,.68);
       opacity: 0;
       visibility: hidden;
-      transition: opacity .2s ease,
-                  visibility .2s ease;
+      transition:
+        opacity .2s ease,
+        visibility .2s ease;
     }
 
     .zylo-overlay.show {
@@ -1794,25 +2409,26 @@ function injectFunctionalCSS() {
 
     .zylo-panel {
       position: relative;
-      width: min(430px, 94vw);
+      width: min(430px,94vw);
       max-height: 88vh;
-      overflow: auto;
+      overflow-y: auto;
       padding: 28px 20px;
+      box-sizing: border-box;
       border-radius: 24px 24px 0 0;
       background: #111;
       color: #fff;
       text-align: center;
       transform: translateY(30px);
       transition: transform .2s ease;
-      box-sizing: border-box;
     }
 
-    .zylo-overlay.show .zylo-panel {
+    .zylo-overlay.show
+    .zylo-panel {
       transform: translateY(0);
     }
 
     .zylo-sheet {
-      width: min(600px, 100vw);
+      width: min(600px,100vw);
       max-height: 78vh;
       background: #111;
       color: #fff;
@@ -1822,7 +2438,8 @@ function injectFunctionalCSS() {
       transition: transform .2s ease;
     }
 
-    .zylo-overlay.show .zylo-sheet {
+    .zylo-overlay.show
+    .zylo-sheet {
       transform: translateY(0);
     }
 
@@ -1850,8 +2467,7 @@ function injectFunctionalCSS() {
     }
 
     .creator-avatar,
-    .own-avatar,
-    .inbox-avatar {
+    .own-avatar {
       width: 82px;
       height: 82px;
       margin: 8px auto 14px;
@@ -1865,26 +2481,10 @@ function injectFunctionalCSS() {
       border: 2px solid rgba(255,255,255,.35);
     }
 
-    .zylo-panel h2 {
-      margin: 8px 0;
-    }
-
-    .creator-username {
-      opacity: .7;
-      margin-bottom: 12px;
-    }
-
-    .creator-bio {
-      opacity: .9;
-      margin: 10px auto 20px;
-      max-width: 320px;
-      line-height: 1.5;
-    }
-
     .creator-stats {
       display: flex;
       justify-content: center;
-      gap: 34px;
+      gap: 30px;
       margin: 20px 0;
     }
 
@@ -1894,10 +2494,6 @@ function injectFunctionalCSS() {
       gap: 4px;
     }
 
-    .creator-stats strong {
-      font-size: 20px;
-    }
-
     .creator-stats span {
       font-size: 12px;
       opacity: .65;
@@ -1905,7 +2501,7 @@ function injectFunctionalCSS() {
 
     .creator-follow-button,
     .creator-message-button {
-      width: min(300px, 90%);
+      width: min(300px,90%);
       min-height: 46px;
       margin: 6px auto;
       display: block;
@@ -1981,12 +2577,11 @@ function injectFunctionalCSS() {
       gap: 8px;
       padding: 12px;
       border-top: 1px solid rgba(255,255,255,.08);
-      background: #111;
     }
 
     .zylo-comment-form input {
-      min-width: 0;
       flex: 1;
+      min-width: 0;
       height: 44px;
       padding: 0 13px;
       border: 0;
@@ -2013,16 +2608,15 @@ function injectFunctionalCSS() {
 
     .search-panel {
       border-radius: 24px;
-      max-height: 80vh;
     }
 
     .zylo-search-box {
       display: flex;
       align-items: center;
       gap: 9px;
+      height: 48px;
       margin: 20px 0;
       padding: 0 14px;
-      height: 48px;
       border-radius: 24px;
       background: #222;
     }
@@ -2055,7 +2649,8 @@ function injectFunctionalCSS() {
       left: 50%;
       bottom: 95px;
       z-index: 100001;
-      transform: translate(-50%, 20px);
+      transform:
+        translate(-50%,20px);
       padding: 10px 16px;
       border-radius: 22px;
       background: rgba(0,0,0,.88);
@@ -2069,7 +2664,8 @@ function injectFunctionalCSS() {
 
     .zylo-toast.show {
       opacity: 1;
-      transform: translate(-50%, 0);
+      transform:
+        translate(-50%,0);
     }
 
     .zylo-big-heart {
@@ -2077,9 +2673,12 @@ function injectFunctionalCSS() {
       left: 50%;
       top: 50%;
       z-index: 50;
-      transform: translate(-50%, -50%) scale(.4);
-      animation: zyloHeart .75s ease forwards;
       pointer-events: none;
+      transform:
+        translate(-50%,-50%)
+        scale(.4);
+      animation:
+        zyloHeart .75s ease forwards;
     }
 
     .zylo-big-heart svg {
@@ -2088,7 +2687,6 @@ function injectFunctionalCSS() {
       fill: #fff;
       stroke: #fff;
       stroke-width: 1;
-      filter: drop-shadow(0 5px 20px rgba(0,0,0,.5));
     }
 
     .zylo-inbox-item {
@@ -2097,76 +2695,67 @@ function injectFunctionalCSS() {
       gap: 12px;
       padding: 14px 8px;
       text-align: left;
-      border-bottom: 1px solid rgba(255,255,255,.08);
+      border-bottom:
+        1px solid rgba(255,255,255,.08);
     }
 
-    .zylo-inbox-item .inbox-avatar {
-      margin: 0;
+    .inbox-avatar {
       width: 48px;
       height: 48px;
-      font-size: 20px;
-    }
-
-    .zylo-inbox-item p {
-      margin: 4px 0 0;
-      opacity: .65;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #222;
+      font-weight: 800;
     }
 
     @keyframes zyloHeart {
       0% {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(.3);
+        transform:
+          translate(-50%,-50%)
+          scale(.3);
       }
+
       20% {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1.15);
+        transform:
+          translate(-50%,-50%)
+          scale(1.15);
       }
+
       70% {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+        transform:
+          translate(-50%,-50%)
+          scale(1);
       }
+
       100% {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(1.35);
+        transform:
+          translate(-50%,-50%)
+          scale(1.35);
       }
     }
 
-    @media (max-width: 480px) {
+    @media (max-width:480px) {
+
       .creator-stats {
-        gap: 22px;
+        gap: 20px;
       }
 
       .zylo-panel {
         width: 100%;
       }
+
     }
 
   `;
 
-  document.head.appendChild(style);
-}
-
-
-/* =========================================================
-   INITIALIZATION
-========================================================= */
-
-function initializeZYLO() {
-  injectFunctionalCSS();
-
-  initializeAllVideos();
-
-  setupUpload();
-  setupSearch();
-  setupTopTabs();
-  setupBottomNavigation();
-
-  setupVideoObserver();
-  setupDoubleTap();
-
-  setTimeout(() => {
-    playVisibleVideo();
-  }, 400);
+  document.head.appendChild(
+    style
+  );
 }
 
 
@@ -2174,7 +2763,10 @@ function initializeZYLO() {
    START
 ========================================================= */
 
-if (document.readyState === "loading") {
+if (
+  document.readyState ===
+  "loading"
+) {
   document.addEventListener(
     "DOMContentLoaded",
     initializeZYLO
