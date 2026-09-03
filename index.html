@@ -1,913 +1,605 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
-
-    <meta name="theme-color" content="#000000">
-
-    <title>ZYLO • Create • Connect • Grow</title>
+    <title>ZYLO — Create • Connect • Grow</title>
 
     <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
 
-    <div class="app">
+<div class="app">
 
-        <!-- ================================= -->
-        <!-- TOP NAVIGATION -->
-        <!-- ================================= -->
+    <!-- ================= TOP BAR ================= -->
+    <header class="top-bar">
 
-        <header class="top-bar">
+        <div class="top-tabs">
 
-            <div class="top-tabs">
-
-                <button class="top-tab live-tab">
-                    LIVE
-                </button>
-
-                <button class="top-tab">
-                    Following
-                </button>
-
-                <button class="top-tab active">
-                    For You
-                </button>
-
-            </div>
-
-            <!-- Search -->
-
-            <button class="search-btn" aria-label="Search">
-
-                <svg
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                >
-                    <circle
-                        cx="11"
-                        cy="11"
-                        r="6.5">
-                    </circle>
-
-                    <path
-                        d="M16 16L21 21">
-                    </path>
-                </svg>
-
+            <button class="top-tab live-tab">
+                LIVE
             </button>
 
-        </header>
-
-
-        <!-- ================================= -->
-        <!-- VIDEO FEED -->
-        <!-- ================================= -->
-
-        <main class="video-feed">
-
-
-            <!-- ================================= -->
-            <!-- VIDEO 1 -->
-            <!-- ================================= -->
-
-            <section class="video-page">
-
-                <video
-                    class="video-player"
-                    src="./backend/uploads/video1.mp4"
-                    loop
-                    muted
-                    playsinline
-                    preload="metadata"
-                ></video>
-
-
-                <!-- RIGHT ACTIONS -->
-
-                <div class="right-actions">
-
-
-                    <!-- PROFILE -->
-
-                    <button
-                        class="profile-action"
-                        aria-label="Profile"
-                    >
-
-                        <span class="profile-circle">
-                            Z
-                        </span>
-
-                        <span class="follow-badge">
-                            +
-                        </span>
-
-                        <span class="action-label">
-                            Follow
-                        </span>
-
-                    </button>
-
-
-                    <!-- LIKE -->
-
-                    <button
-                        class="action-btn like-btn"
-                        aria-label="Like"
-                    >
-
-                        <svg
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                d="M20.8 8.8c0 5.2-8.8 10.2-8.8 10.2S3.2 14 3.2 8.8C3.2 6 5.2 4 7.8 4c1.6 0 3.1.8 4.2 2.1C13.1 4.8 14.6 4 16.2 4c2.6 0 4.6 2 4.6 4.8z">
-                            </path>
-                        </svg>
-
-                        <span class="action-count">
-                            0
-                        </span>
-
-                    </button>
-
-
-                    <!-- COMMENT -->
-
-                    <button
-                        class="action-btn"
-                        aria-label="Comments"
-                    >
-
-                        <svg
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                d="M20 11.5a8 8 0 0 1-8 8H7l-4 2 1.5-4A8 8 0 1 1 20 11.5z">
-                            </path>
-
-                            <circle
-                                cx="8"
-                                cy="11"
-                                r="1">
-                            </circle>
-
-                            <circle
-                                cx="12"
-                                cy="11"
-                                r="1">
-                            </circle>
-
-                            <circle
-                                cx="16"
-                                cy="11"
-                                r="1">
-                            </circle>
-
-                        </svg>
-
-                        <span class="action-count">
-                            0
-                        </span>
-
-                    </button>
-
-
-                    <!-- SAVE -->
-
-                    <button
-                        class="action-btn save-btn"
-                        aria-label="Save"
-                    >
-
-                        <svg
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.8L6 21V4.5z">
-                            </path>
-                        </svg>
-
-                        <span class="action-text">
-                            Save
-                        </span>
-
-                    </button>
-
-
-                    <!-- SHARE -->
-
-                    <button
-                        class="action-btn share-btn"
-                        aria-label="Share"
-                    >
-
-                        <svg
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                d="M21 3L10 14">
-                            </path>
-
-                            <path
-                                d="M21 3l-7 18-4-7-7-4L21 3z">
-                            </path>
-                        </svg>
-
-                        <span class="action-text">
-                            Share
-                        </span>
-
-                    </button>
-
-
-                    <!-- MUSIC -->
-
-                    <button
-                        class="music-btn"
-                        aria-label="Music"
-                    >
-
-                        <span class="music-disc">
-
-                            <svg
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    d="M9 18V6l9-2v12">
-                                </path>
-
-                                <circle
-                                    cx="6.5"
-                                    cy="18"
-                                    r="3">
-                                </circle>
-
-                                <circle
-                                    cx="15.5"
-                                    cy="16"
-                                    r="3">
-                                </circle>
-
-                            </svg>
-
-                        </span>
-
-                    </button>
-
-                </div>
-
-
-                <!-- ================================= -->
-                <!-- VIDEO INFORMATION -->
-                <!-- ================================= -->
-
-                <div class="video-info">
-
-                    <div class="username">
-                        @zylo_creator
-
-                        <span class="verified">
-                            ✓
-                        </span>
-                    </div>
-
-                    <div class="caption">
-                        Welcome to ZYLO 🌍
-                    </div>
-
-                    <div class="tagline">
-                        Create • Connect • Grow
-                    </div>
-
-                    <div class="hashtags">
-                        #ZYLO #Create #Connect #Grow #ForYou
-                    </div>
-
-                    <div class="music-info">
-
-                        <svg
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                d="M9 18V6l9-2v12">
-                            </path>
-
-                            <circle
-                                cx="6.5"
-                                cy="18"
-                                r="3">
-                            </circle>
-
-                            <circle
-                                cx="15.5"
-                                cy="16"
-                                r="3">
-                            </circle>
-                        </svg>
-
-                        Original sound - ZYLO
-
-                    </div>
-
-                </div>
-
-
-                <!-- FULLSCREEN -->
-
-                <button
-                    class="fullscreen-btn"
-                    aria-label="Fullscreen"
-                >
-
-                    <svg
-                        viewBox="0 0 24 24"
-                    >
-
-                        <path
-                            d="M4 9V4h5">
-                        </path>
-
-                        <path
-                            d="M20 9V4h-5">
-                        </path>
-
-                        <path
-                            d="M4 15v5h5">
-                        </path>
-
-                        <path
-                            d="M20 15v5h-5">
-                        </path>
-
-                    </svg>
-
-                </button>
-
-            </section>
-
-
-
-            <!-- ================================= -->
-            <!-- VIDEO 2 -->
-            <!-- ================================= -->
-
-            <section class="video-page">
-
-                <video
-                    class="video-player"
-                    src="./backend/uploads/video1.mp4"
-                    loop
-                    muted
-                    playsinline
-                    preload="metadata"
-                ></video>
-
-
-                <!-- RIGHT ACTIONS -->
-
-                <div class="right-actions">
-
-
-                    <!-- PROFILE -->
-
-                    <button
-                        class="profile-action"
-                        aria-label="Profile"
-                    >
-
-                        <span class="profile-circle">
-                            Z
-                        </span>
-
-                        <span class="follow-badge">
-                            +
-                        </span>
-
-                        <span class="action-label">
-                            Follow
-                        </span>
-
-                    </button>
-
-
-                    <!-- LIKE -->
-
-                    <button
-                        class="action-btn like-btn"
-                        aria-label="Like"
-                    >
-
-                        <svg
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                d="M20.8 8.8c0 5.2-8.8 10.2-8.8 10.2S3.2 14 3.2 8.8C3.2 6 5.2 4 7.8 4c1.6 0 3.1.8 4.2 2.1C13.1 4.8 14.6 4 16.2 4c2.6 0 4.6 2 4.6 4.8z">
-                            </path>
-                        </svg>
-
-                        <span class="action-count">
-                            125.6K
-                        </span>
-
-                    </button>
-
-
-                    <!-- COMMENT -->
-
-                    <button
-                        class="action-btn"
-                        aria-label="Comments"
-                    >
-
-                        <svg
-                            viewBox="0 0 24 24"
-                        >
-
-                            <path
-                                d="M20 11.5a8 8 0 0 1-8 8H7l-4 2 1.5-4A8 8 0 1 1 20 11.5z">
-                            </path>
-
-                            <circle
-                                cx="8"
-                                cy="11"
-                                r="1">
-                            </circle>
-
-                            <circle
-                                cx="12"
-                                cy="11"
-                                r="1">
-                            </circle>
-
-                            <circle
-                                cx="16"
-                                cy="11"
-                                r="1">
-                            </circle>
-
-                        </svg>
-
-                        <span class="action-count">
-                            3428
-                        </span>
-
-                    </button>
-
-
-                    <!-- SAVE -->
-
-                    <button
-                        class="action-btn save-btn"
-                        aria-label="Save"
-                    >
-
-                        <svg
-                            viewBox="0 0 24 24"
-                        >
-
-                            <path
-                                d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.8L6 21V4.5z">
-                            </path>
-
-                        </svg>
-
-                        <span class="action-text">
-                            Save
-                        </span>
-
-                    </button>
-
-
-                    <!-- SHARE -->
-
-                    <button
-                        class="action-btn share-btn"
-                        aria-label="Share"
-                    >
-
-                        <svg
-                            viewBox="0 0 24 24"
-                        >
-
-                            <path
-                                d="M21 3L10 14">
-                            </path>
-
-                            <path
-                                d="M21 3l-7 18-4-7-7-4L21 3z">
-                            </path>
-
-                        </svg>
-
-                        <span class="action-text">
-                            Share
-                        </span>
-
-                    </button>
-
-
-                    <!-- MUSIC -->
-
-                    <button
-                        class="music-btn"
-                        aria-label="Music"
-                    >
-
-                        <span class="music-disc">
-
-                            <svg
-                                viewBox="0 0 24 24"
-                            >
-
-                                <path
-                                    d="M9 18V6l9-2v12">
-                                </path>
-
-                                <circle
-                                    cx="6.5"
-                                    cy="18"
-                                    r="3">
-                                </circle>
-
-                                <circle
-                                    cx="15.5"
-                                    cy="16"
-                                    r="3">
-                                </circle>
-
-                            </svg>
-
-                        </span>
-
-                    </button>
-
-                </div>
-
-
-                <!-- VIDEO INFO -->
-
-                <div class="video-info">
-
-                    <div class="username">
-                        @zylo_creator
-
-                        <span class="verified">
-                            ✓
-                        </span>
-                    </div>
-
-                    <div class="caption">
-                        Create your world on ZYLO 🌍
-                    </div>
-
-                    <div class="tagline">
-                        Create • Connect • Grow
-                    </div>
-
-                    <div class="hashtags">
-                        #ZYLO #Create #Connect #Grow #ForYou
-                    </div>
-
-                    <div class="music-info">
-
-                        <svg
-                            viewBox="0 0 24 24"
-                        >
-
-                            <path
-                                d="M9 18V6l9-2v12">
-                            </path>
-
-                            <circle
-                                cx="6.5"
-                                cy="18"
-                                r="3">
-                            </circle>
-
-                            <circle
-                                cx="15.5"
-                                cy="16"
-                                r="3">
-                            </circle>
-
-                        </svg>
-
-                        Original sound - ZYLO
-
-                    </div>
-
-                </div>
-
-
-                <!-- FULLSCREEN -->
-
-                <button
-                    class="fullscreen-btn"
-                    aria-label="Fullscreen"
-                >
-
-                    <svg
-                        viewBox="0 0 24 24"
-                    >
-
-                        <path
-                            d="M4 9V4h5">
-                        </path>
-
-                        <path
-                            d="M20 9V4h-5">
-                        </path>
-
-                        <path
-                            d="M4 15v5h5">
-                        </path>
-
-                        <path
-                            d="M20 15v5h-5">
-                        </path>
-
-                    </svg>
-
-                </button>
-
-            </section>
-
-        </main>
-
-
-
-        <!-- ================================= -->
-        <!-- UPLOAD INPUT -->
-        <!-- ================================= -->
-
-        <input
-            type="file"
-            id="videoInput"
-            accept="video/*"
-            hidden
-        >
-
-
-
-        <!-- ================================= -->
-        <!-- UPLOAD MODAL -->
-        <!-- ================================= -->
-
-        <div
-            id="uploadBox"
-            class="upload-box"
-        >
-
-            <div class="upload-content">
-
-
-                <!-- CLOSE -->
-
-                <button
-                    id="closeUpload"
-                    class="upload-close"
-                    aria-label="Close"
-                >
-
-                    <svg
-                        viewBox="0 0 24 24"
-                    >
-
-                        <path
-                            d="M6 6L18 18">
-                        </path>
-
-                        <path
-                            d="M18 6L6 18">
-                        </path>
-
-                    </svg>
-
-                </button>
-
-
-                <!-- UPLOAD ICON -->
-
-                <div class="upload-icon">
-
-                    <svg
-                        viewBox="0 0 24 24"
-                    >
-
-                        <path
-                            d="M12 3v12">
-                        </path>
-
-                        <path
-                            d="M7 10l5 5 5-5">
-                        </path>
-
-                        <path
-                            d="M5 21h14">
-                        </path>
-
-                    </svg>
-
-                </div>
-
-
-                <h2>
-                    Upload Video
-                </h2>
-
-
-                <p id="uploadStatus">
-                    আপনার ভিডিও নির্বাচন করুন
-                </p>
-
-
-                <button
-                    id="selectVideo"
-                    class="select-video-btn"
-                >
-                    Select Video
-                </button>
-
-            </div>
+            <button class="top-tab">
+                Following
+            </button>
+
+            <button class="top-tab active">
+                For You
+            </button>
 
         </div>
 
+        <button class="search-btn" aria-label="Search">
+
+            <svg viewBox="0 0 24 24">
+                <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                <path d="M16 16L21 21"></path>
+            </svg>
+
+        </button>
+
+    </header>
 
 
-        <!-- ================================= -->
-        <!-- BOTTOM NAVIGATION -->
-        <!-- ================================= -->
-
-        <nav class="bottom-nav">
+    <!-- ================= VIDEO FEED ================= -->
+    <main class="video-feed">
 
 
-            <!-- HOME -->
+        <!-- ================= VIDEO 1 ================= -->
+        <section class="video-page">
 
+            <video
+                class="video-player"
+                src="./backend/uploads/video1.mp4"
+                loop
+                muted
+                playsinline
+                preload="metadata">
+            </video>
+
+
+            <!-- FULLSCREEN -->
             <button
-                class="nav-item active"
-                data-nav="home"
-            >
+                class="fullscreen-btn"
+                aria-label="Fullscreen">
 
-                <svg
-                    viewBox="0 0 24 24"
-                >
+                <svg viewBox="0 0 24 24">
 
-                    <path
-                        d="M3 11.5L12 4l9 7.5">
-                    </path>
+                    <path d="M8 3H3v5"></path>
+                    <path d="M16 3h5v5"></path>
 
-                    <path
-                        d="M5.5 10.5V20h13v-9.5">
-                    </path>
+                    <path d="M3 16v5h5"></path>
+                    <path d="M21 16v5h-5"></path>
 
                 </svg>
-
-                <span>
-                    Home
-                </span>
 
             </button>
 
 
-
-            <!-- DISCOVER -->
-
-            <button
-                class="nav-item"
-                data-nav="discover"
-            >
-
-                <svg
-                    viewBox="0 0 24 24"
-                >
-
-                    <circle
-                        cx="11"
-                        cy="11"
-                        r="6.5">
-                    </circle>
-
-                    <path
-                        d="M16 16L21 21">
-                    </path>
-
-                </svg>
-
-                <span>
-                    Discover
-                </span>
-
-            </button>
+            <!-- ================= RIGHT ACTIONS ================= -->
+            <div class="right-actions">
 
 
+                <!-- PROFILE -->
+                <button
+                    class="profile-action"
+                    aria-label="Profile">
 
-            <!-- CREATE -->
+                    <span class="profile-circle">
+                        Z
+                    </span>
 
-            <button
-                class="create-btn"
-                id="createBtn"
-                aria-label="Create"
-            >
+                    <span class="follow-badge">
+                        +
+                    </span>
 
-                <span class="create-left"></span>
+                </button>
 
-                <span class="create-center">
 
-                    <svg
-                        viewBox="0 0 24 24"
-                    >
+                <!-- LIKE -->
+                <button
+                    class="action-btn like-btn"
+                    aria-label="Like">
 
-                        <path
-                            d="M12 5V19">
-                        </path>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 21S4 16 2.5 10.5C1.4 6.4 4.2 3 7.8 3c2 0 3.5 1.1 4.2 2.7C12.7 4.1 14.2 3 16.2 3c3.6 0 6.4 3.4 5.3 7.5C20 16 12 21 12 21Z"></path>
+                    </svg>
 
-                        <path
-                            d="M5 12H19">
-                        </path>
+                    <span class="action-count">
+                        0
+                    </span>
+
+                </button>
+
+
+                <!-- COMMENT -->
+                <button
+                    class="action-btn"
+                    aria-label="Comments">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H8l-4 3v-6.2A7.5 7.5 0 0 1 4.5 5.5 7.5 7.5 0 0 1 12 3h1a7 7 0 0 1 7 8.5Z"></path>
 
                     </svg>
 
-                </span>
+                    <span class="action-count">
+                        0
+                    </span>
 
-                <span class="create-right"></span>
-
-            </button>
+                </button>
 
 
+                <!-- SAVE -->
+                <button
+                    class="action-btn save-btn"
+                    aria-label="Save">
 
-            <!-- INBOX -->
+                    <svg viewBox="0 0 24 24">
 
+                        <path d="M6 3h12v18l-6-4-6 4V3Z"></path>
+
+                    </svg>
+
+                    <span class="action-text">
+                        Save
+                    </span>
+
+                </button>
+
+
+                <!-- SHARE -->
+                <button
+                    class="action-btn share-btn"
+                    aria-label="Share">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path d="M21 3 10 14"></path>
+                        <path d="m21 3-7 18-4-7-7-4 18-7Z"></path>
+
+                    </svg>
+
+                    <span class="action-text">
+                        Share
+                    </span>
+
+                </button>
+
+
+                <!-- MUSIC -->
+                <button
+                    class="music-btn"
+                    aria-label="Music">
+
+                    <span class="music-disc">
+
+                        <svg viewBox="0 0 24 24">
+
+                            <path d="M9 18V6l10-2v12"></path>
+                            <circle cx="6" cy="18" r="3"></circle>
+                            <circle cx="16" cy="16" r="3"></circle>
+
+                        </svg>
+
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- ================= VIDEO INFO ================= -->
+            <div class="video-info">
+
+                <div class="username">
+                    @zylo_creator
+                    <span class="verified">✓</span>
+                </div>
+
+                <div class="caption">
+                    Welcome to ZYLO 🌎
+                </div>
+
+                <div class="tagline">
+                    Create • Connect • Grow
+                </div>
+
+                <div class="hashtags">
+                    #ZYLO #Create #Connect #Grow #ForYou
+                </div>
+
+                <div class="music-info">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path d="M9 18V6l10-2v12"></path>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <circle cx="16" cy="16" r="3"></circle>
+
+                    </svg>
+
+                    Original sound - ZYLO
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= VIDEO 2 ================= -->
+        <section class="video-page">
+
+            <video
+                class="video-player"
+                src="./backend/uploads/video1.mp4"
+                loop
+                muted
+                playsinline
+                preload="metadata">
+            </video>
+
+
+            <!-- FULLSCREEN -->
             <button
-                class="nav-item"
-                data-nav="inbox"
-            >
+                class="fullscreen-btn"
+                aria-label="Fullscreen">
 
-                <svg
-                    viewBox="0 0 24 24"
-                >
+                <svg viewBox="0 0 24 24">
 
-                    <path
-                        d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9a2.5 2.5 0 0 1-2.5 2.5H10l-5 4v-4.5A2.5 2.5 0 0 1 3 14V5.5z">
-                    </path>
+                    <path d="M8 3H3v5"></path>
+                    <path d="M16 3h5v5"></path>
+
+                    <path d="M3 16v5h5"></path>
+                    <path d="M21 16v5h-5"></path>
 
                 </svg>
 
-                <span>
-                    Inbox
-                </span>
-
             </button>
 
 
+            <!-- RIGHT ACTIONS -->
+            <div class="right-actions">
 
-            <!-- PROFILE -->
+                <!-- PROFILE — Z + ONLY -->
+                <button
+                    class="profile-action"
+                    aria-label="Profile">
 
-            <button
-                class="nav-item"
-                data-nav="profile"
-            >
+                    <span class="profile-circle">
+                        Z
+                    </span>
 
-                <svg
-                    viewBox="0 0 24 24"
-                >
+                    <span class="follow-badge">
+                        +
+                    </span>
 
-                    <circle
-                        cx="12"
-                        cy="8"
-                        r="3.5">
-                    </circle>
+                </button>
 
-                    <path
-                        d="M5 21c0-4 3-6.5 7-6.5s7 2.5 7 6.5">
-                    </path>
+
+                <!-- LIKE -->
+                <button
+                    class="action-btn like-btn"
+                    aria-label="Like">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path d="M12 21S4 16 2.5 10.5C1.4 6.4 4.2 3 7.8 3c2 0 3.5 1.1 4.2 2.7C12.7 4.1 14.2 3 16.2 3c3.6 0 6.4 3.4 5.3 7.5C20 16 12 21 12 21Z"></path>
+
+                    </svg>
+
+                    <span class="action-count">
+                        0
+                    </span>
+
+                </button>
+
+
+                <!-- COMMENT -->
+                <button
+                    class="action-btn"
+                    aria-label="Comments">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H8l-4 3v-6.2A7.5 7.5 0 0 1 4.5 5.5 7.5 7.5 0 0 1 12 3h1a7 7 0 0 1 7 8.5Z"></path>
+
+                    </svg>
+
+                    <span class="action-count">
+                        0
+                    </span>
+
+                </button>
+
+
+                <!-- SAVE -->
+                <button
+                    class="action-btn save-btn"
+                    aria-label="Save">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path d="M6 3h12v18l-6-4-6 4V3Z"></path>
+
+                    </svg>
+
+                    <span class="action-text">
+                        Save
+                    </span>
+
+                </button>
+
+
+                <!-- SHARE -->
+                <button
+                    class="action-btn share-btn"
+                    aria-label="Share">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path d="M21 3 10 14"></path>
+                        <path d="m21 3-7 18-4-7-7-4 18-7Z"></path>
+
+                    </svg>
+
+                    <span class="action-text">
+                        Share
+                    </span>
+
+                </button>
+
+
+                <!-- MUSIC -->
+                <button
+                    class="music-btn"
+                    aria-label="Music">
+
+                    <span class="music-disc">
+
+                        <svg viewBox="0 0 24 24">
+
+                            <path d="M9 18V6l10-2v12"></path>
+                            <circle cx="6" cy="18" r="3"></circle>
+                            <circle cx="16" cy="16" r="3"></circle>
+
+                        </svg>
+
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- VIDEO INFO -->
+            <div class="video-info">
+
+                <div class="username">
+                    @zylo_creator
+                    <span class="verified">✓</span>
+                </div>
+
+                <div class="caption">
+                    Welcome to ZYLO 🌎
+                </div>
+
+                <div class="tagline">
+                    Create • Connect • Grow
+                </div>
+
+                <div class="hashtags">
+                    #ZYLO #Create #Connect #Grow #ForYou
+                </div>
+
+                <div class="music-info">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path d="M9 18V6l10-2v12"></path>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <circle cx="16" cy="16" r="3"></circle>
+
+                    </svg>
+
+                    Original sound - ZYLO
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- ================= BOTTOM NAV ================= -->
+    <nav class="bottom-nav">
+
+
+        <!-- HOME -->
+        <button
+            class="nav-item active"
+            data-nav="home">
+
+            <svg viewBox="0 0 24 24">
+
+                <path d="m3 10 9-7 9 7"></path>
+                <path d="M5 9v11h14V9"></path>
+                <path d="M9 20v-6h6v6"></path>
+
+            </svg>
+
+            <span>
+                Home
+            </span>
+
+        </button>
+
+
+        <!-- DISCOVER -->
+        <button
+            class="nav-item"
+            data-nav="discover">
+
+            <svg viewBox="0 0 24 24">
+
+                <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                <path d="M16 16 21 21"></path>
+
+            </svg>
+
+            <span>
+                Discover
+            </span>
+
+        </button>
+
+
+        <!-- CREATE -->
+        <button
+            class="create-btn"
+            id="createBtn"
+            aria-label="Create">
+
+            <span class="create-left"></span>
+
+            <span class="create-center">
+
+                <svg viewBox="0 0 24 24">
+
+                    <path d="M12 5V19"></path>
+                    <path d="M5 12H19"></path>
 
                 </svg>
 
-                <span>
-                    Profile
-                </span>
+            </span>
+
+            <span class="create-right"></span>
+
+        </button>
+
+
+        <!-- INBOX -->
+        <button
+            class="nav-item"
+            data-nav="inbox">
+
+            <svg viewBox="0 0 24 24">
+
+                <path d="M4 5h16v14H4z"></path>
+                <path d="m4 7 8 6 8-6"></path>
+
+            </svg>
+
+            <span>
+                Inbox
+            </span>
+
+        </button>
+
+
+        <!-- PROFILE -->
+        <button
+            class="nav-item"
+            data-nav="profile">
+
+            <svg viewBox="0 0 24 24">
+
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4 21c.8-4.2 3.5-6 8-6s7.2 1.8 8 6"></path>
+
+            </svg>
+
+            <span>
+                Profile
+            </span>
+
+        </button>
+
+    </nav>
+
+
+
+    <!-- ================= UPLOAD INPUT ================= -->
+
+    <input
+        type="file"
+        id="videoInput"
+        accept="video/*"
+        hidden>
+
+
+    <!-- ================= UPLOAD MODAL ================= -->
+
+    <div
+        id="uploadBox"
+        class="upload-box">
+
+        <div class="upload-content">
+
+
+            <button
+                id="closeUpload"
+                class="upload-close"
+                aria-label="Close">
+
+                <svg viewBox="0 0 24 24">
+
+                    <path d="M6 6L18 18"></path>
+                    <path d="M18 6L6 18"></path>
+
+                </svg>
 
             </button>
 
-        </nav>
+
+            <div class="upload-icon">
+
+                <svg viewBox="0 0 24 24">
+
+                    <path d="M12 3v12"></path>
+                    <path d="M7 10l5 5 5-5"></path>
+                    <path d="M5 21h14"></path>
+
+                </svg>
+
+            </div>
+
+
+            <h2>
+                Upload Video
+            </h2>
+
+
+            <p id="uploadStatus">
+                আপনার ভিডিও নির্বাচন করুন
+            </p>
+
+
+            <button
+                id="selectVideo"
+                class="select-video-btn">
+
+                Select Video
+
+            </button>
+
+        </div>
 
     </div>
 
+</div>
 
 
-    <!-- ================================= -->
-    <!-- JAVASCRIPT -->
-    <!-- ================================= -->
-
-    <script src="./script.js"></script>
+<script src="./script.js"></script>
 
 </body>
-
 </html>
