@@ -1,12 +1,4 @@
-/* =========================================================
-   ZYLO - FIREBASE ACCOUNT SYSTEM
-   Email / Password Authentication
-   Profile + Edit Profile + Logout
-   ========================================================= */
-
-import {
-  initializeApp
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 
 import {
   getAuth,
@@ -20,725 +12,436 @@ import {
 import {
   getFirestore,
   doc,
-  setDoc,
   getDoc,
+  setDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 
-/* =========================================================
-   1. YOUR FIREBASE CONFIG
-   ========================================================= */
+/* =========================
+   FIREBASE CONFIG
+========================= */
 
 const firebaseConfig = {
-
-  apiKey: "PASTE_YOUR_API_KEY_HERE",
-
-  authDomain: "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
-
-  projectId: "PASTE_YOUR_PROJECT_ID",
-
-  storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
-
-  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
-
-  appId: "PASTE_YOUR_APP_ID"
-
+  apiKey: "AIzaSyBc3AVM3BYmKpIbm288w9VR9AVPVIt9Cgo",
+  authDomain: "zylo-217f2.firebaseapp.com",
+  projectId: "zylo-217f2",
+  storageBucket: "zylo-217f2.firebasestorage.app",
+  messagingSenderId: "859616472941",
+  appId: "1:859616472941:web:6a70b1bc83deaacc213464"
 };
 
 
-/* =========================================================
-   2. INITIALIZE FIREBASE
-   ========================================================= */
+/* =========================
+   INITIALIZE FIREBASE
+========================= */
 
-const firebaseApp = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-const auth = getAuth(firebaseApp);
+const auth = getAuth(app);
 
-const db = getFirestore(firebaseApp);
-
-
-/* =========================================================
-   3. CURRENT USER
-   ========================================================= */
+const db = getFirestore(app);
 
 let currentUser = null;
 
 
-/* =========================================================
-   4. BASIC HELPERS
-   ========================================================= */
+/* =========================
+   STYLE
+========================= */
 
-function escapeHTML(value) {
+const style = document.createElement("style");
 
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+style.textContent = `
+
+.zylo-auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0,0,0,.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.zylo-auth-card {
+  width: min(420px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 22px;
+  padding: 24px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+.zylo-auth-card h2 {
+  margin: 0 0 8px;
+  color: #111;
+}
+
+.zylo-auth-sub {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.zylo-auth-card label {
+  display: block;
+  margin: 13px 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.zylo-auth-card input {
+  width: 100%;
+  height: 48px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 0 14px;
+  box-sizing: border-box;
+  font-size: 15px;
+  outline: none;
+}
+
+.zylo-auth-primary {
+  width: 100%;
+  height: 48px;
+  border: 0;
+  border-radius: 12px;
+  background: #111;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 18px;
+}
+
+.zylo-auth-secondary {
+  width: 100%;
+  height: 46px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: white;
+  color: #111;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.zylo-auth-close {
+  float: right;
+  border: 0;
+  background: transparent;
+  font-size: 28px;
+}
+
+.zylo-auth-switch {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.zylo-auth-switch button {
+  border: 0;
+  background: transparent;
+  font-weight: 700;
+}
+
+.zylo-auth-error {
+  display: none;
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #fff0f0;
+  color: #b00020;
+  font-size: 13px;
+}
+
+.zylo-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: #111;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.zylo-profile-card {
+  text-align: center;
+}
+
+.zylo-profile-name {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.zylo-profile-username {
+  color: #777;
+  margin-top: 5px;
+}
+
+.zylo-profile-bio {
+  color: #555;
+  margin: 14px 0;
+}
+
+.zylo-profile-email {
+  color: #777;
+  font-size: 13px;
+}
+
+`;
+
+document.head.appendChild(style);
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function closeOverlay() {
+
+  document
+    .querySelectorAll(".zylo-auth-overlay")
+    .forEach(el => el.remove());
 
 }
 
 
-function showAuthMessage(message, type = "error") {
+function errorMessage(error) {
 
-  let box = document.getElementById("zylo-auth-message");
+  const messages = {
 
-  if (!box) return;
+    "auth/email-already-in-use":
+      "এই ইমেইল দিয়ে আগে থেকেই অ্যাকাউন্ট আছে।",
+
+    "auth/invalid-email":
+      "ইমেইল ঠিকানা সঠিক নয়।",
+
+    "auth/weak-password":
+      "পাসওয়ার্ড আরও শক্তিশালী দিন।",
+
+    "auth/invalid-credential":
+      "ইমেইল অথবা পাসওয়ার্ড ভুল।",
+
+    "auth/user-not-found":
+      "এই ইমেইলে কোনো অ্যাকাউন্ট পাওয়া যায়নি।",
+
+    "auth/wrong-password":
+      "পাসওয়ার্ড ভুল।",
+
+    "auth/network-request-failed":
+      "ইন্টারনেট সংযোগ পরীক্ষা করুন।"
+
+  };
+
+  return messages[error.code] ||
+    "সমস্যা হয়েছে। আবার চেষ্টা করুন।";
+}
+
+
+function showError(box, message) {
 
   box.textContent = message;
 
-  box.className =
-    "zylo-auth-message " +
-    (type === "success" ? "success" : "error");
+  box.style.display = "block";
 
 }
 
 
-function closeAuthModal() {
+function escapeHtml(value) {
 
-  const modal = document.getElementById("zylo-auth-modal");
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 
-  if (modal) {
+}
 
-    modal.remove();
+
+/* =========================
+   SAVE PROFILE
+========================= */
+
+async function saveProfile(user, data = {}) {
+
+  const ref = doc(db, "users", user.uid);
+
+  await setDoc(
+    ref,
+    {
+      uid: user.uid,
+
+      email: user.email || "",
+
+      name:
+        data.name ||
+        user.displayName ||
+        "ZYLO Creator",
+
+      username:
+        data.username ||
+        "@zylo_creator",
+
+      bio:
+        data.bio ||
+        "Create • Connect • Grow",
+
+      updatedAt: serverTimestamp()
+
+    },
+    {
+      merge: true
+    }
+  );
+
+}
+
+
+/* =========================
+   GET PROFILE
+========================= */
+
+async function getProfile(user) {
+
+  const ref = doc(db, "users", user.uid);
+
+  const snap = await getDoc(ref);
+
+  if (snap.exists()) {
+
+    return snap.data();
 
   }
 
-}
+  return {
 
+    uid: user.uid,
 
-function closeEditModal() {
+    email: user.email || "",
 
-  const modal = document.getElementById("zylo-edit-modal");
+    name: user.displayName || "ZYLO Creator",
 
-  if (modal) {
+    username: "@zylo_creator",
 
-    modal.remove();
+    bio: "Create • Connect • Grow"
 
-  }
-
-}
-
-
-/* =========================================================
-   5. AUTH CSS
-   ========================================================= */
-
-function installAuthCSS() {
-
-  if (document.getElementById("zylo-auth-css")) return;
-
-  const style = document.createElement("style");
-
-  style.id = "zylo-auth-css";
-
-  style.textContent = `
-
-    .zylo-auth-overlay {
-
-      position: fixed;
-      inset: 0;
-      z-index: 999999;
-
-      background: rgba(0,0,0,.78);
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      padding: 20px;
-
-    }
-
-
-    .zylo-auth-box {
-
-      width: min(100%, 430px);
-
-      max-height: 90vh;
-
-      overflow-y: auto;
-
-      background: #111;
-
-      color: #fff;
-
-      border-radius: 24px;
-
-      padding: 28px 22px 24px;
-
-      box-sizing: border-box;
-
-      box-shadow: 0 20px 80px rgba(0,0,0,.6);
-
-      position: relative;
-
-    }
-
-
-    .zylo-auth-close {
-
-      position: absolute;
-
-      right: 20px;
-
-      top: 15px;
-
-      border: 0;
-
-      background: transparent;
-
-      color: #fff;
-
-      font-size: 32px;
-
-      cursor: pointer;
-
-      line-height: 1;
-
-    }
-
-
-    .zylo-auth-title {
-
-      text-align: center;
-
-      font-size: 30px;
-
-      font-weight: 700;
-
-      margin: 10px 0 6px;
-
-    }
-
-
-    .zylo-auth-subtitle {
-
-      text-align: center;
-
-      color: #aaa;
-
-      margin-bottom: 24px;
-
-    }
-
-
-    .zylo-auth-z {
-
-      width: 76px;
-
-      height: 76px;
-
-      border-radius: 50%;
-
-      background: #242424;
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: center;
-
-      font-size: 48px;
-
-      font-weight: 700;
-
-      margin: 5px auto 18px;
-
-    }
-
-
-    .zylo-auth-field {
-
-      margin-bottom: 15px;
-
-    }
-
-
-    .zylo-auth-field label {
-
-      display: block;
-
-      margin-bottom: 7px;
-
-      font-size: 15px;
-
-      color: #ddd;
-
-    }
-
-
-    .zylo-auth-field input {
-
-      width: 100%;
-
-      box-sizing: border-box;
-
-      padding: 15px;
-
-      border: 0;
-
-      outline: 0;
-
-      border-radius: 13px;
-
-      background: #fff;
-
-      color: #111;
-
-      font-size: 16px;
-
-    }
-
-
-    .zylo-auth-main {
-
-      width: 100%;
-
-      border: 0;
-
-      border-radius: 14px;
-
-      padding: 15px;
-
-      margin-top: 8px;
-
-      font-size: 17px;
-
-      font-weight: 700;
-
-      cursor: pointer;
-
-      background: #fff;
-
-      color: #111;
-
-    }
-
-
-    .zylo-auth-secondary {
-
-      width: 100%;
-
-      border: 1px solid #555;
-
-      border-radius: 14px;
-
-      padding: 14px;
-
-      margin-top: 12px;
-
-      font-size: 16px;
-
-      cursor: pointer;
-
-      background: transparent;
-
-      color: #fff;
-
-    }
-
-
-    .zylo-auth-switch {
-
-      text-align: center;
-
-      margin-top: 18px;
-
-      color: #aaa;
-
-    }
-
-
-    .zylo-auth-switch button {
-
-      border: 0;
-
-      background: transparent;
-
-      color: #fff;
-
-      font-weight: 700;
-
-      cursor: pointer;
-
-      font-size: 15px;
-
-    }
-
-
-    .zylo-auth-message {
-
-      min-height: 22px;
-
-      text-align: center;
-
-      margin: 8px 0 12px;
-
-      font-size: 14px;
-
-    }
-
-
-    .zylo-auth-message.error {
-
-      color: #ff6b6b;
-
-    }
-
-
-    .zylo-auth-message.success {
-
-      color: #7dff9b;
-
-    }
-
-
-    .zylo-user-panel {
-
-      position: fixed;
-
-      inset: 0;
-
-      z-index: 999999;
-
-      background: #111;
-
-      color: #fff;
-
-      overflow-y: auto;
-
-      padding: 25px 20px 100px;
-
-      box-sizing: border-box;
-
-    }
-
-
-    .zylo-user-top {
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: space-between;
-
-      margin-bottom: 30px;
-
-    }
-
-
-    .zylo-user-top h2 {
-
-      margin: 0;
-
-      font-size: 28px;
-
-    }
-
-
-    .zylo-user-close {
-
-      border: 0;
-
-      background: transparent;
-
-      color: #fff;
-
-      font-size: 34px;
-
-      cursor: pointer;
-
-    }
-
-
-    .zylo-user-avatar {
-
-      width: 105px;
-
-      height: 105px;
-
-      border-radius: 50%;
-
-      background: #242424;
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: center;
-
-      font-size: 64px;
-
-      font-weight: 700;
-
-      margin: 20px auto;
-
-    }
-
-
-    .zylo-user-name {
-
-      text-align: center;
-
-      font-size: 28px;
-
-      font-weight: 700;
-
-    }
-
-
-    .zylo-user-username {
-
-      text-align: center;
-
-      color: #aaa;
-
-      margin-top: 6px;
-
-      font-size: 17px;
-
-    }
-
-
-    .zylo-user-bio {
-
-      text-align: center;
-
-      margin: 16px auto 25px;
-
-      max-width: 500px;
-
-      color: #ddd;
-
-      font-size: 16px;
-
-    }
-
-
-    .zylo-user-actions {
-
-      display: flex;
-
-      gap: 10px;
-
-      margin: 20px auto;
-
-      max-width: 500px;
-
-    }
-
-
-    .zylo-user-actions button {
-
-      flex: 1;
-
-      padding: 14px;
-
-      border-radius: 13px;
-
-      border: 0;
-
-      background: #fff;
-
-      color: #111;
-
-      font-size: 16px;
-
-      font-weight: 700;
-
-      cursor: pointer;
-
-    }
-
-
-    .zylo-user-actions .logout {
-
-      background: #2b2b2b;
-
-      color: #fff;
-
-    }
-
-
-    .zylo-account-note {
-
-      text-align: center;
-
-      color: #888;
-
-      margin-top: 25px;
-
-      font-size: 14px;
-
-    }
-
-  `;
-
-  document.head.appendChild(style);
+  };
 
 }
 
 
-/* =========================================================
-   6. LOGIN / REGISTER MODAL
-   ========================================================= */
+/* =========================
+   LOGIN / REGISTER
+========================= */
 
-function openAuthModal(mode = "login") {
+function openAuth(mode = "login") {
 
-  closeAuthModal();
+  closeOverlay();
 
-  installAuthCSS();
+  const overlay = document.createElement("div");
 
-  const modal = document.createElement("div");
+  overlay.className = "zylo-auth-overlay";
 
-  modal.id = "zylo-auth-modal";
+  overlay.innerHTML = `
 
-  modal.className = "zylo-auth-overlay";
-
-  modal.innerHTML = `
-
-    <div class="zylo-auth-box">
+    <div class="zylo-auth-card">
 
       <button
         class="zylo-auth-close"
-        id="zylo-auth-close"
-        aria-label="Close"
-      >×</button>
-
-
-      <div class="zylo-auth-z">Z</div>
-
-
-      <div class="zylo-auth-title">
-        ${mode === "login" ? "Welcome Back" : "Create Account"}
-      </div>
-
-
-      <div class="zylo-auth-subtitle">
-        ${mode === "login"
-          ? "Login to your ZYLO account"
-          : "Join ZYLO • Create • Connect • Grow"}
-      </div>
-
-
-      <div id="zylo-auth-message"
-           class="zylo-auth-message"></div>
-
-
-      ${
-        mode === "register"
-        ? `
-
-          <div class="zylo-auth-field">
-
-            <label>Name</label>
-
-            <input
-              id="zylo-register-name"
-              type="text"
-              placeholder="Your name"
-              maxlength="50"
-              autocomplete="name"
-            >
-
-          </div>
-
-
-          <div class="zylo-auth-field">
-
-            <label>Username</label>
-
-            <input
-              id="zylo-register-username"
-              type="text"
-              placeholder="@username"
-              maxlength="30"
-              autocomplete="username"
-            >
-
-          </div>
-
-        `
-        : ""
-      }
-
-
-      <div class="zylo-auth-field">
-
-        <label>Email</label>
-
-        <input
-          id="zylo-auth-email"
-          type="email"
-          placeholder="you@example.com"
-          autocomplete="email"
-        >
-
-      </div>
-
-
-      <div class="zylo-auth-field">
-
-        <label>Password</label>
-
-        <input
-          id="zylo-auth-password"
-          type="password"
-          placeholder="Minimum 6 characters"
-          autocomplete="${mode === "login"
-            ? "current-password"
-            : "new-password"}"
-        >
-
-      </div>
-
-
-      ${
-        mode === "register"
-        ? `
-
-          <div class="zylo-auth-field">
-
-            <label>Confirm Password</label>
-
-            <input
-              id="zylo-register-confirm"
-              type="password"
-              placeholder="Confirm password"
-              autocomplete="new-password"
-            >
-
-          </div>
-
-        `
-        : ""
-      }
-
-
-      <button
-        id="zylo-auth-submit"
-        class="zylo-auth-main"
-      >
-        ${mode === "login" ? "Login" : "Create Account"}
+        type="button">
+        ×
       </button>
 
+      <h2>
+        ${
+          mode === "login"
+          ? "Login to ZYLO"
+          : "Create your ZYLO account"
+        }
+      </h2>
+
+      <p class="zylo-auth-sub">
+        ${
+          mode === "login"
+          ? "আপনার অ্যাকাউন্টে Login করুন।"
+          : "নতুন ZYLO অ্যাকাউন্ট তৈরি করুন।"
+        }
+      </p>
+
+      ${
+        mode === "register"
+        ? `
+
+          <label>Name</label>
+
+          <input
+            id="zylo-name"
+            type="text"
+            placeholder="Your name">
+
+          <label>Username</label>
+
+          <input
+            id="zylo-username"
+            type="text"
+            placeholder="@username">
+
+        `
+        : ""
+      }
+
+      <label>Email</label>
+
+      <input
+        id="zylo-email"
+        type="email"
+        placeholder="you@example.com">
+
+      <label>Password</label>
+
+      <input
+        id="zylo-password"
+        type="password"
+        placeholder="Password">
+
+      <div class="zylo-auth-error"></div>
+
+      <button
+        class="zylo-auth-primary"
+        id="zylo-submit"
+        type="button">
+
+        ${
+          mode === "login"
+          ? "Login"
+          : "Create Account"
+        }
+
+      </button>
 
       <div class="zylo-auth-switch">
 
         ${
           mode === "login"
+
           ? `
-            Don't have an account?
-            <button id="zylo-show-register">
+            অ্যাকাউন্ট নেই?
+            <button id="zylo-switch">
               Create Account
             </button>
           `
+
           : `
-            Already have an account?
-            <button id="zylo-show-login">
+            অ্যাকাউন্ট আছে?
+            <button id="zylo-switch">
               Login
             </button>
           `
@@ -747,1236 +450,550 @@ function openAuthModal(mode = "login") {
       </div>
 
     </div>
-
   `;
 
+  document.body.appendChild(overlay);
 
-  document.body.appendChild(modal);
 
+  overlay
+    .querySelector(".zylo-auth-close")
+    .onclick = closeOverlay;
 
-  document
-    .getElementById("zylo-auth-close")
-    .addEventListener("click", closeAuthModal);
 
+  overlay
+    .querySelector("#zylo-switch")
+    .onclick = () => {
 
-  const submitButton =
-    document.getElementById("zylo-auth-submit");
-
-
-  if (mode === "login") {
-
-    submitButton.addEventListener(
-      "click",
-      handleLogin
-    );
-
-
-    document
-      .getElementById("zylo-show-register")
-      .addEventListener("click", () => {
-
-        openAuthModal("register");
-
-      });
-
-  } else {
-
-    submitButton.addEventListener(
-      "click",
-      handleRegister
-    );
-
-
-    document
-      .getElementById("zylo-show-login")
-      .addEventListener("click", () => {
-
-        openAuthModal("login");
-
-      });
-
-  }
-
-}
-
-
-/* =========================================================
-   7. REGISTER
-   ========================================================= */
-
-async function handleRegister() {
-
-  const name =
-    document
-      .getElementById("zylo-register-name")
-      ?.value
-      .trim();
-
-
-  let username =
-    document
-      .getElementById("zylo-register-username")
-      ?.value
-      .trim();
-
-
-  const email =
-    document
-      .getElementById("zylo-auth-email")
-      ?.value
-      .trim();
-
-
-  const password =
-    document
-      .getElementById("zylo-auth-password")
-      ?.value;
-
-
-  const confirm =
-    document
-      .getElementById("zylo-register-confirm")
-      ?.value;
-
-
-  if (!name) {
-
-    showAuthMessage("Please enter your name.");
-
-    return;
-
-  }
-
-
-  if (!username) {
-
-    showAuthMessage("Please enter a username.");
-
-    return;
-
-  }
-
-
-  username =
-    username
-      .replace(/^@+/, "")
-      .replace(/\s+/g, "_")
-      .toLowerCase();
-
-
-  if (!/^[a-z0-9_.]{3,30}$/.test(username)) {
-
-    showAuthMessage(
-      "Username must be 3-30 characters."
-    );
-
-    return;
-
-  }
-
-
-  if (!email) {
-
-    showAuthMessage("Please enter your email.");
-
-    return;
-
-  }
-
-
-  if (password.length < 6) {
-
-    showAuthMessage(
-      "Password must be at least 6 characters."
-    );
-
-    return;
-
-  }
-
-
-  if (password !== confirm) {
-
-    showAuthMessage(
-      "Passwords do not match."
-    );
-
-    return;
-
-  }
-
-
-  const submitButton =
-    document.getElementById("zylo-auth-submit");
-
-  submitButton.disabled = true;
-
-  submitButton.textContent = "Creating...";
-
-
-  try {
-
-    /*
-      Create Firebase Authentication account.
-    */
-
-    const credential =
-      await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
+      openAuth(
+        mode === "login"
+        ? "register"
+        : "login"
       );
 
-
-    const user = credential.user;
-
-
-    /*
-      Save display name.
-    */
-
-    await updateProfile(user, {
-
-      displayName: name
-
-    });
+    };
 
 
-    /*
-      Save ZYLO profile in Firestore.
-    */
+  overlay
+    .querySelector("#zylo-submit")
+    .onclick = async () => {
 
-    await setDoc(
-      doc(db, "users", user.uid),
-      {
+      const email =
+        overlay
+          .querySelector("#zylo-email")
+          .value
+          .trim();
 
-        uid: user.uid,
+      const password =
+        overlay
+          .querySelector("#zylo-password")
+          .value;
 
-        name: name,
+      const errorBox =
+        overlay
+          .querySelector(".zylo-auth-error");
 
-        username: username,
+      if (!email || !password) {
 
-        email: email,
+        showError(
+          errorBox,
+          "ইমেইল ও পাসওয়ার্ড দিন।"
+        );
 
-        bio: "Create • Connect • Grow",
+        return;
 
-        followers: 0,
-
-        following: 0,
-
-        likes: 0,
-
-        createdAt: serverTimestamp(),
-
-        updatedAt: serverTimestamp()
-
-      },
-      {
-        merge: true
       }
-    );
 
 
-    showAuthMessage(
-      "Account created successfully!",
-      "success"
-    );
+      const button =
+        overlay
+          .querySelector("#zylo-submit");
 
+      button.disabled = true;
 
-    setTimeout(() => {
+      button.textContent =
+        mode === "login"
+        ? "Logging in..."
+        : "Creating...";
 
-      closeAuthModal();
 
-      refreshZYLOProfile();
+      try {
 
-    }, 900);
+        if (mode === "login") {
 
+          const result =
+            await signInWithEmailAndPassword(
+              auth,
+              email,
+              password
+            );
 
-  } catch (error) {
+          await saveProfile(result.user);
 
-    console.error(error);
+          closeOverlay();
 
-    showAuthMessage(
-      firebaseErrorMessage(error)
-    );
+          openMyProfile();
 
-    submitButton.disabled = false;
+        }
 
-    submitButton.textContent = "Create Account";
+        else {
 
-  }
+          const name =
+            overlay
+              .querySelector("#zylo-name")
+              .value
+              .trim()
+              || "ZYLO Creator";
 
-}
 
+          let username =
+            overlay
+              .querySelector("#zylo-username")
+              .value
+              .trim()
+              || "@zylo_creator";
 
-/* =========================================================
-   8. LOGIN
-   ========================================================= */
 
-async function handleLogin() {
+          if (!username.startsWith("@")) {
 
-  const email =
-    document
-      .getElementById("zylo-auth-email")
-      ?.value
-      .trim();
+            username = "@" + username;
 
+          }
 
-  const password =
-    document
-      .getElementById("zylo-auth-password")
-      ?.value;
 
+          const result =
+            await createUserWithEmailAndPassword(
+              auth,
+              email,
+              password
+            );
 
-  if (!email || !password) {
 
-    showAuthMessage(
-      "Please enter email and password."
-    );
+          await updateProfile(
+            result.user,
+            {
+              displayName: name
+            }
+          );
 
-    return;
 
-  }
+          await saveProfile(
+            result.user,
+            {
+              name,
+              username,
+              bio: "Create • Connect • Grow"
+            }
+          );
 
 
-  const submitButton =
-    document.getElementById("zylo-auth-submit");
+          closeOverlay();
 
-  submitButton.disabled = true;
+          openMyProfile();
 
-  submitButton.textContent = "Logging in...";
+        }
 
+      }
 
-  try {
+      catch (error) {
 
-    await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+        console.error(error);
 
+        showError(
+          errorBox,
+          errorMessage(error)
+        );
 
-    showAuthMessage(
-      "Login successful!",
-      "success"
-    );
+        button.disabled = false;
 
+        button.textContent =
+          mode === "login"
+          ? "Login"
+          : "Create Account";
 
-    setTimeout(() => {
-
-      closeAuthModal();
-
-      refreshZYLOProfile();
-
-    }, 700);
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    showAuthMessage(
-      firebaseErrorMessage(error)
-    );
-
-    submitButton.disabled = false;
-
-    submitButton.textContent = "Login";
-
-  }
-
-}
-
-
-/* =========================================================
-   9. FIREBASE ERROR MESSAGE
-   ========================================================= */
-
-function firebaseErrorMessage(error) {
-
-  const code = error?.code || "";
-
-
-  switch (code) {
-
-    case "auth/email-already-in-use":
-
-      return "This email already has an account.";
-
-
-    case "auth/invalid-email":
-
-      return "Please enter a valid email.";
-
-
-    case "auth/weak-password":
-
-      return "Password is too weak. Use at least 6 characters.";
-
-
-    case "auth/invalid-credential":
-
-      return "Email or password is incorrect.";
-
-
-    case "auth/user-not-found":
-
-      return "No account found with this email.";
-
-
-    case "auth/wrong-password":
-
-      return "Incorrect password.";
-
-
-    case "auth/too-many-requests":
-
-      return "Too many attempts. Please try again later.";
-
-
-    case "auth/network-request-failed":
-
-      return "Network error. Check your internet connection.";
-
-
-    default:
-
-      return error?.message ||
-        "Something went wrong. Please try again.";
-
-  }
-
-}
-
-
-/* =========================================================
-   10. GET USER PROFILE
-   ========================================================= */
-
-async function getZYLOUserProfile(user) {
-
-  if (!user) return null;
-
-
-  try {
-
-    const profileRef =
-      doc(db, "users", user.uid);
-
-
-    const snapshot =
-      await getDoc(profileRef);
-
-
-    if (snapshot.exists()) {
-
-      return snapshot.data();
-
-    }
-
-
-    return {
-
-      uid: user.uid,
-
-      name: user.displayName || "ZYLO User",
-
-      username:
-        user.email
-          ? user.email.split("@")[0]
-          : "zylo_user",
-
-      email: user.email || "",
-
-      bio: "Create • Connect • Grow",
-
-      followers: 0,
-
-      following: 0,
-
-      likes: 0
+      }
 
     };
 
-  } catch (error) {
-
-    console.error(
-      "Profile loading error:",
-      error
-    );
-
-
-    return {
-
-      uid: user.uid,
-
-      name: user.displayName || "ZYLO User",
-
-      username:
-        user.email
-          ? user.email.split("@")[0]
-          : "zylo_user",
-
-      email: user.email || "",
-
-      bio: "Create • Connect • Grow",
-
-      followers: 0,
-
-      following: 0,
-
-      likes: 0
-
-    };
-
-  }
-
 }
 
 
-/* =========================================================
-   11. MY PROFILE
-   ========================================================= */
+/* =========================
+   MY PROFILE
+========================= */
 
-async function openMyFirebaseProfile() {
+async function openMyProfile() {
 
   if (!currentUser) {
 
-    openAuthModal("login");
+    openAuth("login");
 
     return;
 
   }
 
 
-  const profile =
-    await getZYLOUserProfile(currentUser);
-
-
-  installAuthCSS();
-
-  closeEditModal();
-
-
-  const old =
-    document.getElementById("zylo-user-profile");
-
-  if (old) old.remove();
-
-
-  const panel =
-    document.createElement("div");
-
-
-  panel.id = "zylo-user-profile";
-
-  panel.className = "zylo-user-panel";
-
-
-  panel.innerHTML = `
-
-    <div class="zylo-user-top">
-
-      <h2>My Profile</h2>
-
-      <button
-        class="zylo-user-close"
-        id="zylo-my-profile-close"
-      >×</button>
-
-    </div>
-
-
-    <div class="zylo-user-avatar">
-      Z
-    </div>
-
-
-    <div class="zylo-user-name">
-      ${escapeHTML(profile?.name || "ZYLO User")}
-    </div>
-
-
-    <div class="zylo-user-username">
-      @${escapeHTML(profile?.username || "zylo_user")}
-    </div>
-
-
-    <div class="zylo-user-bio">
-      ${escapeHTML(
-        profile?.bio || "Create • Connect • Grow"
-      )}
-    </div>
-
-
-    <div class="zylo-user-actions">
-
-      <button id="zylo-edit-profile-button">
-        Edit Profile
-      </button>
-
-      <button
-        id="zylo-logout-button"
-        class="logout"
-      >
-        Logout
-      </button>
-
-    </div>
-
-
-    <div class="zylo-account-note">
-
-      ${escapeHTML(
-        currentUser.email || ""
-      )}
-
-    </div>
-
-  `;
-
-
-  document.body.appendChild(panel);
-
-
-  document
-    .getElementById("zylo-my-profile-close")
-    .addEventListener("click", () => {
-
-      panel.remove();
-
-    });
-
-
-  document
-    .getElementById("zylo-edit-profile-button")
-    .addEventListener("click", () => {
-
-      openEditProfile();
-
-    });
-
-
-  document
-    .getElementById("zylo-logout-button")
-    .addEventListener("click", logoutZYLO);
-
-}
-
-
-/* =========================================================
-   12. EDIT PROFILE
-   ========================================================= */
-
-async function openEditProfile() {
-
-  if (!currentUser) {
-
-    openAuthModal("login");
-
-    return;
-
-  }
+  closeOverlay();
 
 
   const profile =
-    await getZYLOUserProfile(currentUser);
+    await getProfile(currentUser);
 
 
-  const old =
-    document.getElementById("zylo-edit-modal");
-
-  if (old) old.remove();
-
-
-  const modal =
+  const overlay =
     document.createElement("div");
 
-
-  modal.id = "zylo-edit-modal";
-
-  modal.className = "zylo-auth-overlay";
+  overlay.className =
+    "zylo-auth-overlay";
 
 
-  modal.innerHTML = `
+  overlay.innerHTML = `
 
-    <div class="zylo-auth-box">
+    <div class="zylo-auth-card zylo-profile-card">
 
       <button
         class="zylo-auth-close"
-        id="zylo-edit-close"
-      >×</button>
+        type="button">
+        ×
+      </button>
 
-
-      <div class="zylo-auth-z">
+      <div class="zylo-avatar">
         Z
       </div>
 
+      <div class="zylo-profile-name">
 
-      <div class="zylo-auth-title">
-        Edit Profile
-      </div>
-
-
-      <div
-        id="zylo-edit-message"
-        class="zylo-auth-message"
-      ></div>
-
-
-      <div class="zylo-auth-field">
-
-        <label>Name</label>
-
-        <input
-          id="zylo-edit-name"
-          type="text"
-          maxlength="50"
-          value="${escapeHTML(profile?.name || "")}"
-        >
+        ${escapeHtml(
+          profile.name ||
+          "ZYLO Creator"
+        )}
 
       </div>
 
+      <div class="zylo-profile-username">
 
-      <div class="zylo-auth-field">
-
-        <label>Username</label>
-
-        <input
-          id="zylo-edit-username"
-          type="text"
-          maxlength="30"
-          value="@${escapeHTML(
-            profile?.username || ""
-          )}"
-        >
+        ${escapeHtml(
+          profile.username ||
+          "@zylo_creator"
+        )}
 
       </div>
 
+      <div class="zylo-profile-bio">
 
-      <div class="zylo-auth-field">
-
-        <label>Bio</label>
-
-        <input
-          id="zylo-edit-bio"
-          type="text"
-          maxlength="160"
-          value="${escapeHTML(
-            profile?.bio ||
-            "Create • Connect • Grow"
-          )}"
-        >
+        ${escapeHtml(
+          profile.bio ||
+          "Create • Connect • Grow"
+        )}
 
       </div>
 
+      <div class="zylo-profile-email">
+
+        ${escapeHtml(
+          profile.email ||
+          currentUser.email ||
+          ""
+        )}
+
+      </div>
 
       <button
-        id="zylo-save-profile"
-        class="zylo-auth-main"
-      >
-        Save Changes
+        class="zylo-auth-primary"
+        id="zylo-edit"
+        type="button">
+
+        Edit Profile
+
+      </button>
+
+      <button
+        class="zylo-auth-secondary"
+        id="zylo-logout"
+        type="button">
+
+        Logout
+
       </button>
 
     </div>
-
   `;
 
 
-  document.body.appendChild(modal);
+  document.body.appendChild(overlay);
 
 
-  document
-    .getElementById("zylo-edit-close")
-    .addEventListener("click", closeEditModal);
+  overlay
+    .querySelector(".zylo-auth-close")
+    .onclick = closeOverlay;
 
 
-  document
-    .getElementById("zylo-save-profile")
-    .addEventListener(
-      "click",
-      saveEditedProfile
-    );
+  overlay
+    .querySelector("#zylo-edit")
+    .onclick = () => {
+
+      openEditProfile(profile);
+
+    };
+
+
+  overlay
+    .querySelector("#zylo-logout")
+    .onclick = async () => {
+
+      await signOut(auth);
+
+      closeOverlay();
+
+    };
 
 }
 
 
-/* =========================================================
-   13. SAVE EDITED PROFILE
-   ========================================================= */
+/* =========================
+   EDIT PROFILE
+========================= */
 
-async function saveEditedProfile() {
+function openEditProfile(profile) {
 
-  if (!currentUser) return;
+  closeOverlay();
 
 
-  const name =
-    document
-      .getElementById("zylo-edit-name")
-      ?.value
-      .trim();
+  const overlay =
+    document.createElement("div");
 
+  overlay.className =
+    "zylo-auth-overlay";
 
-  let username =
-    document
-      .getElementById("zylo-edit-username")
-      ?.value
-      .trim();
 
+  overlay.innerHTML = `
 
-  const bio =
-    document
-      .getElementById("zylo-edit-bio")
-      ?.value
-      .trim();
+    <div class="zylo-auth-card">
 
+      <button
+        class="zylo-auth-close"
+        type="button">
+        ×
+      </button>
 
-  const message =
-    document.getElementById(
-      "zylo-edit-message"
-    );
+      <h2>Edit Profile</h2>
 
+      <p class="zylo-auth-sub">
+        আপনার প্রোফাইলের তথ্য পরিবর্তন করুন।
+      </p>
 
-  const button =
-    document.getElementById(
-      "zylo-save-profile"
-    );
+      <label>Name</label>
 
+      <input
+        id="edit-name"
+        value="${escapeHtml(
+          profile.name ||
+          "ZYLO Creator"
+        )}">
 
-  if (!name) {
+      <label>Username</label>
 
-    message.textContent =
-      "Name is required.";
+      <input
+        id="edit-username"
+        value="${escapeHtml(
+          profile.username ||
+          "@zylo_creator"
+        )}">
 
-    return;
+      <label>Bio</label>
 
-  }
+      <input
+        id="edit-bio"
+        value="${escapeHtml(
+          profile.bio ||
+          "Create • Connect • Grow"
+        )}">
 
+      <div class="zylo-auth-error"></div>
 
-  username =
-    username
-      .replace(/^@+/, "")
-      .replace(/\s+/g, "_")
-      .toLowerCase();
+      <button
+        class="zylo-auth-primary"
+        id="save-profile"
+        type="button">
 
+        Save Changes
 
-  if (!/^[a-z0-9_.]{3,30}$/.test(username)) {
+      </button>
 
-    message.textContent =
-      "Username must be 3-30 characters.";
+    </div>
+  `;
 
-    return;
 
-  }
+  document.body.appendChild(overlay);
 
 
-  button.disabled = true;
+  overlay
+    .querySelector(".zylo-auth-close")
+    .onclick = openMyProfile;
 
-  button.textContent = "Saving...";
 
+  overlay
+    .querySelector("#save-profile")
+    .onclick = async () => {
 
-  try {
-
-    await updateProfile(
-      currentUser,
-      {
-        displayName: name
-      }
-    );
-
-
-    await setDoc(
-      doc(db, "users", currentUser.uid),
-      {
-
-        name: name,
-
-        username: username,
-
-        bio:
-          bio ||
-          "Create • Connect • Grow",
-
-        updatedAt:
-          serverTimestamp()
-
-      },
-      {
-        merge: true
-      }
-    );
-
-
-    message.className =
-      "zylo-auth-message success";
-
-    message.textContent =
-      "Profile updated successfully.";
-
-
-    setTimeout(async () => {
-
-      closeEditModal();
-
-
-      const profilePanel =
-        document.getElementById(
-          "zylo-user-profile"
-        );
-
-
-      if (profilePanel) {
-
-        profilePanel.remove();
-
-      }
-
-
-      await openMyFirebaseProfile();
-
-      refreshZYLOProfile();
-
-    }, 700);
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    message.className =
-      "zylo-auth-message error";
-
-    message.textContent =
-      firebaseErrorMessage(error);
-
-
-    button.disabled = false;
-
-    button.textContent =
-      "Save Changes";
-
-  }
-
-}
-
-
-/* =========================================================
-   14. LOGOUT
-   ========================================================= */
-
-async function logoutZYLO() {
-
-  try {
-
-    await signOut(auth);
-
-    const panel =
-      document.getElementById(
-        "zylo-user-profile"
-      );
-
-    if (panel) panel.remove();
-
-
-    refreshZYLOProfile();
-
-    showZYLOToast(
-      "Logged out successfully."
-    );
-
-  } catch (error) {
-
-    console.error(error);
-
-    showZYLOToast(
-      "Logout failed."
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   15. UPDATE ZYLO PROFILE BUTTON / ACCOUNT STATE
-   ========================================================= */
-
-function refreshZYLOProfile() {
-
-  const buttons =
-    document.querySelectorAll(
-      ".profile-action"
-    );
-
-
-  buttons.forEach(button => {
-
-    if (currentUser) {
-
-      button.classList.add(
-        "zylo-authenticated"
-      );
-
-      button.setAttribute(
-        "title",
-        "My Account"
-      );
-
-    } else {
-
-      button.classList.remove(
-        "zylo-authenticated"
-      );
-
-      button.setAttribute(
-        "title",
-        "Login / Create Account"
-      );
-
-    }
-
-  });
-
-}
-
-
-/* =========================================================
-   16. FIND EXISTING PROFILE BUTTONS
-   ========================================================= */
-
-function setupProfileButtons() {
-
-  document.addEventListener(
-    "click",
-    event => {
-
-      const profileButton =
-        event.target.closest(
-          ".profile-action"
-        );
-
-
-      if (!profileButton) return;
-
-
-      /*
-        Existing creator profile buttons
-        can still work normally.
-
-        Bottom Profile navigation will be
-        handled separately below.
-      */
-
-    }
-  );
-
-
-  document.addEventListener(
-    "click",
-    event => {
-
-      const navItem =
-        event.target.closest(
-          ".bottom-nav .nav-item"
-        );
-
-
-      if (!navItem) return;
-
-
-      const text =
-        navItem.textContent
+      const name =
+        overlay
+          .querySelector("#edit-name")
+          .value
           .trim()
-          .toLowerCase();
+          || "ZYLO Creator";
 
 
-      if (text.includes("profile")) {
+      let username =
+        overlay
+          .querySelector("#edit-username")
+          .value
+          .trim()
+          || "@zylo_creator";
 
-        event.preventDefault();
 
-        event.stopPropagation();
+      const bio =
+        overlay
+          .querySelector("#edit-bio")
+          .value
+          .trim()
+          || "Create • Connect • Grow";
 
-        openMyFirebaseProfile();
+
+      if (!username.startsWith("@")) {
+
+        username = "@" + username;
 
       }
 
-    },
-    true
-  );
+
+      const button =
+        overlay
+          .querySelector("#save-profile");
+
+
+      const errorBox =
+        overlay
+          .querySelector(".zylo-auth-error");
+
+
+      button.disabled = true;
+
+      button.textContent = "Saving...";
+
+
+      try {
+
+        await updateProfile(
+          currentUser,
+          {
+            displayName: name
+          }
+        );
+
+
+        await saveProfile(
+          currentUser,
+          {
+            name,
+            username,
+            bio
+          }
+        );
+
+
+        closeOverlay();
+
+        await openMyProfile();
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+        showError(
+          errorBox,
+          errorMessage(error)
+        );
+
+        button.disabled = false;
+
+        button.textContent =
+          "Save Changes";
+
+      }
+
+    };
 
 }
 
 
-/* =========================================================
-   17. AUTH STATE
-   ========================================================= */
+/* =========================
+   AUTH STATE
+========================= */
 
 onAuthStateChanged(
   auth,
-  async user => {
+  user => {
 
-    currentUser = user || null;
+    currentUser = user;
 
+    window.ZYLOAuth = {
 
-    refreshZYLOProfile();
+      openLogin: () =>
+        openAuth("login"),
 
+      openRegister: () =>
+        openAuth("register"),
 
-    if (currentUser) {
+      openMyProfile,
 
-      console.log(
-        "ZYLO logged in:",
-        currentUser.uid
-      );
+      openEditProfile,
 
-    } else {
+      logout: () =>
+        signOut(auth),
 
-      console.log(
-        "ZYLO guest mode"
-      );
+      getCurrentUser: () =>
+        currentUser
 
-    }
+    };
 
   }
 );
 
 
-/* =========================================================
-   18. TOAST
-   ========================================================= */
-
-function showZYLOToast(message) {
-
-  let toast =
-    document.getElementById(
-      "zylo-account-toast"
-    );
-
-
-  if (!toast) {
-
-    toast =
-      document.createElement("div");
-
-    toast.id =
-      "zylo-account-toast";
-
-
-    toast.style.position =
-      "fixed";
-
-    toast.style.left =
-      "50%";
-
-    toast.style.bottom =
-      "90px";
-
-    toast.style.transform =
-      "translateX(-50%)";
-
-    toast.style.zIndex =
-      "1000000";
-
-    toast.style.background =
-      "#fff";
-
-    toast.style.color =
-      "#111";
-
-    toast.style.padding =
-      "12px 18px";
-
-    toast.style.borderRadius =
-      "12px";
-
-    toast.style.fontWeight =
-      "600";
-
-    document.body.appendChild(toast);
-
-  }
-
-
-  toast.textContent = message;
-
-
-  clearTimeout(
-    window.__zyloToastTimer
-  );
-
-
-  window.__zyloToastTimer =
-    setTimeout(() => {
-
-      toast.remove();
-
-    }, 2200);
-
-}
-
-
-/* =========================================================
-   19. PUBLIC HELPERS
-   ========================================================= */
-
-window.ZYLOAuth = {
-
-  openLogin() {
-
-    openAuthModal("login");
-
-  },
-
-
-  openRegister() {
-
-    openAuthModal("register");
-
-  },
-
-
-  openMyProfile() {
-
-    openMyFirebaseProfile();
-
-  },
-
-
-  openEditProfile() {
-
-    openEditProfile();
-
-  },
-
-
-  logout() {
-
-    logoutZYLO();
-
-  },
-
-
-  getCurrentUser() {
-
-    return currentUser;
-
-  }
-
-};
-
-
-/* =========================================================
-   20. START
-   ========================================================= */
+/* =========================
+   PROFILE BUTTON
+========================= */
 
 document.addEventListener(
-  "DOMContentLoaded",
-  () => {
+  "click",
+  event => {
 
-    installAuthCSS();
+    const button =
+      event.target.closest(
+        ".bottom-nav .nav-item"
+      );
 
-    setupProfileButtons();
+    if (!button) return;
 
-    refreshZYLOProfile();
 
-  }
+    const text =
+      button.textContent
+        .trim()
+        .toLowerCase();
+
+
+    if (text.includes("profile")) {
+
+      event.preventDefault();
+
+      event.stopImmediatePropagation();
+
+      openMyProfile();
+
+    }
+
+  },
+  true
 );
