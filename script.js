@@ -2969,3 +2969,1110 @@
       }
     );
   }
+  /* =========================================================
+     UPLOAD SYSTEM
+     ========================================================= */
+
+  function getUploadElements() {
+    return {
+      createButton:
+        document.querySelector(
+          "#createBtn,.create-btn"
+        ),
+
+      modal:
+        document.querySelector(
+          "#uploadBox"
+        ),
+
+      closeButton:
+        document.querySelector(
+          "#closeUpload"
+        ),
+
+      input:
+        document.querySelector(
+          "#videoInput"
+        )
+    };
+  }
+
+
+  function openUploadBox() {
+    const {
+      modal
+    } = getUploadElements();
+
+    if (!modal) {
+      showToast(
+        "Upload window not found"
+      );
+      return;
+    }
+
+    modal.style.display =
+      "flex";
+
+    modal.classList.add(
+      "active",
+      "open"
+    );
+
+    document.body.classList.add(
+      "upload-open"
+    );
+  }
+
+
+  function closeUploadBox() {
+    const {
+      modal
+    } = getUploadElements();
+
+    if (!modal) return;
+
+    modal.classList.remove(
+      "active",
+      "open"
+    );
+
+    modal.style.display =
+      "none";
+
+    document.body.classList.remove(
+      "upload-open"
+    );
+  }
+
+
+  function setupUploadModal() {
+    const {
+      createButton,
+      closeButton
+    } = getUploadElements();
+
+    if (createButton) {
+      createButton.addEventListener(
+        "click",
+        (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          openUploadBox();
+        }
+      );
+    }
+
+    if (closeButton) {
+      closeButton.addEventListener(
+        "click",
+        (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          closeUploadBox();
+        }
+      );
+    }
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          event.key === "Escape"
+        ) {
+          closeUploadBox();
+        }
+      }
+    );
+  }
+
+
+  /* =========================================================
+     UPLOADED VIDEO STORAGE
+     ========================================================= */
+
+  function getUploadedVideos() {
+    const data =
+      getStorage(
+        CONFIG.STORAGE
+          .UPLOADED_VIDEOS,
+        []
+      );
+
+    return Array.isArray(data)
+      ? data
+      : [];
+  }
+
+
+  function saveUploadedVideo(
+    videoData
+  ) {
+    const videos =
+      getUploadedVideos();
+
+    const existingIndex =
+      videos.findIndex(
+        (item) =>
+          item.id ===
+          videoData.id
+      );
+
+    if (
+      existingIndex >= 0
+    ) {
+      videos[
+        existingIndex
+      ] = videoData;
+    } else {
+      videos.push(
+        videoData
+      );
+    }
+
+    setStorage(
+      CONFIG.STORAGE
+        .UPLOADED_VIDEOS,
+      videos
+    );
+
+    return videoData;
+  }
+
+
+  /* =========================================================
+     CREATE VIDEO PAGE
+     ========================================================= */
+
+  function createUploadedPage(
+    videoData
+  ) {
+    const feed =
+      $(".video-feed");
+
+    if (!feed) {
+      return null;
+    }
+
+    const existing =
+      feed.querySelector(
+        `.video-page[data-video-id="${CSS.escape(
+          videoData.id
+        )}"]`
+      );
+
+    if (existing) {
+      return existing;
+    }
+
+    const page =
+      document.createElement(
+        "section"
+      );
+
+    page.className =
+      "video-page";
+
+    page.dataset.videoId =
+      videoData.id;
+
+    page.dataset.ownerUid =
+      videoData.uid || "";
+
+    page.dataset.ownerUsername =
+      videoData.username ||
+      "zylo_creator";
+
+    page.innerHTML = `
+      <video
+        playsinline
+        muted
+        preload="none"
+        data-src="${escapeHTML(
+          videoData.url
+        )}"
+      ></video>
+    `;
+
+    feed.appendChild(
+      page
+    );
+
+    VideoEngine.refresh();
+
+    return page;
+  }
+
+
+  /* =========================================================
+     RESTORE UPLOADED VIDEOS
+     ========================================================= */
+
+  function restoreUploadedVideos() {
+    const videos =
+      getUploadedVideos();
+
+    if (!videos.length) {
+      return;
+    }
+
+    videos.forEach(
+      (videoData) => {
+        if (
+          !videoData ||
+          !videoData.url
+        ) {
+          return;
+        }
+
+        /*
+         * Blob URLs only work during the
+         * current browser session.
+         *
+         * Therefore only persistent
+         * server URLs are restored.
+         */
+        if (
+          videoData.url.startsWith(
+            "blob:"
+          )
+        ) {
+          return;
+        }
+
+        createUploadedPage(
+          videoData
+        );
+      }
+    );
+
+    VideoEngine.refresh();
+  }
+
+
+  /* =========================================================
+     BACKEND UPLOAD
+     ========================================================= */
+
+  async function uploadToBackend(
+    file
+  ) {
+    const formData =
+      new FormData();
+
+    formData.append(
+      "video",
+      file
+    );
+
+    /*
+     * These fields allow the backend
+     * to identify the uploader if the
+     * backend supports them.
+     */
+    formData.append(
+      "uid",
+      getUserUID()
+    );
+
+    formData.append(
+      "username",
+      getUsername()
+    );
+
+    const response =
+      await fetch(
+        `${CONFIG.API_BASE_URL}/api/upload`,
+        {
+          method: "POST",
+          body: formData
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        `Upload failed: ${response.status}`
+      );
+    }
+
+    const data =
+      await response.json();
+
+    return data;
+  }
+
+
+  /* =========================================================
+     UPLOAD VIDEO
+     ========================================================= */
+
+  async function uploadVideo(
+    file
+  ) {
+    if (!file) {
+      return;
+    }
+
+    if (
+      !file.type.startsWith(
+        "video/"
+      )
+    ) {
+      showToast(
+        "Please select a video file"
+      );
+
+      return;
+    }
+
+    /*
+     * Use the same Blob URL everywhere
+     * during the current session.
+     */
+    const localURL =
+      URL.createObjectURL(
+        file
+      );
+
+    const videoId =
+      makeId("video");
+
+    const videoData = {
+      id: videoId,
+
+      uid:
+        getUserUID(),
+
+      username:
+        getUsername(),
+
+      name:
+        file.name,
+
+      type:
+        file.type,
+
+      size:
+        file.size,
+
+      url:
+        localURL,
+
+      serverURL:
+        "",
+
+      createdAt:
+        Date.now()
+    };
+
+    /*
+     * Immediately show the video.
+     * This means the user does not have
+     * to wait for the backend response.
+     */
+    saveUploadedVideo(
+      videoData
+    );
+
+    const page =
+      createUploadedPage(
+        videoData
+      );
+
+    if (page) {
+      const pages =
+        VideoEngine.getPages();
+
+      const index =
+        pages.indexOf(page);
+
+      if (index >= 0) {
+        VideoEngine.scrollToPage(
+          index,
+          "smooth"
+        );
+      }
+    }
+
+    showToast(
+      "Video added"
+    );
+
+    /*
+     * Try backend upload in the
+     * background.
+     */
+    try {
+      const result =
+        await uploadToBackend(
+          file
+        );
+
+      let serverURL = "";
+
+      if (
+        result?.url
+      ) {
+        serverURL =
+          result.url;
+      } else if (
+        result?.videoUrl
+      ) {
+        serverURL =
+          result.videoUrl;
+      } else if (
+        result?.data?.url
+      ) {
+        serverURL =
+          result.data.url;
+      } else if (
+        result?.data?.videoUrl
+      ) {
+        serverURL =
+          result.data.videoUrl;
+      }
+
+      /*
+       * If backend returned a URL,
+       * replace the temporary Blob URL
+       * with the persistent URL.
+       */
+      if (serverURL) {
+        videoData.serverURL =
+          serverURL;
+
+        videoData.url =
+          serverURL;
+
+        saveUploadedVideo(
+          videoData
+        );
+
+        const uploadedPage =
+          document.querySelector(
+            `.video-page[data-video-id="${CSS.escape(
+              videoId
+            )}"]`
+          );
+
+        const uploadedVideo =
+          uploadedPage
+            ? $("video", uploadedPage)
+            : null;
+
+        if (uploadedVideo) {
+          uploadedVideo.dataset
+            .zyloPrimary =
+            serverURL;
+
+          uploadedVideo.src =
+            serverURL;
+
+          uploadedVideo.load();
+
+          VideoEngine.refresh();
+        }
+      }
+    } catch (error) {
+      console.warn(
+        "ZYLO backend upload failed:",
+        error
+      );
+
+      /*
+       * The local Blob video remains
+       * available during this session.
+       */
+      showToast(
+        "Video saved for this session"
+      );
+    }
+  }
+
+
+  /* =========================================================
+     FILE INPUT
+     ========================================================= */
+
+  function setupVideoInput() {
+    const {
+      input
+    } = getUploadElements();
+
+    if (!input) {
+      return;
+    }
+
+    input.addEventListener(
+      "change",
+      async (event) => {
+        const file =
+          event.target.files?.[0];
+
+        if (!file) {
+          return;
+        }
+
+        await uploadVideo(
+          file
+        );
+
+        /*
+         * Reset input so the same
+         * file can be selected again.
+         */
+        event.target.value = "";
+      }
+    );
+  }
+
+
+  /* =========================================================
+     DRAG / DROP UPLOAD
+     ========================================================= */
+
+  function setupDragDrop() {
+    const {
+      modal
+    } = getUploadElements();
+
+    if (!modal) {
+      return;
+    }
+
+    modal.addEventListener(
+      "dragover",
+      (event) => {
+        event.preventDefault();
+      }
+    );
+
+    modal.addEventListener(
+      "drop",
+      async (event) => {
+        event.preventDefault();
+
+        const file =
+          event.dataTransfer
+            ?.files?.[0];
+
+        if (!file) {
+          return;
+        }
+
+        await uploadVideo(
+          file
+        );
+      }
+    );
+  }
+
+
+  /* =========================================================
+     PAGE VIDEO FALLBACK
+     ========================================================= */
+
+  function setupVideoFallbacks() {
+    $$(".video-page video")
+      .forEach(
+        (video) => {
+          installErrorFallback(
+            video
+          );
+
+          const primary =
+            captureVideoSource(
+              video
+            );
+
+          if (
+            !primary &&
+            !video.src
+          ) {
+            video.src =
+              CONFIG.DEFAULT_VIDEO;
+          }
+        }
+      );
+
+    VideoEngine.refresh();
+  }
+
+
+  /* =========================================================
+     LOAD DEFAULT VIDEO
+     ========================================================= */
+
+  function ensureDefaultVideo() {
+    const feed =
+      $(".video-feed");
+
+    if (!feed) {
+      return;
+    }
+
+    const existing =
+      feed.querySelector(
+        ".video-page"
+      );
+
+    if (existing) {
+      return;
+    }
+
+    const page =
+      document.createElement(
+        "section"
+      );
+
+    page.className =
+      "video-page";
+
+    page.dataset.videoId =
+      "video1";
+
+    page.innerHTML = `
+      <video
+        playsinline
+        muted
+        preload="auto"
+        src="${CONFIG.DEFAULT_VIDEO}"
+      ></video>
+    `;
+
+    feed.appendChild(
+      page
+    );
+  }
+
+
+  /* =========================================================
+     REINITIALIZE VIDEO ENGINE
+     ========================================================= */
+
+  function refreshZYLOVideos() {
+    VideoEngine.refresh();
+
+    const pages =
+      VideoEngine.getPages();
+
+    if (!pages.length) {
+      ensureDefaultVideo();
+
+      VideoEngine.refresh();
+    }
+
+    setupVideoFallbacks();
+  }
+
+
+  /* =========================================================
+     CREATE BUTTON GLOBAL HANDLER
+     ========================================================= */
+
+  function setupCreateButton() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            "#createBtn,.create-btn"
+          );
+
+        if (!button) {
+          return;
+        }
+
+        /*
+         * The upload modal handler
+         * already opens it.
+         */
+        const {
+          modal,
+          input
+        } = getUploadElements();
+
+        if (!modal) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        openUploadBox();
+
+        /*
+         * If the modal has an input,
+         * let the user choose a video.
+         */
+        if (
+          input &&
+          event.target ===
+            button
+        ) {
+          /*
+           * Do not force the file
+           * picker automatically.
+           */
+        }
+      }
+    );
+  }
+
+
+  /* =========================================================
+     KEYBOARD VIDEO CONTROL
+     ========================================================= */
+
+  function setupKeyboardControls() {
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          isInteractiveTarget(
+            event.target
+          )
+        ) {
+          return;
+        }
+
+        if (
+          event.key ===
+          "ArrowDown"
+        ) {
+          event.preventDefault();
+
+          VideoEngine.next();
+
+          return;
+        }
+
+        if (
+          event.key ===
+          "ArrowUp"
+        ) {
+          event.preventDefault();
+
+          VideoEngine.previous();
+
+          return;
+        }
+
+        if (
+          event.code ===
+          "Space"
+        ) {
+          const pages =
+            VideoEngine.getPages();
+
+          const index =
+            VideoEngine.getActiveIndex();
+
+          const page =
+            pages[index];
+
+          const video =
+            page
+              ? $("video", page)
+              : null;
+
+          if (!video) {
+            return;
+          }
+
+          event.preventDefault();
+
+          if (
+            video.paused
+          ) {
+            video.muted = true;
+
+            video.play().catch(
+              () => {}
+            );
+          } else {
+            video.pause();
+          }
+        }
+      }
+    );
+  }
+
+
+  /* =========================================================
+     ONLINE / OFFLINE HANDLING
+     ========================================================= */
+
+  function setupNetworkHandling() {
+    window.addEventListener(
+      "online",
+      () => {
+        showToast(
+          "Internet connection restored"
+        );
+
+        VideoEngine.refresh();
+      }
+    );
+
+    window.addEventListener(
+      "offline",
+      () => {
+        showToast(
+          "You are offline"
+        );
+      }
+    );
+  }
+
+
+  /* =========================================================
+     PAGE VISIBILITY + ACTIVE VIDEO
+     ========================================================= */
+
+  function syncActiveVideo() {
+    const pages =
+      VideoEngine.getPages();
+
+    if (!pages.length) {
+      return;
+    }
+
+    let index =
+      VideoEngine.getActiveIndex();
+
+    if (
+      index < 0 ||
+      index >= pages.length
+    ) {
+      index = 0;
+    }
+
+    const video =
+      $("video", pages[index]);
+
+    if (!video) {
+      return;
+    }
+
+    video.muted = true;
+    video.playsInline = true;
+
+    video.play().catch(
+      () => {}
+    );
+  }
+
+
+  /* =========================================================
+     AUTH STATE BRIDGE
+     ========================================================= */
+
+  function setupAuthBridge() {
+    window.addEventListener(
+      "zylo:authloaded",
+      () => {
+        setTimeout(
+          () => {
+            VideoEngine.refresh();
+          },
+          100
+        );
+      }
+    );
+
+    window.addEventListener(
+      "zylo:authchange",
+      () => {
+        VideoEngine.refresh();
+      }
+    );
+
+    window.addEventListener(
+      "zylo:userchange",
+      () => {
+        VideoEngine.refresh();
+      }
+    );
+  }
+
+
+  /* =========================================================
+     GLOBAL VIDEO API
+     ========================================================= */
+
+  function exposeGlobalAPI() {
+    window.ZYLOVideoEngine =
+      VideoEngine;
+
+    window.ZYLOVideo = {
+      next: () =>
+        VideoEngine.next(),
+
+      previous: () =>
+        VideoEngine.previous(),
+
+      refresh: () =>
+        VideoEngine.refresh(),
+
+      playActive: () =>
+        syncActiveVideo(),
+
+      upload: (
+        file
+      ) =>
+        uploadVideo(file)
+    };
+  }
+
+
+  /* =========================================================
+     INITIALIZATION
+     ========================================================= */
+
+  function initializeZYLO() {
+    /*
+     * Auth first.
+     */
+    loadAuthJS();
+
+    /*
+     * Make sure at least one
+     * video exists.
+     */
+    ensureDefaultVideo();
+
+    /*
+     * Restore videos previously
+     * uploaded with persistent URLs.
+     */
+    restoreUploadedVideos();
+
+    /*
+     * Start the main Video Engine.
+     */
+    VideoEngine.init();
+
+    /*
+     * Functional systems.
+     */
+    setupLikeButtons();
+
+    setupSaveButtons();
+
+    setupCommentButtons();
+
+    setupShareButtons();
+
+    setupMusicButtons();
+
+    setupFullscreenButtons();
+
+    setupDoubleTapLike();
+
+    setupVideoPlayPause();
+
+    setupVisibilityHandling();
+
+    setupCreatorProfileButtons();
+
+    setupTopNavigation();
+
+    setupBottomNavigation();
+
+    setupSearch();
+
+    /*
+     * Upload system.
+     */
+    setupUploadModal();
+
+    setupVideoInput();
+
+    setupDragDrop();
+
+    setupCreateButton();
+
+    /*
+     * Other controls.
+     */
+    setupKeyboardControls();
+
+    setupNetworkHandling();
+
+    setupAuthBridge();
+
+    /*
+     * Final video refresh.
+     */
+    refreshZYLOVideos();
+
+    /*
+     * Hash navigation.
+     */
+    openHashVideo();
+
+    /*
+     * Small delayed sync gives the
+     * browser time to finish layout.
+     */
+    window.setTimeout(
+      () => {
+        VideoEngine.refresh();
+
+        const pages =
+          VideoEngine.getPages();
+
+        if (!pages.length) {
+          ensureDefaultVideo();
+
+          VideoEngine.refresh();
+        }
+
+        const index =
+          VideoEngine.getActiveIndex();
+
+        if (
+          index >= 0
+        ) {
+          syncActiveVideo();
+        }
+      },
+      500
+    );
+
+    console.log(
+      "ZYLO Video Engine initialized"
+    );
+  }
+
+
+  /* =========================================================
+     DOM READY
+     ========================================================= */
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeZYLO,
+      {
+        once: true
+      }
+    );
+  } else {
+    initializeZYLO();
+  }
+
+
+  /* =========================================================
+     GLOBAL API
+     ========================================================= */
+
+  exposeGlobalAPI();
+
+
+})();
