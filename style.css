@@ -1181,3 +1181,62 @@ button {
 .follow-badge {
     bottom: -2px;
 }
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.video-feed {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+
+  touch-action: pan-y;
+}
+
+.video-page {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+
+  flex: 0 0 100dvh;
+
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+
+  overflow: hidden;
+}
+
+.video-page video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@supports not (height: 100dvh) {
+  .video-feed {
+    height: 100vh;
+    min-height: 100vh;
+  }
+
+  .video-page {
+    height: 100vh;
+    min-height: 100vh;
+    flex-basis: 100vh;
+  }
+}
