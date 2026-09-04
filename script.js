@@ -1852,3 +1852,1120 @@
       }
     );
   }
+
+   /* =========================================================
+     SHARE
+     ========================================================= */
+
+  function getShareURL(page) {
+    if (!page) {
+      return window.location.href;
+    }
+
+    const id =
+      page.dataset.videoId ||
+      page.id ||
+      "";
+
+    if (!id) {
+      return window.location.href;
+    }
+
+    return `${window.location.origin}${window.location.pathname}#video-${encodeURIComponent(
+      id
+    )}`;
+  }
+
+  async function shareVideo(button) {
+    const page =
+      button?.closest?.(".video-page");
+
+    const url =
+      getShareURL(page);
+
+    const title =
+      page?.querySelector(
+        ".video-title,.caption,.description"
+      )?.textContent?.trim() ||
+      "ZYLO Video";
+
+    const shareData = {
+      title: "ZYLO",
+      text: title,
+      url
+    };
+
+    try {
+      if (
+        navigator.share &&
+        typeof navigator.share ===
+          "function"
+      ) {
+        await navigator.share(
+          shareData
+        );
+        return;
+      }
+    } catch (error) {
+      if (
+        error?.name ===
+        "AbortError"
+      ) {
+        return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(
+        url
+      );
+
+      showToast(
+        "Video link copied"
+      );
+
+      return;
+    } catch {}
+
+    try {
+      const textarea =
+        document.createElement(
+          "textarea"
+        );
+
+      textarea.value = url;
+      textarea.style.position =
+        "fixed";
+      textarea.style.opacity = "0";
+
+      document.body.appendChild(
+        textarea
+      );
+
+      textarea.select();
+
+      document.execCommand(
+        "copy"
+      );
+
+      textarea.remove();
+
+      showToast(
+        "Video link copied"
+      );
+    } catch {
+      showToast(
+        "Unable to share video"
+      );
+    }
+  }
+
+  function setupShareButtons() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            ".share-btn"
+          );
+
+        if (!button) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        shareVideo(button);
+      }
+    );
+  }
+
+
+  /* =========================================================
+     TOAST
+     ========================================================= */
+
+  let toastTimer = null;
+
+  function showToast(message) {
+    let toast =
+      document.querySelector(
+        ".zylo-toast"
+      );
+
+    if (!toast) {
+      toast =
+        document.createElement(
+          "div"
+        );
+
+      toast.className =
+        "zylo-toast";
+
+      toast.style.position =
+        "fixed";
+
+      toast.style.left =
+        "50%";
+
+      toast.style.bottom =
+        "90px";
+
+      toast.style.transform =
+        "translateX(-50%)";
+
+      toast.style.zIndex =
+        "99999";
+
+      toast.style.padding =
+        "10px 16px";
+
+      toast.style.borderRadius =
+        "12px";
+
+      toast.style.background =
+        "rgba(0,0,0,.85)";
+
+      toast.style.color =
+        "#fff";
+
+      toast.style.fontSize =
+        "14px";
+
+      toast.style.pointerEvents =
+        "none";
+
+      document.body.appendChild(
+        toast
+      );
+    }
+
+    toast.textContent =
+      message;
+
+    toast.style.display =
+      "block";
+
+    clearTimeout(
+      toastTimer
+    );
+
+    toastTimer =
+      window.setTimeout(
+        () => {
+          toast.style.display =
+            "none";
+        },
+        1800
+      );
+  }
+
+
+  /* =========================================================
+     MUSIC
+     ========================================================= */
+
+  let globalAudio = null;
+  let musicPlaying = false;
+
+  function getMusicSource(button) {
+    if (!button) return "";
+
+    return (
+      button.dataset.music ||
+      button.getAttribute(
+        "data-music"
+      ) ||
+      ""
+    );
+  }
+
+  function createAudio() {
+    if (globalAudio) {
+      return globalAudio;
+    }
+
+    globalAudio =
+      document.createElement(
+        "audio"
+      );
+
+    globalAudio.preload =
+      "auto";
+
+    globalAudio.loop = true;
+
+    globalAudio.style.display =
+      "none";
+
+    document.body.appendChild(
+      globalAudio
+    );
+
+    return globalAudio;
+  }
+
+  async function toggleMusic(
+    button
+  ) {
+    const source =
+      getMusicSource(button);
+
+    if (!source) {
+      showToast(
+        "Music is not available"
+      );
+      return;
+    }
+
+    const audio =
+      createAudio();
+
+    if (
+      audio.src !==
+      normalizeVideoSource(
+        source
+      )
+    ) {
+      audio.src = source;
+      audio.load();
+    }
+
+    try {
+      if (
+        audio.paused
+      ) {
+        await audio.play();
+
+        musicPlaying =
+          true;
+
+        button.classList.add(
+          "active",
+          "playing"
+        );
+      } else {
+        audio.pause();
+
+        musicPlaying =
+          false;
+
+        button.classList.remove(
+          "active",
+          "playing"
+        );
+      }
+    } catch {
+      showToast(
+        "Music could not be played"
+      );
+    }
+  }
+
+  function stopMusic() {
+    if (!globalAudio) return;
+
+    try {
+      globalAudio.pause();
+      globalAudio.currentTime =
+        0;
+    } catch {}
+
+    musicPlaying =
+      false;
+
+    $$(".music-btn").forEach(
+      (button) => {
+        button.classList.remove(
+          "active",
+          "playing"
+        );
+      }
+    );
+  }
+
+  function setupMusicButtons() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            ".music-btn"
+          );
+
+        if (!button) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        toggleMusic(
+          button
+        );
+      }
+    );
+  }
+
+
+  /* =========================================================
+     FULLSCREEN
+     ========================================================= */
+
+  async function enterFullscreen(
+    element
+  ) {
+    if (!element) return;
+
+    try {
+      if (
+        element.requestFullscreen
+      ) {
+        await element.requestFullscreen();
+        return;
+      }
+
+      if (
+        element.webkitRequestFullscreen
+      ) {
+        element.webkitRequestFullscreen();
+        return;
+      }
+
+      if (
+        element.webkitEnterFullscreen
+      ) {
+        element.webkitEnterFullscreen();
+        return;
+      }
+    } catch (error) {
+      console.warn(
+        "ZYLO fullscreen error:",
+        error
+      );
+    }
+  }
+
+  async function toggleFullscreen(
+    button
+  ) {
+    const page =
+      button?.closest?.(
+        ".video-page"
+      );
+
+    if (!page) return;
+
+    const video =
+      $("video", page);
+
+    if (!video) return;
+
+    try {
+      if (
+        document.fullscreenElement ||
+        document.webkitFullscreenElement
+      ) {
+        if (
+          document.exitFullscreen
+        ) {
+          await document.exitFullscreen();
+        } else if (
+          document.webkitExitFullscreen
+        ) {
+          document.webkitExitFullscreen();
+        }
+
+        return;
+      }
+
+      await enterFullscreen(
+        video
+      );
+    } catch {}
+  }
+
+  function setupFullscreenButtons() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            ".fullscreen-btn"
+          );
+
+        if (!button) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        toggleFullscreen(
+          button
+        );
+      }
+    );
+  }
+
+
+  /* =========================================================
+     DOUBLE TAP LIKE
+     ========================================================= */
+
+  const doubleTapState =
+    new WeakMap();
+
+  function triggerLike(button) {
+    if (!button) return;
+
+    button.click();
+  }
+
+  function setupDoubleTapLike() {
+    $$(".video-page").forEach(
+      (page) => {
+        const video =
+          $("video", page);
+
+        if (!video) return;
+
+        let lastTap = 0;
+
+        const handleTap =
+          (event) => {
+            if (
+              isInteractiveTarget(
+                event.target
+              )
+            ) {
+              return;
+            }
+
+            const now =
+              Date.now();
+
+            const elapsed =
+              now - lastTap;
+
+            if (
+              elapsed > 0 &&
+              elapsed < 320
+            ) {
+              const likeButton =
+                $(
+                  ".like-btn",
+                  page
+                );
+
+              if (likeButton) {
+                triggerLike(
+                  likeButton
+                );
+              }
+
+              lastTap = 0;
+            } else {
+              lastTap = now;
+            }
+          };
+
+        video.addEventListener(
+          "touchend",
+          handleTap,
+          {
+            passive: true
+          }
+        );
+
+        video.addEventListener(
+          "click",
+          handleTap
+        );
+
+        doubleTapState.set(
+          video,
+          true
+        );
+      }
+    );
+  }
+
+
+  /* =========================================================
+     VIDEO CLICK = PLAY / PAUSE
+     ========================================================= */
+
+  function setupVideoPlayPause() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const video =
+          event.target.closest(
+            ".video-page video"
+          );
+
+        if (!video) return;
+
+        if (
+          isInteractiveTarget(
+            event.target
+          )
+        ) {
+          return;
+        }
+
+        if (
+          video.paused
+        ) {
+          video.muted = true;
+
+          video.play().catch(
+            () => {}
+          );
+
+          video.dataset
+            .zyloPlaying =
+            "true";
+        } else {
+          video.pause();
+
+          video.dataset
+            .zyloPlaying =
+            "false";
+        }
+      }
+    );
+  }
+
+
+  /* =========================================================
+     VISIBILITY / APP BACKGROUND
+     ========================================================= */
+
+  function setupVisibilityHandling() {
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (
+          document.hidden
+        ) {
+          $$(".video-page video")
+            .forEach(
+              (video) => {
+                try {
+                  video.pause();
+                } catch {}
+              }
+            );
+
+          return;
+        }
+
+        const pages =
+          VideoEngine.getPages();
+
+        const index =
+          VideoEngine.getActiveIndex();
+
+        if (
+          index >= 0 &&
+          pages[index]
+        ) {
+          const video =
+            $(
+              "video",
+              pages[index]
+            );
+
+          if (video) {
+            video.muted = true;
+
+            video.play().catch(
+              () => {}
+            );
+          }
+        }
+      }
+    );
+  }
+
+
+  /* =========================================================
+     CREATOR PROFILE
+     ========================================================= */
+
+  function getCreatorData(
+    page
+  ) {
+    if (!page) {
+      return {
+        uid: "",
+        username:
+          "ZYLO Creator"
+      };
+    }
+
+    const profile =
+      $(".profile-action", page);
+
+    return {
+      uid:
+        profile?.dataset?.uid ||
+        page.dataset.ownerUid ||
+        "",
+
+      username:
+        profile?.dataset?.username ||
+        page.dataset.ownerUsername ||
+        page.dataset.username ||
+        "ZYLO Creator"
+    };
+  }
+
+  function openCreatorProfile(
+    page
+  ) {
+    const creator =
+      getCreatorData(page);
+
+    try {
+      window.dispatchEvent(
+        new CustomEvent(
+          "zylo:creatorprofile",
+          {
+            detail: creator
+          }
+        )
+      );
+    } catch {}
+
+    if (
+      window.ZYLOAuth &&
+      typeof window.ZYLOAuth.openCreatorProfile ===
+        "function"
+    ) {
+      window.ZYLOAuth.openCreatorProfile(
+        creator.uid,
+        creator.username
+      );
+
+      return;
+    }
+
+    showToast(
+      `@${creator.username}`
+    );
+  }
+
+  function setupCreatorProfileButtons() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            ".profile-action"
+          );
+
+        if (!button) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const page =
+          button.closest(
+            ".video-page"
+          );
+
+        if (!page) return;
+
+        openCreatorProfile(
+          page
+        );
+      }
+    );
+  }
+
+
+  /* =========================================================
+     TOP NAVIGATION
+     ========================================================= */
+
+  function activateTopTab(
+    tab
+  ) {
+    if (!tab) return;
+
+    const allTabs =
+      $$(
+        ".top-tab,.feed-tab,[data-feed]"
+      );
+
+    allTabs.forEach(
+      (item) => {
+        item.classList.toggle(
+          "active",
+          item === tab
+        );
+      }
+    );
+
+    const type =
+      tab.dataset.feed ||
+      tab.dataset.tab ||
+      tab.textContent
+        ?.trim()
+        .toLowerCase() ||
+      "";
+
+    document.dispatchEvent(
+      new CustomEvent(
+        "zylo:feedchange",
+        {
+          detail: {
+            feed: type
+          }
+        }
+      )
+    );
+  }
+
+  function setupTopNavigation() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const tab =
+          event.target.closest(
+            ".top-tab,.feed-tab,[data-feed]"
+          );
+
+        if (!tab) return;
+
+        if (
+          tab.classList.contains(
+            "search-btn"
+          )
+        ) {
+          return;
+        }
+
+        event.preventDefault();
+
+        activateTopTab(
+          tab
+        );
+      }
+    );
+  }
+
+
+  /* =========================================================
+     BOTTOM NAVIGATION
+     ========================================================= */
+
+  function setupBottomNavigation() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const item =
+          event.target.closest(
+            ".nav-item"
+          );
+
+        if (!item) return;
+
+        const nav =
+          item.dataset.nav ||
+          "";
+
+        if (
+          nav === "profile"
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (
+            window.ZYLOAuth &&
+            typeof window.ZYLOAuth.openOwnProfile ===
+              "function"
+          ) {
+            window.ZYLOAuth.openOwnProfile();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent(
+                "zylo:openprofile"
+              )
+            );
+          }
+
+          return;
+        }
+
+        if (
+          nav === "create"
+        ) {
+          return;
+        }
+
+        if (
+          nav === "home"
+        ) {
+          const feed =
+            $(".video-feed");
+
+          if (feed) {
+            feed.scrollTo({
+              top: 0,
+              behavior:
+                "smooth"
+            });
+          }
+        }
+
+        if (
+          nav === "discover"
+        ) {
+          document.dispatchEvent(
+            new CustomEvent(
+              "zylo:discover"
+            )
+          );
+        }
+
+        if (
+          nav === "inbox"
+        ) {
+          document.dispatchEvent(
+            new CustomEvent(
+              "zylo:inbox"
+            )
+          );
+        }
+
+        $$(".nav-item").forEach(
+          (navItem) => {
+            navItem.classList.toggle(
+              "active",
+              navItem === item
+            );
+          }
+        );
+      }
+    );
+  }
+
+
+  /* =========================================================
+     SEARCH
+     ========================================================= */
+
+  let searchOverlay = null;
+
+  function closeSearch() {
+    if (
+      searchOverlay
+    ) {
+      searchOverlay.remove();
+      searchOverlay = null;
+    }
+  }
+
+  function createSearchOverlay() {
+    closeSearch();
+
+    searchOverlay =
+      document.createElement(
+        "div"
+      );
+
+    searchOverlay.className =
+      "zylo-search-overlay";
+
+    searchOverlay.innerHTML = `
+      <div class="zylo-search-box">
+        <div class="zylo-search-header">
+          <input
+            type="search"
+            placeholder="Search ZYLO"
+            autocomplete="off"
+            data-zylo-search-input
+          />
+
+          <button
+            type="button"
+            data-zylo-search-close
+            aria-label="Close search"
+          >×</button>
+        </div>
+
+        <div
+          class="zylo-search-results"
+          data-zylo-search-results
+        ></div>
+      </div>
+    `;
+
+    document.body.appendChild(
+      searchOverlay
+    );
+
+    const input =
+      $(
+        "[data-zylo-search-input]",
+        searchOverlay
+      );
+
+    const results =
+      $(
+        "[data-zylo-search-results]",
+        searchOverlay
+      );
+
+    input?.addEventListener(
+      "input",
+      () => {
+        performSearch(
+          input.value,
+          results
+        );
+      }
+    );
+
+    $(
+      "[data-zylo-search-close]",
+      searchOverlay
+    )?.addEventListener(
+      "click",
+      closeSearch
+    );
+
+    input?.focus();
+  }
+
+  function performSearch(
+    query,
+    results
+  ) {
+    if (!results) return;
+
+    const value =
+      String(query || "")
+        .trim()
+        .toLowerCase();
+
+    if (!value) {
+      results.innerHTML = "";
+      return;
+    }
+
+    const matches = [];
+
+    $$(".video-page").forEach(
+      (page) => {
+        const text =
+          page.textContent
+            ?.toLowerCase() ||
+          "";
+
+        if (
+          text.includes(value)
+        ) {
+          matches.push(
+            page
+          );
+        }
+      }
+    );
+
+    if (!matches.length) {
+      results.innerHTML = `
+        <div class="zylo-search-empty">
+          No results found
+        </div>
+      `;
+
+      return;
+    }
+
+    results.innerHTML =
+      matches
+        .map(
+          (page, index) => {
+            const creator =
+              getCreatorData(
+                page
+              );
+
+            return `
+              <button
+                type="button"
+                class="zylo-search-result"
+                data-result-index="${index}"
+              >
+                <strong>
+                  ${escapeHTML(
+                    creator.username
+                  )}
+                </strong>
+              </button>
+            `;
+          }
+        )
+        .join("");
+
+    results
+      .querySelectorAll(
+        "[data-result-index]"
+      )
+      .forEach(
+        (button) => {
+          button.addEventListener(
+            "click",
+            () => {
+              const index =
+                parseInt(
+                  button.dataset
+                    .resultIndex,
+                  10
+                );
+
+              const page =
+                matches[index];
+
+              const pages =
+                VideoEngine.getPages();
+
+              const pageIndex =
+                pages.indexOf(
+                  page
+                );
+
+              closeSearch();
+
+              if (
+                pageIndex >= 0
+              ) {
+                VideoEngine.scrollToPage(
+                  pageIndex,
+                  "smooth"
+                );
+              }
+            }
+          );
+        }
+      );
+  }
+
+  function setupSearch() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            ".search-btn"
+          );
+
+        if (!button) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        createSearchOverlay();
+      }
+    );
+  }
