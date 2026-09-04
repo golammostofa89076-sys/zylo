@@ -42,6 +42,7 @@
       return null;
     }
   };
+   
 
   const $$ = (selector, root = document) => {
     try {
