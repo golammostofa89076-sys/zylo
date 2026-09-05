@@ -3354,3 +3354,1452 @@
 
     document.head.appendChild(style);
   }
+
+  /* =========================================================
+     UPLOAD STUDIO — PART 3
+     ========================================================= */
+
+  function createUploadStudio() {
+    injectUploadStyles();
+
+    const studio =
+      document.createElement("div");
+
+    studio.id =
+      "zyloUploadStudio";
+
+    studio.innerHTML = `
+      <div class="zylo-upload-top">
+
+        <div class="zylo-upload-title">
+          Create
+        </div>
+
+        <button
+          type="button"
+          class="zylo-upload-close"
+          id="zyloUploadClose"
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div class="zylo-upload-content">
+
+        <div class="zylo-upload-preview">
+
+          <video
+            id="zyloUploadPreview"
+            playsinline
+            muted
+            controls
+            preload="metadata"
+          ></video>
+
+          <div
+            class="zylo-upload-placeholder"
+            id="zyloUploadPlaceholder"
+          >
+            Choose a video to preview
+          </div>
+
+        </div>
+
+        <div class="zylo-upload-fields">
+
+          <div class="zylo-upload-field">
+
+            <button
+              type="button"
+              class="zylo-upload-select"
+              id="zyloUploadSelect"
+            >
+              Choose video
+            </button>
+
+          </div>
+
+          <div class="zylo-upload-field">
+
+            <label for="zyloCaption">
+              Caption
+            </label>
+
+            <textarea
+              id="zyloCaption"
+              maxlength="2200"
+              placeholder="Describe your video..."
+            ></textarea>
+
+          </div>
+
+          <div class="zylo-upload-field">
+
+            <label for="zyloHashtags">
+              Hashtags
+            </label>
+
+            <input
+              id="zyloHashtags"
+              type="text"
+              maxlength="500"
+              placeholder="#zylo #video #creator"
+            />
+
+          </div>
+
+          <div class="zylo-upload-field">
+
+            <label for="zyloPrivacy">
+              Who can watch this video?
+            </label>
+
+            <select id="zyloPrivacy">
+
+              <option value="public">
+                Everyone
+              </option>
+
+              <option value="friends">
+                Friends
+              </option>
+
+              <option value="private">
+                Only me
+              </option>
+
+            </select>
+
+          </div>
+
+          <div class="zylo-upload-field">
+
+            <label>
+              Settings
+            </label>
+
+            <div class="zylo-upload-options">
+
+              <label class="zylo-upload-option">
+
+                <span>
+                  Allow comments
+                </span>
+
+                <input
+                  type="checkbox"
+                  id="zyloAllowComments"
+                  checked
+                />
+
+              </label>
+
+              <label class="zylo-upload-option">
+
+                <span>
+                  Allow saving
+                </span>
+
+                <input
+                  type="checkbox"
+                  id="zyloAllowSave"
+                  checked
+                />
+
+              </label>
+
+              <label class="zylo-upload-option">
+
+                <span>
+                  Allow sharing
+                </span>
+
+                <input
+                  type="checkbox"
+                  id="zyloAllowShare"
+                  checked
+                />
+
+              </label>
+
+            </div>
+
+          </div>
+
+          <div class="zylo-upload-progress-wrap">
+
+            <div
+              class="zylo-upload-progress"
+            >
+              <div
+                id="zyloUploadProgress"
+              ></div>
+            </div>
+
+            <div
+              class="zylo-upload-status"
+              id="zyloUploadStatus"
+            >
+              Select a video to continue
+            </div>
+
+          </div>
+
+          <div class="zylo-upload-actions">
+
+            <button
+              type="button"
+              class="zylo-upload-cancel"
+              id="zyloUploadCancel"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              class="zylo-upload-post"
+              id="zyloUploadPost"
+              disabled
+            >
+              Post
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+    document.body.appendChild(studio);
+
+    uploadStudio = studio;
+
+    setupUploadStudioEvents();
+
+    return studio;
+  }
+
+  function setupUploadStudioEvents() {
+    if (!uploadStudio) return;
+
+    const selectButton =
+      $("#zyloUploadSelect", uploadStudio);
+
+    const closeButton =
+      $("#zyloUploadClose", uploadStudio);
+
+    const cancelButton =
+      $("#zyloUploadCancel", uploadStudio);
+
+    const postButton =
+      $("#zyloUploadPost", uploadStudio);
+
+    selectButton?.addEventListener(
+      "click",
+      () => {
+        const input =
+          $("#videoInput");
+
+        if (input) {
+          input.value = "";
+          input.click();
+        }
+      }
+    );
+
+    closeButton?.addEventListener(
+      "click",
+      closeUploadStudio
+    );
+
+    cancelButton?.addEventListener(
+      "click",
+      closeUploadStudio
+    );
+
+    postButton?.addEventListener(
+      "click",
+      () => {
+        uploadVideo();
+      }
+    );
+  }
+
+  function openUploadBox() {
+    if (
+      uploadStudio &&
+      document.body.contains(uploadStudio)
+    ) {
+      uploadStudio.style.display =
+        "flex";
+
+      return;
+    }
+
+    createUploadStudio();
+
+    selectedUploadFile = null;
+
+    setUploadStatus(
+      "Select a video to continue"
+    );
+
+    setUploadProgress(0);
+
+    const input =
+      $("#videoInput");
+
+    if (input) {
+      input.value = "";
+    }
+  }
+
+  function closeUploadStudio() {
+    if (!uploadStudio) return;
+
+    if (
+      uploadPreviewURL
+    ) {
+      try {
+        URL.revokeObjectURL(
+          uploadPreviewURL
+        );
+      } catch {}
+
+      uploadPreviewURL = "";
+    }
+
+    const preview =
+      $("#zyloUploadPreview", uploadStudio);
+
+    if (preview) {
+      preview.pause();
+      preview.removeAttribute("src");
+      preview.load();
+    }
+
+    uploadStudio.remove();
+
+    uploadStudio = null;
+    selectedUploadFile = null;
+  }
+
+  function setUploadStatus(message) {
+    if (!uploadStudio) return;
+
+    const status =
+      $("#zyloUploadStatus", uploadStudio);
+
+    if (status) {
+      status.textContent =
+        String(message || "");
+    }
+  }
+
+  function setUploadProgress(value) {
+    if (!uploadStudio) return;
+
+    const progress =
+      $("#zyloUploadProgress", uploadStudio);
+
+    if (!progress) return;
+
+    const percent =
+      Math.max(
+        0,
+        Math.min(
+          100,
+          Number(value) || 0
+        )
+      );
+
+    progress.style.width =
+      `${percent}%`;
+  }
+
+  function updatePostButton() {
+    if (!uploadStudio) return;
+
+    const post =
+      $("#zyloUploadPost", uploadStudio);
+
+    if (!post) return;
+
+    post.disabled =
+      !selectedUploadFile;
+  }
+
+  function previewUploadFile(file) {
+    if (!file) return;
+
+    if (
+      !file.type ||
+      !file.type.startsWith("video/")
+    ) {
+      setUploadStatus(
+        "Please select a valid video file."
+      );
+
+      selectedUploadFile = null;
+      updatePostButton();
+
+      return;
+    }
+
+    const maxSize =
+      200 * 1024 * 1024;
+
+    if (file.size > maxSize) {
+      setUploadStatus(
+        "Video must be 200 MB or smaller."
+      );
+
+      selectedUploadFile = null;
+      updatePostButton();
+
+      return;
+    }
+
+    selectedUploadFile = file;
+
+    if (uploadPreviewURL) {
+      try {
+        URL.revokeObjectURL(
+          uploadPreviewURL
+        );
+      } catch {}
+    }
+
+    uploadPreviewURL =
+      URL.createObjectURL(file);
+
+    if (!uploadStudio) {
+      createUploadStudio();
+    }
+
+    const preview =
+      $("#zyloUploadPreview", uploadStudio);
+
+    const placeholder =
+      $(
+        "#zyloUploadPlaceholder",
+        uploadStudio
+      );
+
+    if (preview) {
+      preview.src =
+        uploadPreviewURL;
+
+      preview.muted = true;
+      preview.controls = true;
+
+      preview.load();
+
+      preview.play().catch(() => {});
+    }
+
+    if (placeholder) {
+      placeholder.style.display =
+        "none";
+    }
+
+    setUploadStatus(
+      `${file.name} • ${formatFileSize(file.size)}`
+    );
+
+    setUploadProgress(0);
+
+    updatePostButton();
+  }
+
+  function formatFileSize(bytes) {
+    const size =
+      Number(bytes) || 0;
+
+    if (size < 1024) {
+      return `${size} B`;
+    }
+
+    if (size < 1024 * 1024) {
+      return `${(
+        size / 1024
+      ).toFixed(1)} KB`;
+    }
+
+    if (
+      size <
+      1024 * 1024 * 1024
+    ) {
+      return `${(
+        size /
+        (1024 * 1024)
+      ).toFixed(1)} MB`;
+    }
+
+    return `${(
+      size /
+      (1024 * 1024 * 1024)
+    ).toFixed(2)} GB`;
+  }
+
+  function getUploadFormData() {
+    if (!uploadStudio) {
+      throw new Error(
+        "Upload studio is not open."
+      );
+    }
+
+    if (!selectedUploadFile) {
+      throw new Error(
+        "Please choose a video first."
+      );
+    }
+
+    const caption =
+      $(
+        "#zyloCaption",
+        uploadStudio
+      )?.value?.trim() || "";
+
+    const hashtags =
+      $(
+        "#zyloHashtags",
+        uploadStudio
+      )?.value?.trim() || "";
+
+    const privacy =
+      $(
+        "#zyloPrivacy",
+        uploadStudio
+      )?.value || "public";
+
+    const allowComments =
+      Boolean(
+        $(
+          "#zyloAllowComments",
+          uploadStudio
+        )?.checked
+      );
+
+    const allowSave =
+      Boolean(
+        $(
+          "#zyloAllowSave",
+          uploadStudio
+        )?.checked
+      );
+
+    const allowShare =
+      Boolean(
+        $(
+          "#zyloAllowShare",
+          uploadStudio
+        )?.checked
+      );
+
+    return {
+      caption,
+      hashtags,
+      privacy,
+      allowComments,
+      allowSave,
+      allowShare
+    };
+  }
+
+  function getCurrentUserData() {
+    const uid =
+      getUserUID();
+
+    const username =
+      getUsername();
+
+    return {
+      uid:
+        uid ||
+        `guest_${Date.now()}`,
+
+      username:
+        username ||
+        "zylo_creator"
+    };
+  }
+
+  function uploadVideo() {
+    if (!selectedUploadFile) {
+      setUploadStatus(
+        "Please choose a video first."
+      );
+
+      return;
+    }
+
+    if (!uploadStudio) return;
+
+    const postButton =
+      $("#zyloUploadPost", uploadStudio);
+
+    const cancelButton =
+      $("#zyloUploadCancel", uploadStudio);
+
+    const selectButton =
+      $("#zyloUploadSelect", uploadStudio);
+
+    if (postButton) {
+      postButton.disabled = true;
+      postButton.textContent =
+        "Uploading...";
+    }
+
+    if (cancelButton) {
+      cancelButton.disabled = true;
+    }
+
+    if (selectButton) {
+      selectButton.disabled = true;
+    }
+
+    let formData;
+
+    try {
+      formData =
+        getUploadFormData();
+    } catch (error) {
+      setUploadStatus(
+        error.message
+      );
+
+      if (postButton) {
+        postButton.disabled = false;
+        postButton.textContent =
+          "Post";
+      }
+
+      return;
+    }
+
+    const user =
+      getCurrentUserData();
+
+    const data =
+      new FormData();
+
+    data.append(
+      "video",
+      selectedUploadFile,
+      selectedUploadFile.name
+    );
+
+    data.append(
+      "uid",
+      user.uid
+    );
+
+    data.append(
+      "username",
+      user.username
+    );
+
+    data.append(
+      "caption",
+      formData.caption
+    );
+
+    data.append(
+      "hashtags",
+      formData.hashtags
+    );
+
+    data.append(
+      "privacy",
+      formData.privacy
+    );
+
+    data.append(
+      "allowComments",
+      String(
+        formData.allowComments
+      )
+    );
+
+    data.append(
+      "allowSave",
+      String(
+        formData.allowSave
+      )
+    );
+
+    data.append(
+      "allowShare",
+      String(
+        formData.allowShare
+      )
+    );
+
+    const xhr =
+      new XMLHttpRequest();
+
+    xhr.open(
+      "POST",
+      `${CONFIG.API_BASE_URL}/api/upload`,
+      true
+    );
+
+    xhr.setRequestHeader(
+      "Accept",
+      "application/json"
+    );
+
+    xhr.upload.onprogress =
+      (event) => {
+        if (!event.lengthComputable) {
+          setUploadStatus(
+            "Uploading..."
+          );
+
+          return;
+        }
+
+        const percent =
+          (event.loaded /
+            event.total) *
+          100;
+
+        setUploadProgress(
+          percent
+        );
+
+        setUploadStatus(
+          `Uploading ${Math.round(
+            percent
+          )}%`
+        );
+      };
+
+    xhr.onload = () => {
+      let response = null;
+
+      try {
+        response =
+          JSON.parse(
+            xhr.responseText ||
+            "{}"
+          );
+      } catch {
+        response = null;
+      }
+
+      if (
+        xhr.status < 200 ||
+        xhr.status >= 300
+      ) {
+        const message =
+          response?.message ||
+          response?.error ||
+          `Upload failed (${xhr.status})`;
+
+        handleUploadFailure(
+          new Error(message)
+        );
+
+        return;
+      }
+
+      const uploadedURL =
+        response?.url ||
+        response?.videoUrl ||
+        response?.video?.url ||
+        "";
+
+      if (!uploadedURL) {
+        handleUploadFailure(
+          new Error(
+            "Server did not return a video URL."
+          )
+        );
+
+        return;
+      }
+
+      setUploadProgress(100);
+
+      setUploadStatus(
+        "Processing video..."
+      );
+
+      const videoId =
+        response?.videoId ||
+        response?.video?.videoId ||
+        makeId("video");
+
+      const record = {
+        videoId,
+
+        uid:
+          response?.uid ||
+          response?.video?.uid ||
+          user.uid,
+
+        username:
+          response?.username ||
+          response?.video?.username ||
+          user.username,
+
+        url: uploadedURL,
+
+        videoUrl: uploadedURL,
+
+        caption:
+          formData.caption,
+
+        hashtags:
+          formData.hashtags,
+
+        privacy:
+          formData.privacy,
+
+        allowComments:
+          formData.allowComments,
+
+        allowSave:
+          formData.allowSave,
+
+        allowShare:
+          formData.allowShare,
+
+        filename:
+          selectedUploadFile.name,
+
+        size:
+          selectedUploadFile.size,
+
+        type:
+          selectedUploadFile.type,
+
+        createdAt:
+          Date.now()
+      };
+
+      saveUploadedVideo(
+        record
+      );
+
+      setUploadStatus(
+        "Posted successfully!"
+      );
+
+      window.setTimeout(() => {
+        addUploadedVideoToFeed(
+          record
+        );
+
+        closeUploadStudio();
+      }, 500);
+    };
+
+    xhr.onerror = () => {
+      handleUploadFailure(
+        new Error(
+          "Network error. Please try again."
+        )
+      );
+    };
+
+    xhr.onabort = () => {
+      handleUploadFailure(
+        new Error(
+          "Upload cancelled."
+        )
+      );
+    };
+
+    xhr.ontimeout = () => {
+      handleUploadFailure(
+        new Error(
+          "Upload timed out. Please try again."
+        )
+      );
+    };
+
+    setUploadStatus(
+      "Starting upload..."
+    );
+
+    xhr.send(data);
+  }
+
+  function handleUploadFailure(error) {
+    console.error(
+      "ZYLO upload error:",
+      error
+    );
+
+    setUploadStatus(
+      error?.message ||
+      "Upload failed."
+    );
+
+    const postButton =
+      uploadStudio &&
+      $("#zyloUploadPost", uploadStudio);
+
+    const cancelButton =
+      uploadStudio &&
+      $("#zyloUploadCancel", uploadStudio);
+
+    const selectButton =
+      uploadStudio &&
+      $("#zyloUploadSelect", uploadStudio);
+
+    if (postButton) {
+      postButton.disabled = false;
+      postButton.textContent =
+        "Post";
+    }
+
+    if (cancelButton) {
+      cancelButton.disabled = false;
+    }
+
+    if (selectButton) {
+      selectButton.disabled = false;
+    }
+  }
+
+  function saveUploadedVideo(video) {
+    const videos =
+      getStorage(
+        CONFIG.STORAGE.UPLOADED_VIDEOS,
+        []
+      );
+
+    const list =
+      Array.isArray(videos)
+        ? videos
+        : [];
+
+    const clean =
+      list.filter(
+        (item) =>
+          item &&
+          item.videoId !==
+            video.videoId
+      );
+
+    clean.unshift(video);
+
+    setStorage(
+      CONFIG.STORAGE.UPLOADED_VIDEOS,
+      clean
+    );
+  }
+
+  function getUploadedVideos() {
+    const videos =
+      getStorage(
+        CONFIG.STORAGE.UPLOADED_VIDEOS,
+        []
+      );
+
+    return Array.isArray(videos)
+      ? videos
+      : [];
+  }
+
+  function setupUploadInput() {
+    const input =
+      $("#videoInput");
+
+    if (!input) return;
+
+    input.setAttribute(
+      "accept",
+      "video/*"
+    );
+
+    input.addEventListener(
+      "change",
+      (event) => {
+        const file =
+          event.target.files?.[0];
+
+        if (!file) return;
+
+        if (!uploadStudio) {
+          openUploadBox();
+        }
+
+        previewUploadFile(
+          file
+        );
+      }
+    );
+  }
+
+  function addUploadedVideoToFeed(video) {
+    if (!video?.url) return;
+
+    const feed =
+      getFeed();
+
+    if (!feed) return;
+
+    const existing =
+      $(
+        `.video-page[data-video-id="${CSS.escape(
+          String(video.videoId)
+        )}"]`
+      );
+
+    if (existing) {
+      VideoEngine.refresh();
+      return;
+    }
+
+    const template =
+      $(".video-page", feed);
+
+    if (!template) {
+      console.warn(
+        "ZYLO: no video template found."
+      );
+
+      return;
+    }
+
+    const page =
+      template.cloneNode(true);
+
+    page.dataset.videoId =
+      video.videoId;
+
+    page.dataset.creatorUid =
+      video.uid || "";
+
+    page.dataset.creatorUsername =
+      video.username || "";
+
+    page.dataset.username =
+      video.username || "";
+
+    page.dataset.description =
+      video.caption || "";
+
+    page.dataset.hashtags =
+      video.hashtags || "";
+
+    page.dataset.privacy =
+      video.privacy || "public";
+
+    page.dataset.allowComments =
+      String(
+        video.allowComments !== false
+      );
+
+    page.dataset.allowSave =
+      String(
+        video.allowSave !== false
+      );
+
+    page.dataset.allowShare =
+      String(
+        video.allowShare !== false
+      );
+
+    const media =
+      $("video", page);
+
+    if (media) {
+      media.pause();
+
+      media.loop = false;
+      media.removeAttribute(
+        "loop"
+      );
+
+      media.muted = true;
+      media.playsInline = true;
+
+      media.setAttribute(
+        "playsinline",
+        ""
+      );
+
+      media.preload =
+        "metadata";
+
+      media.src =
+        video.url;
+
+      media.load();
+    }
+
+    setUploadedPageText(
+      page,
+      video
+    );
+
+    feed.appendChild(page);
+
+    VideoEngine.refresh();
+
+    window.setTimeout(() => {
+      const pages =
+        VideoEngine.getPages();
+
+      const index =
+        pages.indexOf(page);
+
+      if (index >= 0) {
+        VideoEngine.scrollToPage(
+          index,
+          "smooth"
+        );
+      }
+    }, 100);
+  }
+
+  function setUploadedPageText(
+    page,
+    video
+  ) {
+    const username =
+      video.username ||
+      "zylo_creator";
+
+    const caption =
+      video.caption ||
+      "";
+
+    const hashtags =
+      video.hashtags ||
+      "";
+
+    const userElements = [
+      ...$$(
+        ".username",
+        page
+      ),
+      ...$$(
+        ".creator-name",
+        page
+      ),
+      ...$$(
+        "[data-username]",
+        page
+      )
+    ];
+
+    userElements.forEach(
+      (element) => {
+        if (
+          !element.matches(
+            "input,textarea"
+          )
+        ) {
+          element.textContent =
+            username;
+        }
+      }
+    );
+
+    const descriptionElements = [
+      ...$$(
+        ".video-description",
+        page
+      ),
+      ...$$(
+        ".description",
+        page
+      ),
+      ...$$(
+        ".caption",
+        page
+      ),
+      ...$$(
+        "[data-description]",
+        page
+      )
+    ];
+
+    descriptionElements.forEach(
+      (element) => {
+        if (
+          !element.matches(
+            "input,textarea"
+          )
+        ) {
+          element.textContent =
+            caption;
+        }
+      }
+    );
+
+    const hashtagElements = [
+      ...$$(
+        ".hashtags",
+        page
+      ),
+      ...$$(
+        "[data-hashtags]",
+        page
+      )
+    ];
+
+    hashtagElements.forEach(
+      (element) => {
+        if (
+          !element.matches(
+            "input,textarea"
+          )
+        ) {
+          element.textContent =
+            hashtags;
+        }
+      }
+    );
+
+    page.setAttribute(
+      "aria-label",
+      `${username} video`
+    );
+  }
+
+  /* =========================================================
+     RESTORE UPLOADED VIDEOS
+     ========================================================= */
+
+  function restoreUploadedVideos() {
+    const videos =
+      getUploadedVideos();
+
+    if (!videos.length) return;
+
+    videos
+      .slice()
+      .reverse()
+      .forEach((video) => {
+        if (!video?.url) return;
+
+        if (
+          String(video.url).startsWith(
+            "blob:"
+          )
+        ) {
+          return;
+        }
+
+        addUploadedVideoToFeed(
+          video
+        );
+      });
+  }
+
+  /* =========================================================
+     CREATE BUTTON
+     ========================================================= */
+
+  function setupCreateButton() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            "#createBtn,.create-btn"
+          );
+
+        if (!button) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        openUploadBox();
+      },
+      true
+    );
+  }
+
+  /* =========================================================
+     INITIALIZATION
+     ========================================================= */
+
+  function initializeVideoSystem() {
+    VideoEngine.init();
+
+    setupLikeButtons();
+    setupSaveButtons();
+    setupCommentButtons();
+    setupShareButtons();
+    setupMusicButtons();
+    setupFullscreenButtons();
+    setupFollowButtons();
+
+    setupNavigation();
+    setupSearch();
+
+    setupCreateButton();
+    setupUploadInput();
+
+    restoreUploadedVideos();
+
+    openHashVideo();
+
+    window.addEventListener(
+      "hashchange",
+      openHashVideo
+    );
+
+    window.addEventListener(
+      "resize",
+      () => {
+        VideoEngine.refresh();
+      }
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (
+          document.hidden
+        ) {
+          const pages =
+            VideoEngine.getPages();
+
+          pages.forEach(
+            (page) => {
+              const video =
+                $("video", page);
+
+              if (video) {
+                video.pause();
+              }
+            }
+          );
+        } else {
+          const index =
+            VideoEngine.getActiveIndex();
+
+          if (index >= 0) {
+            VideoEngine.activate(
+              index,
+              {
+                updateHash: false
+              }
+            );
+          }
+        }
+      }
+    );
+
+    console.log(
+      "ZYLO Video System ready"
+    );
+  }
+
+  /* =========================================================
+     AUTH BRIDGE
+     ========================================================= */
+
+  function loadAuthJS() {
+    if (
+      window.ZYLOAuth ||
+      document.querySelector(
+        'script[data-zylo-auth="true"]'
+      )
+    ) {
+      return;
+    }
+
+    const script =
+      document.createElement("script");
+
+    script.src =
+      "./auth.js";
+
+    script.async = true;
+
+    script.dataset.zyloAuth =
+      "true";
+
+    script.onload = () => {
+      console.log(
+        "ZYLO Auth loaded"
+      );
+    };
+
+    script.onerror = () => {
+      console.warn(
+        "ZYLO Auth could not be loaded."
+      );
+    };
+
+    document.head.appendChild(
+      script
+    );
+  }
+
+  /* =========================================================
+     GLOBAL EVENTS
+     ========================================================= */
+
+  window.addEventListener(
+    "zylo:video-uploaded",
+    (event) => {
+      const video =
+        event.detail;
+
+      if (video) {
+        saveUploadedVideo(
+          video
+        );
+
+        addUploadedVideoToFeed(
+          video
+        );
+      }
+    }
+  );
+
+  window.addEventListener(
+    "zylo:followchange",
+    () => {
+      VideoEngine.refresh();
+    }
+  );
+
+  /* =========================================================
+     START ZYLO
+     ========================================================= */
+
+  function startZYLO() {
+    try {
+      initializeVideoSystem();
+    } catch (error) {
+      console.error(
+        "ZYLO initialization error:",
+        error
+      );
+    }
+
+    loadAuthJS();
+  }
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      startZYLO,
+      {
+        once: true
+      }
+    );
+  } else {
+    startZYLO();
+  }
+
+})();
