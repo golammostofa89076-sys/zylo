@@ -1240,3 +1240,85 @@ body {
     flex-basis: 100vh;
   }
 }
+
+/* =====================================================
+   ZYLO - VIDEO FEED SCROLL FIX
+   ===================================================== */
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#app {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.video-feed {
+    position: relative;
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+
+    overflow-y: scroll;
+    overflow-x: hidden;
+
+    scroll-snap-type: y mandatory;
+    scroll-snap-stop: always;
+
+    -webkit-overflow-scrolling: touch;
+
+    touch-action: pan-y;
+
+    overscroll-behavior-y: contain;
+
+    scrollbar-width: none;
+}
+
+.video-feed::-webkit-scrollbar {
+    display: none;
+}
+
+.video-page {
+    position: relative;
+
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+
+    flex: none;
+
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+
+    overflow: hidden;
+}
+
+.video-page video {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    pointer-events: auto;
+}
+
+@supports not (height: 100dvh) {
+
+    .video-feed {
+        height: 100vh;
+        min-height: 100vh;
+    }
+
+    .video-page {
+        height: 100vh;
+        min-height: 100vh;
+    }
+}
