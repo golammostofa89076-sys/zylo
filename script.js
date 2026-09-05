@@ -3360,99 +3360,194 @@
     );
   }
 
+async function uploadVideo(file) {
+  if (!file) {
+    return;
+  }
 
-  async function uploadVideo(
-    file
-  ) {
-    if (!file) {
-      return;
-    }
+  /* =====================================================
+     VIDEO VALIDATION
+     ===================================================== */
 
-    if (
-      !file.type.startsWith(
-        "video/"
-      )
-    ) {
-      alert(
-        "Please select a video file."
+  if (!file.type.startsWith("video/")) {
+    alert("Please select a video file.");
+    return;
+  }
+
+  const MAX_SIZE = 200 * 1024 * 1024; // 200 MB
+
+  if (file.size > MAX_SIZE) {
+    alert("Video size must be 200 MB or less.");
+    return;
+  }
+
+  /* =====================================================
+     USER INFO
+     ===================================================== */
+
+  const uid = getUserUID();
+  const username = getUsername();
+
+  /* =====================================================
+     FORM DATA
+     ===================================================== */
+
+  const formData = new FormData();
+
+  formData.append("video", file);
+  formData.append("uid", uid);
+  formData.append("username", username);
+
+  let serverURL = "";
+
+  /* =====================================================
+     SERVER UPLOAD
+     ===================================================== */
+
+  try {
+    const response = await fetch(
+      CONFIG.API_BASE_URL + "/api/upload",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "Upload failed: " + response.status
       );
-
-      return;
     }
 
-    const uid =
-      getUserUID();
+    const result = await response.json();
 
-    const username =
-      getUsername();
-
-    const formData =
-      new FormData();
-
-    formData.append(
-      "video",
-      file
-    );
-
-    formData.append(
-      "uid",
-      uid
-    );
-
-    formData.append(
-      "username",
-      username
-    );
-
-    let serverURL =
+    serverURL =
+      result?.url ||
+      result?.videoUrl ||
+      result?.fileUrl ||
       "";
 
-    try {
-      const response =
-        await fetch(
-          CONFIG.API_BASE_URL +
-            "/api/upload",
-          {
-            method:
-              "POST",
-
-            body:
-              formData
-          }
-        );
-
-      if (!response.ok) {
-        throw new Error(
-          "Upload failed: " +
-            response.status
-        );
-      }
-
-      const result =
-        await response.json();
-
+    if (
+      serverURL &&
+      !serverURL.startsWith("http")
+    ) {
       serverURL =
-        result?.url ||
-        result?.videoUrl ||
-        result?.fileUrl ||
-        "";
+        CONFIG.API_BASE_URL +
+        serverURL;
+    }
 
-      if (
-        serverURL &&
-        !serverURL.startsWith(
-          "http"
-        )
-      ) {
-        serverURL =
-          CONFIG.API_BASE_URL +
-          serverURL;
-      }
-    } catch (error) {
-      console.warn(
-        "ZYLO server upload error:",
-        error
+    if (!serverURL) {
+      throw new Error(
+        "Server did not return a video URL."
       );
     }
+
+  } catch (error) {
+    console.error(
+      "ZYLO upload failed:",
+      error
+    );
+
+    alert(
+      "Video upload failed. Please try again."
+    );
+
+    return;
+  }
+
+  /* =====================================================
+     VIDEO DATA
+     ===================================================== */
+
+  const videoData = {
+    id: makeId("video"),
+
+    uid,
+
+    username,
+
+    name: file.name,
+
+    url: serverURL,
+
+    serverURL,
+
+    createdAt: Date.now(),
+
+    size: file.size,
+
+    type: file.type
+  };
+
+  /* =====================================================
+     SAVE UPLOAD METADATA
+     ===================================================== */
+
+  const uploads =
+    getStorage(
+      CONFIG.STORAGE.UPLOADED_VIDEOS,
+      []
+    );
+
+  uploads.unshift(videoData);
+
+  setStorage(
+    CONFIG.STORAGE.UPLOADED_VIDEOS,
+    uploads
+  );
+
+  /* =====================================================
+     ADD VIDEO TO FEED
+     ===================================================== */
+
+  const page =
+    createUploadedPage(videoData);
+
+  VideoEngine.refresh();
+
+  /* =====================================================
+     OPEN NEW VIDEO
+     ===================================================== */
+
+  if (page) {
+    const index =
+      VideoEngine
+        .getPages()
+        .indexOf(page);
+
+    if (index >= 0) {
+      VideoEngine.scrollToPage(
+        index,
+        "smooth"
+      );
+    }
+  }
+
+  /* =====================================================
+     CLOSE UPLOAD BOX
+     ===================================================== */
+
+  closeUploadBox();
+
+  /* =====================================================
+     UPLOAD EVENT
+     ===================================================== */
+
+  window.dispatchEvent(
+    new CustomEvent(
+      "zylo:uploaded",
+      {
+        detail: videoData
+      }
+    )
+  );
+
+  console.log(
+    "ZYLO: video uploaded successfully",
+    videoData
+  );
+}
+
 
     const localURL =
       URL.createObjectURL(
