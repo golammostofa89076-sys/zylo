@@ -26,6 +26,7 @@ if (!fs.existsSync(UPLOAD_DIR)) {
   });
 }
 
+
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, {
     recursive: true
