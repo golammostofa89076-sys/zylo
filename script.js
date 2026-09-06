@@ -4046,3 +4046,15 @@
     };
 
 })();
+
+document.addEventListener("click", (event) => {
+  const button = event.target.closest("#selectVideo");
+  if (!button) return;
+
+  event.preventDefault();
+
+  const input = document.getElementById("videoInput");
+  if (input) {
+    input.click();
+  }
+});
