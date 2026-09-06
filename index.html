@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -14,16 +15,16 @@
         content="ZYLO — Create • Connect • Grow"
     >
 
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./style.css?v=1006">
 </head>
 
 <body>
 
 <div id="app">
 
-    <!-- =====================================================
+    <!-- =========================
          TOP BAR
-         ===================================================== -->
+         ========================= -->
 
     <header class="top-bar">
 
@@ -64,28 +65,29 @@
     </header>
 
 
-    <!-- =====================================================
+    <!-- =========================
          VIDEO FEED
-         ===================================================== -->
+         ========================= -->
 
     <main class="video-feed">
 
-
-        <!-- =================================================
-             VIDEO 1
-             ================================================= -->
+        <!-- VIDEO 1 -->
 
         <section
             class="video-page"
             data-video-id="video1"
+            data-creator-uid="zylo_creator"
+            data-creator-username="zylo_creator"
+            data-title="Welcome to ZYLO"
         >
 
             <video
                 src="./backend/uploads/video1.mp4"
-                loop
+                autoplay
                 muted
                 playsinline
-                preload="metadata"
+                webkit-playsinline
+                preload="auto"
             ></video>
 
             <div class="video-overlay"></div>
@@ -109,18 +111,14 @@
             </button>
 
 
-            <!-- RIGHT SIDE ACTIONS -->
+            <!-- RIGHT ACTIONS -->
 
             <div class="right-actions">
-
-
-                <!-- PROFILE -->
 
                 <button
                     class="profile-action"
                     aria-label="Profile"
                 >
-
                     <span class="profile-circle">
                         Z
                     </span>
@@ -128,17 +126,13 @@
                     <span class="follow-badge">
                         +
                     </span>
-
                 </button>
 
-
-                <!-- LIKE -->
 
                 <button
                     class="action-btn like-btn"
                     aria-label="Like"
                 >
-
                     <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
@@ -149,17 +143,13 @@
                     <span class="action-count">
                         0
                     </span>
-
                 </button>
 
 
-                <!-- COMMENT -->
-
                 <button
-                    class="action-btn"
+                    class="action-btn comment-btn"
                     aria-label="Comments"
                 >
-
                     <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
@@ -170,17 +160,13 @@
                     <span class="action-count">
                         0
                     </span>
-
                 </button>
 
-
-                <!-- SAVE -->
 
                 <button
                     class="action-btn save-btn"
                     aria-label="Save"
                 >
-
                     <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
@@ -191,17 +177,13 @@
                     <span class="action-label">
                         Save
                     </span>
-
                 </button>
 
-
-                <!-- SHARE -->
 
                 <button
                     class="action-btn share-btn"
                     aria-label="Share"
                 >
-
                     <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
@@ -213,17 +195,13 @@
                     <span class="action-label">
                         Share
                     </span>
-
                 </button>
 
-
-                <!-- MUSIC -->
 
                 <button
                     class="music-btn"
                     aria-label="Music"
                 >
-
                     <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
@@ -244,13 +222,12 @@
                     <span>
                         Music
                     </span>
-
                 </button>
 
             </div>
 
 
-            <!-- VIDEO INFORMATION -->
+            <!-- VIDEO INFO -->
 
             <div class="video-info">
 
@@ -279,28 +256,27 @@
         </section>
 
 
-
-        <!-- =================================================
-             VIDEO 2
-             ================================================= -->
+        <!-- VIDEO 2 -->
 
         <section
             class="video-page"
             data-video-id="video2"
+            data-creator-uid="zylo_creator"
+            data-creator-username="zylo_creator"
+            data-title="ZYLO Short Video"
         >
 
             <video
                 src="./backend/uploads/video1.mp4"
-                loop
+                autoplay
                 muted
                 playsinline
-                preload="metadata"
+                webkit-playsinline
+                preload="auto"
             ></video>
 
             <div class="video-overlay"></div>
 
-
-            <!-- FULLSCREEN -->
 
             <button
                 class="fullscreen-btn"
@@ -318,18 +294,12 @@
             </button>
 
 
-            <!-- RIGHT SIDE ACTIONS -->
-
             <div class="right-actions">
-
-
-                <!-- PROFILE -->
 
                 <button
                     class="profile-action"
                     aria-label="Profile"
                 >
-
                     <span class="profile-circle">
                         Z
                     </span>
@@ -337,17 +307,13 @@
                     <span class="follow-badge">
                         +
                     </span>
-
                 </button>
 
-
-                <!-- LIKE -->
 
                 <button
                     class="action-btn like-btn"
                     aria-label="Like"
                 >
-
                     <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
@@ -358,17 +324,13 @@
                     <span class="action-count">
                         0
                     </span>
-
                 </button>
 
 
-                <!-- COMMENT -->
-
                 <button
-                    class="action-btn"
+                    class="action-btn comment-btn"
                     aria-label="Comments"
                 >
-
                     <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
@@ -379,17 +341,13 @@
                     <span class="action-count">
                         0
                     </span>
-
                 </button>
 
-
-                <!-- SAVE -->
 
                 <button
                     class="action-btn save-btn"
                     aria-label="Save"
                 >
-
                     <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
@@ -400,17 +358,13 @@
                     <span class="action-label">
                         Save
                     </span>
-
                 </button>
 
-
-                <!-- SHARE -->
 
                 <button
                     class="action-btn share-btn"
                     aria-label="Share"
                 >
-
                     <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
@@ -422,17 +376,13 @@
                     <span class="action-label">
                         Share
                     </span>
-
                 </button>
 
-
-                <!-- MUSIC -->
 
                 <button
                     class="music-btn"
                     aria-label="Music"
                 >
-
                     <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
@@ -453,13 +403,10 @@
                     <span>
                         Music
                     </span>
-
                 </button>
 
             </div>
 
-
-            <!-- VIDEO INFORMATION -->
 
             <div class="video-info">
 
@@ -490,22 +437,17 @@
     </main>
 
 
-
-    <!-- =====================================================
-         BOTTOM NAVIGATION
-         ===================================================== -->
+    <!-- =========================
+         BOTTOM NAV
+         ========================= -->
 
     <nav class="bottom-nav">
-
-
-        <!-- HOME -->
 
         <button
             class="nav-item active"
             data-nav="home"
             aria-label="Home"
         >
-
             <svg
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -517,18 +459,14 @@
             <span>
                 Home
             </span>
-
         </button>
 
-
-        <!-- DISCOVER -->
 
         <button
             class="nav-item"
             data-nav="discover"
             aria-label="Discover"
         >
-
             <svg
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -545,16 +483,14 @@
             <span>
                 Discover
             </span>
-
         </button>
 
-
-        <!-- CREATE -->
 
         <button
             id="createBtn"
             class="create-btn"
             aria-label="Create"
+            type="button"
         >
 
             <span class="create-left"></span>
@@ -576,14 +512,11 @@
         </button>
 
 
-        <!-- INBOX -->
-
         <button
             class="nav-item"
             data-nav="inbox"
             aria-label="Inbox"
         >
-
             <svg
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -595,18 +528,14 @@
             <span>
                 Inbox
             </span>
-
         </button>
 
-
-        <!-- PROFILE -->
 
         <button
             class="nav-item"
             data-nav="profile"
             aria-label="Profile"
         >
-
             <svg
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -623,16 +552,14 @@
             <span>
                 Profile
             </span>
-
         </button>
 
     </nav>
 
 
-
-    <!-- =====================================================
-         VIDEO UPLOAD INPUT
-         ===================================================== -->
+    <!-- =========================
+         FILE INPUT
+         ========================= -->
 
     <input
         id="videoInput"
@@ -642,66 +569,100 @@
     >
 
 
-
-    <!-- =====================================================
+    <!-- =========================
          UPLOAD MODAL
-         ===================================================== -->
+         ========================= -->
 
     <div
         id="uploadBox"
         class="upload-box"
+        hidden
     >
 
-        <div class="upload-content">
+        <div class="upload-modal">
 
             <button
                 id="closeUpload"
                 class="close-upload"
+                type="button"
                 aria-label="Close"
             >
                 ×
             </button>
 
-            <div class="upload-icon">
 
-                <svg
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                >
-                    <path d="M12 16V4"></path>
-                    <path d="m7 9 5-5 5 5"></path>
-                    <path d="M4 14v5h16v-5"></path>
-                </svg>
-
+            <div class="upload-title">
+                Create Video
             </div>
 
-            <h2>
-                Upload Video
-            </h2>
-
-            <p id="uploadStatus"></p>
 
             <button
                 id="selectVideo"
-                class="select-video"
+                class="upload-select"
+                type="button"
             >
                 Select Video
             </button>
+
+
+            <input
+                id="videoInputModal"
+                type="file"
+                accept="video/*"
+                hidden
+            >
+
+
+            <div
+                id="uploadPreview"
+                class="upload-preview"
+                hidden
+            >
+
+                <video
+                    id="uploadPreviewVideo"
+                    controls
+                    playsinline
+                ></video>
+
+            </div>
+
+
+            <div class="upload-actions">
+
+                <button
+                    id="uploadCancel"
+                    type="button"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    id="uploadPost"
+                    type="button"
+                >
+                    Post
+                </button>
+
+            </div>
+
+
+            <div
+                id="uploadStatus"
+                class="upload-status"
+                aria-live="polite"
+            ></div>
 
         </div>
 
     </div>
 
-
 </div>
 
 
-<!-- =========================================================
-     JAVASCRIPT
-     IMPORTANT: JavaScript stays in script.js
-     ========================================================= -->
+<!-- IMPORTANT: CACHE BUST -->
 
-<script src="./script.js"></script>
+<script src="./script.js?v=1006"></script>
 
 </body>
 </html>
