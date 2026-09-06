@@ -47,6 +47,7 @@
         <button
             class="search-btn"
             aria-label="Search"
+            type="button"
         >
             <svg
                 viewBox="0 0 24 24"
@@ -98,6 +99,7 @@
             <button
                 class="fullscreen-btn"
                 aria-label="Fullscreen"
+                type="button"
             >
                 <svg
                     viewBox="0 0 24 24"
@@ -118,6 +120,7 @@
                 <button
                     class="profile-action"
                     aria-label="Profile"
+                    type="button"
                 >
                     <span class="profile-circle">
                         Z
@@ -132,6 +135,7 @@
                 <button
                     class="action-btn like-btn"
                     aria-label="Like"
+                    type="button"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -149,6 +153,7 @@
                 <button
                     class="action-btn comment-btn"
                     aria-label="Comments"
+                    type="button"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -166,6 +171,7 @@
                 <button
                     class="action-btn save-btn"
                     aria-label="Save"
+                    type="button"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -183,6 +189,7 @@
                 <button
                     class="action-btn share-btn"
                     aria-label="Share"
+                    type="button"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -201,6 +208,7 @@
                 <button
                     class="music-btn"
                     aria-label="Music"
+                    type="button"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -278,9 +286,12 @@
             <div class="video-overlay"></div>
 
 
+            <!-- FULLSCREEN -->
+
             <button
                 class="fullscreen-btn"
                 aria-label="Fullscreen"
+                type="button"
             >
                 <svg
                     viewBox="0 0 24 24"
@@ -294,11 +305,14 @@
             </button>
 
 
+            <!-- RIGHT ACTIONS -->
+
             <div class="right-actions">
 
                 <button
                     class="profile-action"
                     aria-label="Profile"
+                    type="button"
                 >
                     <span class="profile-circle">
                         Z
@@ -313,6 +327,7 @@
                 <button
                     class="action-btn like-btn"
                     aria-label="Like"
+                    type="button"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -330,6 +345,7 @@
                 <button
                     class="action-btn comment-btn"
                     aria-label="Comments"
+                    type="button"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -347,6 +363,7 @@
                 <button
                     class="action-btn save-btn"
                     aria-label="Save"
+                    type="button"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -364,6 +381,7 @@
                 <button
                     class="action-btn share-btn"
                     aria-label="Share"
+                    type="button"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -382,6 +400,7 @@
                 <button
                     class="music-btn"
                     aria-label="Music"
+                    type="button"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -407,6 +426,8 @@
 
             </div>
 
+
+            <!-- VIDEO INFO -->
 
             <div class="video-info">
 
@@ -447,6 +468,7 @@
             class="nav-item active"
             data-nav="home"
             aria-label="Home"
+            type="button"
         >
             <svg
                 viewBox="0 0 24 24"
@@ -466,6 +488,7 @@
             class="nav-item"
             data-nav="discover"
             aria-label="Discover"
+            type="button"
         >
             <svg
                 viewBox="0 0 24 24"
@@ -516,6 +539,7 @@
             class="nav-item"
             data-nav="inbox"
             aria-label="Inbox"
+            type="button"
         >
             <svg
                 viewBox="0 0 24 24"
@@ -535,6 +559,7 @@
             class="nav-item"
             data-nav="profile"
             aria-label="Profile"
+            type="button"
         >
             <svg
                 viewBox="0 0 24 24"
@@ -558,7 +583,7 @@
 
 
     <!-- =========================
-         FILE INPUT
+         SINGLE FILE INPUT
          ========================= -->
 
     <input
@@ -605,12 +630,11 @@
             </button>
 
 
-            <input
-                id="videoInputModal"
-                type="file"
-                accept="video/*"
-                hidden
-            >
+            <!--
+                IMPORTANT:
+                The modal no longer has a second file input.
+                The single #videoInput above is used by the upload system.
+            -->
 
 
             <div
@@ -660,9 +684,11 @@
 </div>
 
 
-<!-- IMPORTANT: CACHE BUST -->
+<!-- =========================
+     SCRIPT
+     ========================= -->
 
-<script src="./script.js?v=1006"></script>
+<script src="./script.js?v=1009"></script>
 
 </body>
 </html>
