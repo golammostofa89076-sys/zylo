@@ -1,14 +1,16 @@
 /* =========================================================
-   ZYLO - COMPLETE FRONTEND ENGINE v1009
+   ZYLO - COMPLETE FRONTEND ENGINE v1010
 
    FAST VIDEO PLAYBACK
    SMART VIDEO LOADING
    AUTO PLAY
    AUTO NEXT
    UPLOAD + PREVIEW
+   BACKEND-PERSISTENT VIDEO UPLOAD
    LIKE + SAVE + COMMENT + SHARE
    MUSIC + FULLSCREEN
-   FOLLOW + SEARCH + PROFILE
+   FOLLOW + FOLLOWING FEED
+   SEARCH + PROFILE
    AUTH BRIDGE
 
    UI / CSS / BUTTON DESIGN IS NOT CHANGED.
@@ -33,19 +35,22 @@
 
     STORAGE: {
       UPLOADED_VIDEOS:
-        "zylo_uploaded_videos_v5",
+        "zylo_uploaded_videos_v6",
 
       LIKES:
-        "zylo_likes_v5",
+        "zylo_likes_v6",
 
       SAVED:
-        "zylo_saved_v5",
+        "zylo_saved_v6",
 
       COMMENTS:
-        "zylo_comments_v5",
+        "zylo_comments_v6",
 
       FOLLOWS:
-        "zylo_follows_v5"
+        "zylo_follows_v6",
+
+      FEED_MODE:
+        "zylo_feed_mode_v1"
     },
 
     VIDEO: {
@@ -67,7 +72,10 @@
 
     UPLOAD: {
       MAX_SIZE:
-        200 * 1024 * 1024
+        200 * 1024 * 1024,
+
+      ENDPOINT:
+        "/api/upload"
     }
   };
 
@@ -220,6 +228,161 @@
 
 
   /* =========================================================
+     URL HELPERS
+     ========================================================= */
+
+  function normalizeVideoURL(
+    value
+  ) {
+    if (!value) {
+      return "";
+    }
+
+    const raw =
+      String(value).trim();
+
+    if (!raw) {
+      return "";
+    }
+
+    /*
+     * Blob/data URLs are local temporary URLs.
+     */
+
+    if (
+      raw.startsWith("blob:") ||
+      raw.startsWith("data:")
+    ) {
+      return raw;
+    }
+
+    /*
+     * Already absolute URL.
+     */
+
+    if (
+      /^https?:\/\//i.test(raw)
+    ) {
+      return raw;
+    }
+
+    /*
+     * Protocol-relative URL.
+     */
+
+    if (
+      raw.startsWith("//")
+    ) {
+      return (
+        window.location.protocol +
+        raw
+      );
+    }
+
+    /*
+     * Backend-relative URL.
+     *
+     * Examples:
+     * /uploads/video.mp4
+     * uploads/video.mp4
+     */
+
+    try {
+      return new URL(
+        raw,
+        CONFIG.API_BASE_URL +
+          "/"
+      ).href;
+    } catch {
+      return raw;
+    }
+  }
+
+
+  function getPermanentVideoURL(
+    result
+  ) {
+    if (!result) {
+      return "";
+    }
+
+    const candidates = [
+      result.url,
+      result.videoUrl,
+      result.videoURL,
+      result.src,
+
+      result.video?.url,
+      result.video?.videoUrl,
+      result.video?.videoURL,
+      result.video?.src,
+
+      result.data?.url,
+      result.data?.videoUrl,
+      result.data?.video?.url,
+
+      result.file?.url,
+      result.upload?.url
+    ];
+
+    for (
+      const candidate of candidates
+    ) {
+      if (
+        typeof candidate ===
+          "string" &&
+        candidate.trim()
+      ) {
+        return normalizeVideoURL(
+          candidate
+        );
+      }
+    }
+
+    return "";
+  }
+
+
+  function getServerVideoId(
+    result
+  ) {
+    if (!result) {
+      return "";
+    }
+
+    const candidates = [
+      result.videoId,
+      result.id,
+
+      result.video?.videoId,
+      result.video?.id,
+
+      result.data?.videoId,
+      result.data?.id,
+
+      result.file?.id
+    ];
+
+    for (
+      const candidate of candidates
+    ) {
+      if (
+        candidate !==
+          undefined &&
+        candidate !== null &&
+        String(candidate).trim()
+      ) {
+        return String(
+          candidate
+        );
+      }
+    }
+
+    return "";
+  }
+
+
+  /* =========================================================
      AUTH
      ========================================================= */
 
@@ -300,7 +463,7 @@
     script.type = "module";
 
     script.src =
-      "./auth.js?v=1009";
+      "./auth.js?v=1010";
 
     script.dataset.zyloAuth =
       "true";
@@ -332,7 +495,9 @@
   function isDefaultVideo(
     source
   ) {
-    if (!source) return false;
+    if (!source) {
+      return false;
+    }
 
     const value =
       String(source)
@@ -369,7 +534,9 @@
       );
 
     if (custom) {
-      return custom;
+      return normalizeVideoURL(
+        custom
+      );
     }
 
     const src =
@@ -379,14 +546,16 @@
       video.src;
 
     if (src) {
-      return src;
+      return normalizeVideoURL(
+        src
+      );
     }
 
     const sourceTag =
       $("source", video);
 
     if (sourceTag) {
-      return (
+      return normalizeVideoURL(
         sourceTag.getAttribute(
           "src"
         ) ||
@@ -425,7 +594,9 @@
   function prepareVideo(
     video
   ) {
-    if (!video) return;
+    if (!video) {
+      return;
+    }
 
     video.muted = true;
     video.defaultMuted = true;
@@ -448,6 +619,7 @@
     );
 
     video.loop = false;
+
     video.removeAttribute(
       "loop"
     );
@@ -510,12 +682,6 @@
     try {
       prepareVideo(video);
 
-      /*
-       * IMPORTANT:
-       * Do NOT reload the same video.
-       * This is the main speed fix.
-       */
-
       const alreadyLoaded =
         sourceMatches(
           video,
@@ -535,11 +701,6 @@
           "auto";
 
         video.load();
-
-        /*
-         * Do not wait 7 seconds.
-         * Metadata/canplay is enough.
-         */
 
         await new Promise(
           (resolve) => {
@@ -616,24 +777,19 @@
               }
             );
 
-            /*
-             * Fast timeout.
-             * We don't block playback for seconds.
-             */
-
             setTimeout(
               () => {
+                if (finished) {
+                  return;
+                }
+
                 if (
-                  !finished
+                  video.readyState >=
+                  1
                 ) {
-                  if (
-                    video.readyState >=
-                    1
-                  ) {
-                    done();
-                  } else {
-                    failed();
-                  }
+                  done();
+                } else {
+                  failed();
                 }
               },
               1800
@@ -677,11 +833,6 @@
         video
       );
 
-    /*
-     * Already working source:
-     * use it immediately.
-     */
-
     if (
       video.currentSrc &&
       video.readyState >= 2
@@ -699,12 +850,8 @@
       Number(
         video.dataset
           .zyloSourceIndex ||
-          0
+        0
       );
-
-    /*
-     * Try current source first.
-     */
 
     for (
       let i = currentIndex;
@@ -726,11 +873,6 @@
         return true;
       }
     }
-
-    /*
-     * If current source failed,
-     * try all sources again.
-     */
 
     for (
       let i = 0;
@@ -774,7 +916,8 @@
       .zyloActive =
       "true";
 
-    video.muted = true;
+    video.muted =
+      true;
 
     try {
       const promise =
@@ -881,6 +1024,26 @@
           return [];
         }
 
+        return $$(".video-page", feed)
+          .filter(
+            (page) =>
+              !page.hidden &&
+              page.style.display !==
+                "none"
+          );
+      }
+
+
+      function getAllPages() {
+        if (!feed) {
+          feed =
+            getFeed();
+        }
+
+        if (!feed) {
+          return [];
+        }
+
         return $$(".video-page", feed);
       }
 
@@ -915,10 +1078,6 @@
           .zyloRegistered =
           "true";
 
-
-        /*
-         * Video ended
-         */
 
         video.addEventListener(
           "ended",
@@ -969,10 +1128,6 @@
         );
 
 
-        /*
-         * Video source error
-         */
-
         video.addEventListener(
           "error",
           async () => {
@@ -985,7 +1140,7 @@
               Number(
                 video.dataset
                   .zyloSourceIndex ||
-                  0
+                0
               );
 
             const nextIndex =
@@ -1025,8 +1180,10 @@
       function pauseAll(
         exceptVideo = null
       ) {
-        pages.forEach(
-          (page) => {
+        getAllPages().forEach(
+          (
+            page
+          ) => {
             const video =
               getVideo(page);
 
@@ -1060,9 +1217,7 @@
       ) {
         refresh();
 
-        if (
-          !pages.length
-        ) {
+        if (!pages.length) {
           return;
         }
 
@@ -1089,10 +1244,6 @@
           index;
 
 
-        /*
-         * Activate page
-         */
-
         pages.forEach(
           (
             item,
@@ -1115,9 +1266,7 @@
             const itemVideo =
               getVideo(item);
 
-            if (
-              itemVideo
-            ) {
+            if (itemVideo) {
               itemVideo.dataset
                 .zyloActive =
                 active
@@ -1136,14 +1285,7 @@
         );
 
 
-        /*
-         * FAST PATH:
-         * If already loaded, play immediately.
-         */
-
-        if (
-          video
-        ) {
+        if (video) {
           let loaded =
             false;
 
@@ -1161,19 +1303,13 @@
               );
           }
 
-          if (
-            loaded
-          ) {
+          if (loaded) {
             await playVideo(
               video
             );
           }
         }
 
-
-        /*
-         * Preload next video
-         */
 
         smartPreload(
           index
@@ -1243,11 +1379,6 @@
             ) {
               video.preload =
                 "metadata";
-
-              /*
-               * Load next video
-               * without blocking current video.
-               */
 
               if (
                 !video.currentSrc
@@ -1346,9 +1477,7 @@
       ) {
         refresh();
 
-        if (
-          !pages.length
-        ) {
+        if (!pages.length) {
           return;
         }
 
@@ -1403,9 +1532,7 @@
       ) {
         refresh();
 
-        if (
-          !pages.length
-        ) {
+        if (!pages.length) {
           return;
         }
 
@@ -1414,9 +1541,7 @@
             ? activeIndex
             : findNearestIndex();
 
-        if (
-          current < 0
-        ) {
+        if (current < 0) {
           return;
         }
 
@@ -1427,9 +1552,7 @@
           nextIndex >=
           pages.length
         ) {
-          if (
-            fromEnded
-          ) {
+          if (fromEnded) {
             console.log(
               "ZYLO: শেষ ভিডিওতে পৌঁছেছে"
             );
@@ -1448,9 +1571,7 @@
       function previous() {
         refresh();
 
-        if (
-          !pages.length
-        ) {
+        if (!pages.length) {
           return;
         }
 
@@ -1459,9 +1580,7 @@
             ? activeIndex
             : findNearestIndex();
 
-        if (
-          current < 0
-        ) {
+        if (current < 0) {
           return;
         }
 
@@ -1506,9 +1625,7 @@
           return;
         }
 
-        if (
-          wheelLocked
-        ) {
+        if (wheelLocked) {
           return;
         }
 
@@ -1569,9 +1686,7 @@
       function handleTouchEnd(
         event
       ) {
-        if (
-          !touching
-        ) {
+        if (!touching) {
           return;
         }
 
@@ -1605,38 +1720,28 @@
           touchStartX;
 
         if (
-          Math.abs(
-            deltaY
-          ) <
-          Math.abs(
-            deltaX
-          )
+          Math.abs(deltaY) <
+          Math.abs(deltaX)
         ) {
           return;
         }
 
         if (
-          Math.abs(
-            deltaY
-          ) <
+          Math.abs(deltaY) <
           CONFIG.VIDEO
             .SWIPE_THRESHOLD
         ) {
           return;
         }
 
-        if (
-          wheelLocked
-        ) {
+        if (wheelLocked) {
           return;
         }
 
         wheelLocked =
           true;
 
-        if (
-          deltaY < 0
-        ) {
+        if (deltaY < 0) {
           next();
         } else {
           previous();
@@ -1668,9 +1773,7 @@
               const index =
                 findNearestIndex();
 
-              if (
-                index < 0
-              ) {
+              if (index < 0) {
                 return;
               }
 
@@ -1741,9 +1844,7 @@
                 }
               );
 
-              if (
-                !best
-              ) {
+              if (!best) {
                 return;
               }
 
@@ -1756,8 +1857,7 @@
                 );
 
               if (
-                index >=
-                  0 &&
+                index >= 0 &&
                 index !==
                   activeIndex &&
                 best.intersectionRatio >=
@@ -1870,9 +1970,7 @@
 
 
       function init() {
-        if (
-          initialized
-        ) {
+        if (initialized) {
           refresh();
           return;
         }
@@ -1952,10 +2050,6 @@
         if (
           initialIndex >= 0
         ) {
-          /*
-           * Start almost immediately.
-           */
-
           setTimeout(
             () => {
               activate(
@@ -1972,7 +2066,7 @@
 
 
         console.log(
-          "ZYLO Video Engine v1009 initialized"
+          "ZYLO Video Engine v1010 initialized"
         );
       }
 
@@ -1981,6 +2075,7 @@
         init,
         refresh,
         getPages,
+        getAllPages,
         getActiveIndex:
           () => activeIndex,
         activate,
@@ -2068,9 +2163,7 @@
         page
       );
 
-    if (
-      index >= 0
-    ) {
+    if (index >= 0) {
       setTimeout(
         () => {
           VideoEngine.scrollToPage(
@@ -2195,9 +2288,7 @@
             id
           );
 
-        if (
-          index >= 0
-        ) {
+        if (index >= 0) {
           likes.splice(
             index,
             1
@@ -2301,9 +2392,7 @@
             id
           );
 
-        if (
-          index >= 0
-        ) {
+        if (index >= 0) {
           saved.splice(
             index,
             1
@@ -2345,9 +2434,7 @@
     return value &&
       typeof value ===
         "object" &&
-      !Array.isArray(
-        value
-      )
+      !Array.isArray(value)
       ? value
       : {};
   }
@@ -2999,9 +3086,7 @@
             );
 
 
-          if (
-            index >= 0
-          ) {
+          if (index >= 0) {
             follows.splice(
               index,
               1
@@ -3029,6 +3114,8 @@
             CONFIG.STORAGE.FOLLOWS,
             follows
           );
+
+          applyFollowingFilter();
         }
       );
     }
@@ -3084,7 +3171,7 @@
 
     const creatorPages =
       VideoEngine
-        .getPages()
+        .getAllPages()
         .filter(
           (
             item
@@ -3119,21 +3206,28 @@
         itemButton.addEventListener(
           "click",
           () => {
-            const index =
+            const all =
               VideoEngine
-                .getPages()
-                .indexOf(
-                  item
-                );
+                .getAllPages();
 
-            if (
-              index >= 0
-            ) {
+            const index =
+              all.indexOf(
+                item
+              );
+
+            if (index >= 0) {
               panel.remove();
 
-              VideoEngine.scrollToPage(
-                index,
-                "smooth"
+              showForYouMode();
+
+              setTimeout(
+                () => {
+                  VideoEngine.scrollToPage(
+                    index,
+                    "smooth"
+                  );
+                },
+                50
               );
             }
           }
@@ -3285,7 +3379,7 @@
 
         const pages =
           VideoEngine
-            .getPages()
+            .getAllPages()
             .filter(
               (
                 page
@@ -3347,21 +3441,28 @@
             item.addEventListener(
               "click",
               () => {
-                const index =
+                const all =
                   VideoEngine
-                    .getPages()
-                    .indexOf(
-                      page
-                    );
+                    .getAllPages();
 
-                if (
-                  index >= 0
-                ) {
+                const index =
+                  all.indexOf(
+                    page
+                  );
+
+                if (index >= 0) {
                   overlay.remove();
 
-                  VideoEngine.scrollToPage(
-                    index,
-                    "smooth"
+                  showForYouMode();
+
+                  setTimeout(
+                    () => {
+                      VideoEngine.scrollToPage(
+                        index,
+                        "smooth"
+                      );
+                    },
+                    50
                   );
                 }
               }
@@ -3524,6 +3625,23 @@
       } catch {}
 
 
+      if (
+        previewVideo.dataset
+          .zyloObjectURL
+      ) {
+        try {
+          URL.revokeObjectURL(
+            previewVideo.dataset
+              .zyloObjectURL
+          );
+        } catch {}
+
+        delete previewVideo
+          .dataset
+          .zyloObjectURL;
+      }
+
+
       previewVideo.removeAttribute(
         "src"
       );
@@ -3541,11 +3659,6 @@
      ========================================================= */
 
   function setupCreateButton() {
-    /*
-     * Capture phase makes this work even when
-     * other click handlers exist.
-     */
-
     document.addEventListener(
       "click",
       (
@@ -3616,8 +3729,6 @@
 
     /*
      * SELECT VIDEO
-     *
-     * Directly opens phone picker.
      */
 
     document.addEventListener(
@@ -3652,12 +3763,6 @@
           return;
         }
 
-
-        /*
-         * Reset value first.
-         * This allows selecting the same
-         * video again.
-         */
 
         input.value =
           "";
@@ -3754,10 +3859,6 @@
           preview &&
           previewVideo
         ) {
-          /*
-           * Release previous preview URL.
-           */
-
           if (
             previewVideo.dataset
               .zyloObjectURL
@@ -3860,9 +3961,22 @@
 
 
         try {
-          await uploadVideo(
-            file
+          const result =
+            await uploadVideo(
+              file
+            );
+
+
+          /*
+           * IMPORTANT:
+           * Upload succeeded.
+           */
+
+          console.log(
+            "ZYLO upload complete:",
+            result
           );
+
         } catch (
           error
         ) {
@@ -3876,6 +3990,7 @@
             error?.message ||
             "Video upload failed."
           );
+
         } finally {
           button.disabled =
             false;
@@ -3901,6 +4016,27 @@
 
 
     if (!feed) {
+      return null;
+    }
+
+
+    const permanentURL =
+      normalizeVideoURL(
+        data.url ||
+        data.serverURL
+      );
+
+
+    if (
+      !permanentURL ||
+      permanentURL.startsWith(
+        "blob:"
+      )
+    ) {
+      console.warn(
+        "ZYLO: refusing to create feed page without permanent video URL."
+      );
+
       return null;
     }
 
@@ -3993,11 +4129,11 @@
 
     video.dataset
       .zyloOriginal =
-      data.url;
+      permanentURL;
 
 
     video.src =
-      data.url;
+      permanentURL;
 
 
     page.appendChild(
@@ -4015,7 +4151,7 @@
 
 
   /* =========================================================
-     UPLOAD VIDEO
+     UPLOAD VIDEO - v1010
      ========================================================= */
 
   async function uploadVideo(
@@ -4057,6 +4193,12 @@
       getUsername();
 
 
+    /*
+     * Guest upload is not blocked here.
+     * Backend can decide whether authentication
+     * is required.
+     */
+
     const formData =
       new FormData();
 
@@ -4079,116 +4221,135 @@
     );
 
 
-    let serverURL =
-      "";
+    const endpoint =
+      `${CONFIG.API_BASE_URL}` +
+      `${CONFIG.UPLOAD.ENDPOINT}`;
 
 
-    let serverVideoId =
-      "";
+    let response;
 
-
-    /*
-     * BACKEND UPLOAD
-     */
 
     try {
-      const response =
+      response =
         await fetch(
-          `${CONFIG.API_BASE_URL}/api/upload`,
+          endpoint,
           {
             method:
               "POST",
 
             body:
-              formData
+              formData,
+
+            headers: {
+              Accept:
+                "application/json"
+            }
           }
         );
-
-
-      let result =
-        {};
-
-
-      try {
-        result =
-          await response.json();
-      } catch {
-        result =
-          {};
-      }
-
-
-      if (
-        response.ok &&
-        result
-      ) {
-        serverURL =
-          result.url ||
-          result.videoUrl ||
-          result.video?.url ||
-          "";
-
-
-        serverVideoId =
-          result.videoId ||
-          result.video?.videoId ||
-          "";
-      }
-
-
-      if (
-        !serverURL
-      ) {
-        throw new Error(
-          result?.message ||
-          "Server did not return a video URL."
-        );
-      }
-
-
-      console.log(
-        "ZYLO: video uploaded successfully"
-      );
     } catch (
       error
     ) {
-      console.warn(
-        "ZYLO server upload failed:",
-        error
+      throw new Error(
+        "ZYLO server is unreachable. Please check the backend and try again."
       );
+    }
 
 
-      /*
-       * Backend unavailable:
-       * keep local preview working.
-       */
+    let result =
+      {};
 
-      serverURL =
-        "";
+
+    const responseText =
+      await response.text();
+
+
+    if (responseText) {
+      try {
+        result =
+          JSON.parse(
+            responseText
+          );
+      } catch {
+        result = {
+          raw:
+            responseText
+        };
+      }
     }
 
 
     /*
-     * Local blob URL
+     * HTTP error
      */
 
-    const localURL =
-      URL.createObjectURL(
-        file
+    if (!response.ok) {
+      const serverMessage =
+        result?.message ||
+        result?.error ||
+        result?.raw ||
+        `Upload failed with HTTP ${response.status}.`;
+
+      throw new Error(
+        String(
+          serverMessage
+        )
+      );
+    }
+
+
+    /*
+     * IMPORTANT:
+     * The backend MUST return a permanent URL.
+     *
+     * No Blob fallback.
+     */
+
+    const serverURL =
+      getPermanentVideoURL(
+        result
       );
 
 
-    const finalURL =
-      serverURL ||
-      localURL;
+    if (!serverURL) {
+      console.error(
+        "ZYLO: backend response did not contain a video URL.",
+        result
+      );
+
+      throw new Error(
+        "Upload reached the server, but the server did not return a permanent video URL."
+      );
+    }
+
+
+    /*
+     * Blob URL must NEVER be stored
+     * as the uploaded video's permanent URL.
+     */
+
+    if (
+      serverURL.startsWith(
+        "blob:"
+      )
+    ) {
+      throw new Error(
+        "Server returned a temporary Blob URL. A permanent video URL is required."
+      );
+    }
+
+
+    const serverVideoId =
+      getServerVideoId(
+        result
+      ) ||
+      makeId(
+        "video"
+      );
 
 
     const videoData = {
       id:
-        serverVideoId ||
-        makeId(
-          "video"
-        ),
+        serverVideoId,
 
       uid,
 
@@ -4198,7 +4359,7 @@
         file.name,
 
       url:
-        finalURL,
+        serverURL,
 
       serverURL,
 
@@ -4207,6 +4368,10 @@
     };
 
 
+    /*
+     * Save ONLY after backend success.
+     */
+
     const uploads =
       getStorage(
         CONFIG.STORAGE.UPLOADED_VIDEOS,
@@ -4214,9 +4379,29 @@
       );
 
 
-    uploads.unshift(
-      videoData
-    );
+    const existingIndex =
+      uploads.findIndex(
+        (
+          item
+        ) =>
+          item?.id ===
+          videoData.id
+      );
+
+
+    if (
+      existingIndex >=
+      0
+    ) {
+      uploads[
+        existingIndex
+      ] =
+        videoData;
+    } else {
+      uploads.unshift(
+        videoData
+      );
+    }
 
 
     setStorage(
@@ -4226,7 +4411,7 @@
 
 
     /*
-     * Add new video to feed
+     * Add permanent video to feed.
      */
 
     const page =
@@ -4235,49 +4420,69 @@
       );
 
 
+    if (!page) {
+      throw new Error(
+        "Upload succeeded, but the video could not be added to the feed."
+      );
+    }
+
+
     VideoEngine.refresh();
 
 
-    if (page) {
-      const index =
-        VideoEngine
-          .getPages()
-          .indexOf(
-            page
+    const index =
+      VideoEngine
+        .getPages()
+        .indexOf(
+          page
+        );
+
+
+    if (index >= 0) {
+      VideoEngine.scrollToPage(
+        index,
+        "smooth"
+      );
+
+      setTimeout(
+        () => {
+          VideoEngine.activate(
+            index,
+            {
+              updateHash:
+                true
+            }
           );
-
-
-      if (
-        index >= 0
-      ) {
-        /*
-         * First scroll.
-         * Then activate.
-         */
-
-        VideoEngine.scrollToPage(
-          index,
-          "smooth"
-        );
-
-
-        setTimeout(
-          () => {
-            VideoEngine.activate(
-              index,
-              {
-                updateHash:
-                  true
-              }
-            );
-          },
-          250
-        );
-      }
+        },
+        250
+      );
     }
 
 
     closeUploadBox();
+
+
+    /*
+     * Notify other ZYLO modules.
+     */
+
+    try {
+      window.dispatchEvent(
+        new CustomEvent(
+          "zylo:videouploaded",
+          {
+            detail:
+              videoData
+          }
+        )
+      );
+    } catch {}
+
+
+    console.log(
+      "ZYLO: permanent video upload successful:",
+      serverURL
+    );
 
 
     return videoData;
@@ -4349,17 +4554,20 @@
 
 
           const url =
-            data.serverURL ||
-            data.url;
+            normalizeVideoURL(
+              data.serverURL ||
+              data.url
+            );
 
 
           /*
-           * Blob URLs don't survive reload.
+           * Never restore temporary
+           * Blob URLs.
            */
 
           if (
             !url ||
-            String(url).startsWith(
+            url.startsWith(
               "blob:"
             )
           ) {
@@ -4373,6 +4581,125 @@
           });
         }
       );
+  }
+
+
+  /* =========================================================
+     FOLLOWING FILTER
+     ========================================================= */
+
+  function getFollowingUIDs() {
+    const follows =
+      getStorage(
+        CONFIG.STORAGE.FOLLOWS,
+        []
+      );
+
+    return Array.isArray(
+      follows
+    )
+      ? follows
+      : [];
+  }
+
+
+  function applyFollowingFilter() {
+    const follows =
+      getFollowingUIDs();
+
+
+    const allPages =
+      VideoEngine.getAllPages();
+
+
+    allPages.forEach(
+      (
+        page
+      ) => {
+        const creator =
+          getCreatorData(
+            page
+          );
+
+        const match =
+          follows.includes(
+            creator.uid
+          );
+
+
+        page.dataset
+          .followingMatch =
+          match
+            ? "true"
+            : "false";
+
+
+        page.hidden =
+          !match;
+
+
+        page.style.display =
+          match
+            ? ""
+            : "none";
+      }
+    );
+
+
+    VideoEngine.refresh();
+
+
+    const pages =
+      VideoEngine.getPages();
+
+
+    if (
+      pages.length
+    ) {
+      VideoEngine.scrollToPage(
+        0,
+        "auto"
+      );
+    }
+  }
+
+
+  function showForYouMode() {
+    setStorage(
+      CONFIG.STORAGE.FEED_MODE,
+      "for-you"
+    );
+
+
+    const allPages =
+      VideoEngine.getAllPages();
+
+
+    allPages.forEach(
+      (
+        page
+      ) => {
+        page.hidden =
+          false;
+
+        page.style.display =
+          "";
+      }
+    );
+
+
+    VideoEngine.refresh();
+
+
+    if (
+      VideoEngine.getPages()
+        .length
+    ) {
+      VideoEngine.scrollToPage(
+        0,
+        "auto"
+      );
+    }
   }
 
 
@@ -4413,13 +4740,7 @@
           event.preventDefault();
 
 
-          VideoEngine.refresh();
-
-
-          VideoEngine.scrollToPage(
-            0,
-            "smooth"
-          );
+          showForYouMode();
 
 
           return;
@@ -4468,32 +4789,9 @@
           type ===
           "for-you"
         ) {
-          $$(".video-page")
-            .forEach(
-              (
-                page
-              ) => {
-                page.hidden =
-                  false;
+          event.preventDefault();
 
-                page.style.display =
-                  "";
-              }
-            );
-
-
-          VideoEngine.refresh();
-
-
-          setTimeout(
-            () => {
-              VideoEngine.scrollToPage(
-                0,
-                "auto"
-              );
-            },
-            50
-          );
+          showForYouMode();
         }
 
 
@@ -4501,47 +4799,14 @@
           type ===
           "following"
         ) {
-          const follows =
-            getStorage(
-              CONFIG.STORAGE.FOLLOWS,
-              []
-            );
+          event.preventDefault();
 
+          setStorage(
+            CONFIG.STORAGE.FEED_MODE,
+            "following"
+          );
 
-          /*
-           * Keep all videos mounted.
-           */
-
-          $$(".video-page")
-            .forEach(
-              (
-                page
-              ) => {
-                page.hidden =
-                  false;
-
-                page.style.display =
-                  "";
-
-
-                const creator =
-                  getCreatorData(
-                    page
-                  );
-
-
-                page.dataset
-                  .followingMatch =
-                  follows.includes(
-                    creator.uid
-                  )
-                    ? "true"
-                    : "false";
-              }
-            );
-
-
-          VideoEngine.refresh();
+          applyFollowingFilter();
         }
       }
     );
@@ -4560,7 +4825,7 @@
           document.hidden
         ) {
           VideoEngine
-            .getPages()
+            .getAllPages()
             .forEach(
               (
                 page
@@ -4587,9 +4852,7 @@
             .getActiveIndex();
 
 
-        if (
-          index >= 0
-        ) {
+        if (index >= 0) {
           VideoEngine.activate(
             index,
             {
@@ -4692,7 +4955,8 @@
 
 
     /*
-     * Restore videos BEFORE engine starts.
+     * Restore permanent uploads
+     * BEFORE engine starts.
      */
 
     restoreUploadedVideos();
@@ -4741,6 +5005,32 @@
 
 
     /*
+     * Restore last feed mode.
+     */
+
+    const savedMode =
+      getStorage(
+        CONFIG.STORAGE.FEED_MODE,
+        "for-you"
+      );
+
+
+    if (
+      savedMode ===
+      "following"
+    ) {
+      setTimeout(
+        () => {
+          applyFollowingFilter();
+        },
+        100
+      );
+    } else {
+      showForYouMode();
+    }
+
+
+    /*
      * Hash
      */
 
@@ -4773,6 +5063,24 @@
       "zylo:authloaded",
       () => {
         VideoEngine.refresh();
+
+        /*
+         * Auth identity can change creator
+         * information, so refresh feed state.
+         */
+
+        const mode =
+          getStorage(
+            CONFIG.STORAGE.FEED_MODE,
+            "for-you"
+          );
+
+        if (
+          mode ===
+          "following"
+        ) {
+          applyFollowingFilter();
+        }
       }
     );
 
@@ -4806,7 +5114,7 @@
 
 
     console.log(
-      "ZYLO frontend initialized - v1009"
+      "ZYLO frontend initialized - v1010"
     );
   }
 
@@ -4852,7 +5160,11 @@
 
     getUserUID,
 
-    getUsername
+    getUsername,
+
+    normalizeVideoURL,
+
+    getPermanentVideoURL
   };
 
 })();
