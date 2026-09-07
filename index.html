@@ -30,15 +30,30 @@
 
         <div class="top-tabs">
 
-            <button class="top-tab live-tab">
+            <button
+                class="top-tab live-tab"
+                data-feed-tab="live"
+                aria-label="LIVE"
+                type="button"
+            >
                 LIVE
             </button>
 
-            <button class="top-tab">
+            <button
+                class="top-tab"
+                data-feed-tab="following"
+                aria-label="Following"
+                type="button"
+            >
                 Following
             </button>
 
-            <button class="top-tab active">
+            <button
+                class="top-tab active"
+                data-feed-tab="for-you"
+                aria-label="For You"
+                type="button"
+            >
                 For You
             </button>
 
@@ -72,7 +87,9 @@
 
     <main class="video-feed">
 
-        <!-- VIDEO 1 -->
+        <!-- =========================
+             VIDEO 1
+             ========================= -->
 
         <section
             class="video-page"
@@ -83,12 +100,15 @@
         >
 
             <video
+                id="video-video1"
                 src="./backend/uploads/video1.mp4"
                 autoplay
                 muted
                 playsinline
                 webkit-playsinline
                 preload="auto"
+                disablepictureinpicture
+                controlslist="nodownload noplaybackrate"
             ></video>
 
             <div class="video-overlay"></div>
@@ -196,7 +216,7 @@
                         aria-hidden="true"
                     >
                         <path d="M21 3 10.5 13.5"></path>
-                        <path d="m21 3-6.7 18-3.8-7.5L3 9.7 21 3Z"></path>
+                        <path d="M21 3 14.3 21 10.5 13.5 3 9.7 21 3Z"></path>
                     </svg>
 
                     <span class="action-label">
@@ -264,7 +284,9 @@
         </section>
 
 
-        <!-- VIDEO 2 -->
+        <!-- =========================
+             VIDEO 2
+             ========================= -->
 
         <section
             class="video-page"
@@ -275,12 +297,15 @@
         >
 
             <video
+                id="video-video2"
                 src="./backend/uploads/video1.mp4"
                 autoplay
                 muted
                 playsinline
                 webkit-playsinline
                 preload="auto"
+                disablepictureinpicture
+                controlslist="nodownload noplaybackrate"
             ></video>
 
             <div class="video-overlay"></div>
@@ -388,7 +413,7 @@
                         aria-hidden="true"
                     >
                         <path d="M21 3 10.5 13.5"></path>
-                        <path d="m21 3-6.7 18-3.8-7.5L3 9.7 21 3Z"></path>
+                        <path d="M21 3 14.3 21 10.5 13.5 3 9.7 21 3Z"></path>
                     </svg>
 
                     <span class="action-label">
@@ -630,13 +655,6 @@
             </button>
 
 
-            <!--
-                IMPORTANT:
-                The modal no longer has a second file input.
-                The single #videoInput above is used by the upload system.
-            -->
-
-
             <div
                 id="uploadPreview"
                 class="upload-preview"
@@ -685,7 +703,7 @@
 
 
 <!-- =========================
-     SCRIPT
+     ZYLO FRONTEND SCRIPT
      ========================= -->
 
 <script src="./script.js?v=1013"></script>
