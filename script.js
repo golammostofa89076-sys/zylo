@@ -1029,78 +1029,8 @@
       try {
         const result = await zyloAPI(`/api/videos/${encodeURIComponent(id)}/comments`, {
           method: "POST",
-          body: JSON.stringify({
-            uid: getUserUID(),
-            username: getUsername(),
-            text
-          })
-        });
 
-        const all = getComments();
-        if (!Array.isArray(all[id])) all[id] = [];
-        if (result.comment) all[id].push(result.comment);
-        setComments(all);
-        input.value = "";
-        openComments(button);
-
-        const page = button.closest(".video-page");
-        setButtonCount($(".comment-btn,[aria-label=\"Comments\"]", page), result.commentCount);
-      } catch (error) {
-        console.warn("ZYLO comment backend sync failed:", error.message);
-      }
-    });
-
-    $("[data-zylo-comment-close]", panel)?.addEventListener(
-      "click",
-      closeCommentPanel
-    );
-
-    input.focus();
-  }
-
-  function setupCommentButtons() {
-    document.addEventListener("click", (event) => {
-      const button = event.target.closest(
-        '[aria-label="Comments"],.comment-btn'
-      );
-
-      if (!button) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      openComments(button);
-    });
-  }
-
-  /* =========================================================
-     SHARE
-     ========================================================= */
-
-  async function shareVideo(button) {
-    const page = button.closest(".video-page");
-    const id = page?.dataset?.videoId || "";
-    const url = `${window.location.origin}${window.location.pathname}#video-${encodeURIComponent(id)}`;
-
-    try {
-      let shared = false;
-      if (navigator.share) {
-        await navigator.share({ title: "ZYLO", text: "Watch this video on ZYLO", url });
-        shared = true;
-      } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(url);
-        button.classList.add("active");
-        window.setTimeout(() => button.classList.remove("active"), 1200);
-        shared = true;
-      }
-
-      if (shared && id) {
-        try {
-          const data = await zyloAPI(`/api/videos/${encodeURIComponent(id)}/share`, {
-            method: "POST",
-
-
-                         body: JSON.stringify({ uid: getUserUID() })
+                       body: JSON.stringify({ uid: getUserUID() })
           });
           setButtonCount(button, data.shareCount);
         } catch (error) {
@@ -1583,7 +1513,6 @@
     if (old) old.remove();
 
     const nativeInput = $("#videoInput");
-
     uploadState = {
       file: null,
       previewURL: "",
@@ -1598,7 +1527,6 @@
 
     const studio = document.createElement("div");
     studio.id = "zyloUploadStudio";
-
     studio.innerHTML = `
       <div class="zylo-upload-card" role="dialog" aria-modal="true" aria-label="Create a post">
         <div class="zylo-upload-head">
@@ -1639,7 +1567,6 @@
           <button type="button" class="zylo-upload-btn zylo-upload-secondary" data-upload-close>Cancel</button>
           <button type="button" class="zylo-upload-btn zylo-upload-primary" id="zyloPostVideo" disabled>Post</button>
         </div>
-
         <div class="zylo-upload-status" id="zyloUploadStatus"></div>
         <div class="zylo-upload-progress" id="zyloUploadProgress"><span></span></div>
       </div>
@@ -1664,52 +1591,31 @@
       }
     }
 
-    $("#zyloChooseVideo", studio)?.addEventListener(
-      "click",
-      chooseVideo
-    );
+    $("#zyloChooseVideo", studio)?.addEventListener("click", chooseVideo);
 
-    $("#zyloUploadCaption", studio)?.addEventListener(
-      "input",
-      (e) => {
-        uploadState.caption = e.target.value;
-      }
-    );
+    $("#zyloUploadCaption", studio)?.addEventListener("input", (e) => {
+      uploadState.caption = e.target.value;
+    });
 
-    $("#zyloUploadHashtags", studio)?.addEventListener(
-      "input",
-      (e) => {
-        uploadState.hashtags = e.target.value;
-      }
-    );
+    $("#zyloUploadHashtags", studio)?.addEventListener("input", (e) => {
+      uploadState.hashtags = e.target.value;
+    });
 
-    $("#zyloUploadPrivacy", studio)?.addEventListener(
-      "change",
-      (e) => {
-        uploadState.privacy = e.target.value;
-      }
-    );
+    $("#zyloUploadPrivacy", studio)?.addEventListener("change", (e) => {
+      uploadState.privacy = e.target.value;
+    });
 
-    $("#zyloAllowComments", studio)?.addEventListener(
-      "change",
-      (e) => {
-        uploadState.allowComments = e.target.checked;
-      }
-    );
+    $("#zyloAllowComments", studio)?.addEventListener("change", (e) => {
+      uploadState.allowComments = e.target.checked;
+    });
 
-    $("#zyloAllowSave", studio)?.addEventListener(
-      "change",
-      (e) => {
-        uploadState.allowSave = e.target.checked;
-      }
-    );
+    $("#zyloAllowSave", studio)?.addEventListener("change", (e) => {
+      uploadState.allowSave = e.target.checked;
+    });
 
-    $("#zyloAllowShare", studio)?.addEventListener(
-      "change",
-      (e) => {
-        uploadState.allowShare = e.target.checked;
-      }
-    );
+    $("#zyloAllowShare", studio)?.addEventListener("change", (e) => {
+      uploadState.allowShare = e.target.checked;
+    });
 
     $("[data-upload-close]", studio)?.addEventListener(
       "click",
@@ -1740,7 +1646,6 @@
           allowComments: uploadState.allowComments,
           allowSave: uploadState.allowSave,
           allowShare: uploadState.allowShare,
-
           onProgress: (value) => {
             progressBar.style.width =
               `${Math.max(15, Math.min(95, value))}%`;
@@ -1824,7 +1729,8 @@
 
   function setUploadedPageText(page, data) {
     const username =
-      data.username || getUsername();
+      data.username ||
+      getUsername();
 
     const title =
       data.caption ||
@@ -1884,9 +1790,7 @@
     }
 
     page.dataset.title = title;
-    page.dataset.description =
-      `${title} ${hashtags}`;
-
+    page.dataset.description = `${title} ${hashtags}`;
     page.dataset.privacy =
       data.privacy || "Everyone";
 
@@ -1917,10 +1821,12 @@
     page.dataset.videoId = data.id;
 
     page.dataset.creatorUid =
-      data.uid || getUserUID();
+      data.uid ||
+      getUserUID();
 
     page.dataset.creatorUsername =
-      data.username || getUsername();
+      data.username ||
+      getUsername();
 
     page.dataset.uploaded = "true";
     page.dataset.active = "false";
@@ -1938,10 +1844,13 @@
     video.removeAttribute("loop");
     video.loop = false;
     video.src = source;
+
     video.muted = true;
     video.playsInline = true;
+
     video.setAttribute("playsinline", "");
     video.setAttribute("muted", "");
+
     video.preload = "metadata";
     video.removeAttribute("autoplay");
 
@@ -1969,30 +1878,35 @@
 
     const uid = getUserUID();
     const username = getUsername();
-    const localURL = URL.createObjectURL(file);
+
+    const localURL =
+      URL.createObjectURL(file);
 
     const formData = new FormData();
 
     formData.append("video", file);
     formData.append("uid", uid);
     formData.append("username", username);
-    formData.append("caption", options.caption || "");
-    formData.append("hashtags", options.hashtags || "");
+    formData.append(
+      "caption",
+      options.caption || ""
+    );
+    formData.append(
+      "hashtags",
+      options.hashtags || ""
+    );
     formData.append(
       "privacy",
       options.privacy || "Everyone"
     );
-
     formData.append(
       "allowComments",
       String(options.allowComments !== false)
     );
-
     formData.append(
       "allowSave",
       String(options.allowSave !== false)
     );
-
     formData.append(
       "allowShare",
       String(options.allowShare !== false)
@@ -2004,7 +1918,8 @@
     try {
       const result = await new Promise(
         (resolve, reject) => {
-          const xhr = new XMLHttpRequest();
+          const xhr =
+            new XMLHttpRequest();
 
           xhr.open(
             "POST",
@@ -2021,10 +1936,12 @@
             (event) => {
               if (
                 event.lengthComputable &&
-                typeof options.onProgress === "function"
+                typeof options.onProgress ===
+                  "function"
               ) {
                 options.onProgress(
-                  (event.loaded / event.total) * 100
+                  (event.loaded / event.total) *
+                    100
                 );
               }
             };
@@ -2088,7 +2005,12 @@
       /*
        * Accept the common response shapes used by
        * the ZYLO backend.
+       *
+       * This keeps the frontend compatible if the API
+       * returns the video object directly or wraps it
+       * inside data/video/result.
        */
+
       const payload =
         result?.data ||
         result?.result ||
@@ -2125,9 +2047,10 @@
       }
 
       /*
-       * Convert a relative backend URL into
-       * a browser-usable absolute URL.
+       * Convert a relative backend URL into a
+       * browser-usable absolute URL.
        */
+
       try {
         serverURL =
           new URL(
@@ -2135,14 +2058,11 @@
             CONFIG.API_BASE_URL + "/"
           ).href;
       } catch {
-        serverURL = String(serverURL);
+        serverURL =
+          String(serverURL);
       }
-
     } catch (error) {
-      try {
-        URL.revokeObjectURL(localURL);
-      } catch {}
-
+      URL.revokeObjectURL(localURL);
       throw error;
     }
 
@@ -2155,11 +2075,9 @@
 
       username,
 
-      name:
-        file.name,
+      name: file.name,
 
-      url:
-        serverURL,
+      url: serverURL,
 
       serverURL,
 
@@ -2204,7 +2122,9 @@
     );
 
     const page =
-      createUploadedPage(videoData);
+      createUploadedPage(
+        videoData
+      );
 
     VideoEngine.refresh();
 
@@ -2223,7 +2143,9 @@
     }
 
     try {
-      URL.revokeObjectURL(localURL);
+      URL.revokeObjectURL(
+        localURL
+      );
     } catch {}
 
     closeUploadBox();
@@ -2245,15 +2167,13 @@
       !studio ||
       !preview ||
       !file
-    ) return;
-
-    if (
-      !file.type.startsWith("video/")
     ) {
+      return;
+    }
+
+    if (!file.type.startsWith("video/")) {
       preview.innerHTML =
-        `<div class="zylo-upload-placeholder">
-          Please choose a video file.
-        </div>`;
+        `<div class="zylo-upload-placeholder">Please choose a video file.</div>`;
 
       uploadState.file = null;
 
@@ -2339,7 +2259,9 @@
     if (
       !Array.isArray(uploads) ||
       !uploads.length
-    ) return;
+    ) {
+      return;
+    }
 
     const feed = getFeed();
 
@@ -2356,9 +2278,15 @@
       );
 
     /*
-     * Uploaded videos are restored only when
-     * a valid server URL exists.
+     * Uploaded videos are restored only when a
+     * valid server URL exists.
+     *
+     * This prevents broken/empty video cards from
+     * being inserted after a page refresh.
+     *
+     * The existing feed/UI remains untouched.
      */
+
     [...uploads]
       .reverse()
       .forEach((data) => {
@@ -2376,8 +2304,7 @@
           createUploadedPage({
             ...data,
 
-            id:
-              String(data.id),
+            id: String(data.id),
 
             uid:
               data.uid ||
@@ -2408,7 +2335,9 @@
           isInteractiveTarget(
             event.target
           )
-        ) return;
+        ) {
+          return;
+        }
 
         const video =
           event.target.closest(
@@ -2485,13 +2414,16 @@
           isInteractiveTarget(
             event.target
           )
-        ) return;
+        ) {
+          return;
+        }
 
         if (
           event.key === "ArrowDown" ||
           event.key === "PageDown"
         ) {
           event.preventDefault();
+
           VideoEngine.next();
         }
 
@@ -2500,6 +2432,7 @@
           event.key === "PageUp"
         ) {
           event.preventDefault();
+
           VideoEngine.previous();
         }
 
@@ -2543,6 +2476,7 @@
     setupSaveButtons();
     setupCommentButtons();
     setupShareButtons();
+
     setupMusicButtons();
     setupFullscreenButtons();
     setupDoubleTapLike();
@@ -2598,7 +2532,9 @@
     document.addEventListener(
       "DOMContentLoaded",
       initializeZYLO,
-      { once: true }
+      {
+        once: true
+      }
     );
   } else {
     initializeZYLO();
@@ -2613,11 +2549,17 @@
 
   window.ZYLO = {
     VideoEngine,
+
     openUploadBox,
+
     closeUploadBox,
+
     uploadVideo,
+
     getCurrentUser,
+
     getUserUID,
+
     getUsername
   };
 
