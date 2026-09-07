@@ -3990,3 +3990,76 @@
       }
     );
   }
+
+   /* =========================================================
+     INITIALIZATION
+     ========================================================= */
+
+  function initializeZYLO() {
+    loadAuthJS();
+
+    restoreUploadedVideos();
+
+    VideoEngine.init();
+
+    setupLikeButtons();
+    setupSaveButtons();
+    setupCommentButtons();
+    setupShareButtons();
+    setupMusicButtons();
+    setupFullscreenButtons();
+    setupDoubleTapLike();
+    setupCreatorProfileButtons();
+
+    setupNavigation();
+    setupSearch();
+
+    setupCreateButton();
+    setupUploadCloseButtons();
+    setupUploadInput();
+
+    setupVideoClick();
+    setupVisibilityHandling();
+    setupKeyboardNavigation();
+
+    openHashVideo();
+
+    window.addEventListener("hashchange", openHashVideo);
+
+    window.addEventListener("resize", () => {
+      VideoEngine.refresh();
+    });
+
+    window.addEventListener("zylo:authloaded", () => {
+      VideoEngine.refresh();
+    });
+
+    console.log("ZYLO frontend initialized");
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeZYLO,
+      { once: true }
+    );
+  } else {
+    initializeZYLO();
+  }
+
+  /* =========================================================
+     GLOBAL API
+     ========================================================= */
+
+  window.ZYLOVideoEngine = VideoEngine;
+
+  window.ZYLO = {
+    VideoEngine,
+    openUploadBox,
+    closeUploadBox,
+    uploadVideo,
+    getCurrentUser,
+    getUserUID,
+    getUsername
+  };
+})();
