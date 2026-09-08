@@ -1584,3 +1584,43 @@ html.zylo-overlay-open,
 body.zylo-overlay-open {
   overflow: hidden !important;
 }
+
+
+/* =========================================================
+   ZYLO COMMENT — FORCE VISIBLE BOTTOM SHEET
+   ========================================================= */
+
+.zylo-comment-panel {
+  display: flex !important;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  z-index: 999999 !important;
+  align-items: flex-end !important;
+  justify-content: stretch !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+
+  background: rgba(0,0,0,.58) !important;
+}
+
+.zylo-comment-panel .zylo-comment-inner {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+
+  width: 100% !important;
+  height: 72dvh !important;
+  min-height: 300px !important;
+
+  background: #fff !important;
+  color: #111 !important;
+
+  border-radius: 18px 18px 0 0 !important;
+  overflow: hidden !important;
+
+  transform: translateY(0) !important;
+}
