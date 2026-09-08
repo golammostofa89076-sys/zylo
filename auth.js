@@ -14,13 +14,17 @@ import {
   doc,
   getDoc,
   setDoc,
+  deleteDoc,
+  getDocs,
+  query,
+  where,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 
 /* =========================================================
-   ZYLO AUTH + PROFILE SYSTEM
-   Version: PROFILE-01
+   ZYLO AUTH + PROFILE + FIRESTORE FOLLOW SYSTEM
+   Version: PROFILE-02
    ========================================================= */
 
 
@@ -801,6 +805,7 @@ document.head.appendChild(style);
    ========================================================= */
 
 function closeAllZYLOOverlays() {
+
   document
     .querySelectorAll(
       ".zylo-auth-overlay, .zylo-profile-overlay"
@@ -808,39 +813,50 @@ function closeAllZYLOOverlays() {
     .forEach(element => {
       element.remove();
     });
+
 }
 
 
 function closeProfileOverlaysOnly() {
+
   document
-    .querySelectorAll(".zylo-profile-overlay")
+    .querySelectorAll(
+      ".zylo-profile-overlay"
+    )
     .forEach(element => {
       element.remove();
     });
+
 }
 
 
 function escapeHtml(value) {
+
   return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+
 }
 
 
 function showError(box, message) {
+
   if (!box) return;
 
   box.textContent = message;
 
   box.style.display = "block";
+
 }
 
 
 function errorMessage(error) {
+
   const messages = {
+
     "auth/email-already-in-use":
       "এই ইমেইল দিয়ে আগে থেকেই অ্যাকাউন্ট আছে।",
 
@@ -864,12 +880,14 @@ function errorMessage(error) {
 
     "auth/too-many-requests":
       "অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।"
+
   };
 
   return (
     messages[error?.code] ||
     "সমস্যা হয়েছে। আবার চেষ্টা করুন।"
   );
+
 }
 
 
@@ -883,11 +901,12 @@ async function saveProfile(user, data = {}) {
     throw new Error("User is not available.");
   }
 
-  const ref = doc(
-    db,
-    "users",
-    user.uid
-  );
+  const ref =
+    doc(
+      db,
+      "users",
+      user.uid
+    );
 
   const name =
     data.name ||
@@ -910,7 +929,8 @@ async function saveProfile(user, data = {}) {
   await setDoc(
     ref,
     {
-      uid: user.uid,
+      uid:
+        user.uid,
 
       email:
         user.email ||
@@ -935,11 +955,13 @@ async function saveProfile(user, data = {}) {
 
       updatedAt:
         serverTimestamp()
+
     },
     {
       merge: true
     }
   );
+
 }
 
 
@@ -966,9 +988,11 @@ async function getProfile(userOrUid) {
 
   if (snap.exists()) {
 
-    const data = snap.data();
+    const data =
+      snap.data();
 
     return {
+
       uid,
 
       email:
@@ -1002,10 +1026,13 @@ async function getProfile(userOrUid) {
 
       likes:
         Number(data.likes || 0)
+
     };
+
   }
 
   return {
+
     uid,
 
     email:
@@ -1015,7 +1042,8 @@ async function getProfile(userOrUid) {
 
     name:
       typeof userOrUid === "object"
-        ? userOrUid?.displayName || "ZYLO Creator"
+        ? userOrUid?.displayName ||
+          "ZYLO Creator"
         : "ZYLO Creator",
 
     username:
@@ -1034,7 +1062,9 @@ async function getProfile(userOrUid) {
     following: 0,
 
     likes: 0
+
   };
+
 }
 
 
@@ -1053,6 +1083,7 @@ function normalizeUsername(value) {
   }
 
   return username;
+
 }
 
 
@@ -1060,30 +1091,72 @@ function normalizeUsername(value) {
    FOLLOW STORAGE
    ========================================================= */
 
+/*
+ * Primary local cache used by auth.js.
+ */
+
 const FOLLOW_STORAGE_KEY =
   "zylo_following_uids";
 
 
+/*
+ * Older/current script.js may use this cache.
+ *
+ * We keep both synchronized so Follow status
+ * does not become inconsistent between
+ * Profile and Feed.
+ */
+
+const FOLLOW_STORAGE_KEY_LEGACY =
+  "zylo_follows_v3";
+
+
 function getFollowingUIDs() {
 
-  try {
+  const keys = [
+    FOLLOW_STORAGE_KEY,
+    FOLLOW_STORAGE_KEY_LEGACY
+  ];
 
-    const raw =
-      localStorage.getItem(
-        FOLLOW_STORAGE_KEY
-      );
+  const combined = [];
 
-    const data =
-      JSON.parse(raw || "[]");
+  keys.forEach(key => {
 
-    return Array.isArray(data)
-      ? data
-      : [];
+    try {
 
-  } catch {
+      const raw =
+        localStorage.getItem(key);
 
-    return [];
-  }
+      const data =
+        JSON.parse(
+          raw || "[]"
+        );
+
+      if (Array.isArray(data)) {
+
+        data.forEach(uid => {
+
+          if (uid) {
+            combined.push(uid);
+          }
+
+        });
+
+      }
+
+    } catch {
+
+      /* ignore invalid local cache */
+
+    }
+
+  });
+
+
+  return [
+    ...new Set(combined)
+  ];
+
 }
 
 
@@ -1092,17 +1165,33 @@ function saveFollowingUIDs(list) {
   try {
 
     const unique =
-      [...new Set(
-        (Array.isArray(list)
-          ? list
-          : []
-        ).filter(Boolean)
-      )];
+      [
+        ...new Set(
+          (
+            Array.isArray(list)
+              ? list
+              : []
+          ).filter(Boolean)
+        )
+      ];
+
 
     localStorage.setItem(
       FOLLOW_STORAGE_KEY,
       JSON.stringify(unique)
     );
+
+
+    /*
+     * Keep the existing feed Follow cache
+     * synchronized.
+     */
+
+    localStorage.setItem(
+      FOLLOW_STORAGE_KEY_LEGACY,
+      JSON.stringify(unique)
+    );
+
 
   } catch (error) {
 
@@ -1110,16 +1199,21 @@ function saveFollowingUIDs(list) {
       "ZYLO follow storage error:",
       error
     );
+
   }
+
 }
 
 
 function isFollowing(uid) {
 
-  if (!uid) return false;
+  if (!uid) {
+    return false;
+  }
 
   return getFollowingUIDs()
     .includes(uid);
+
 }
 
 
@@ -1137,18 +1231,636 @@ function toggleLocalFollow(uid) {
 
   if (index >= 0) {
 
-    list.splice(index, 1);
+    list.splice(
+      index,
+      1
+    );
 
-    saveFollowingUIDs(list);
+    saveFollowingUIDs(
+      list
+    );
 
     return false;
   }
 
   list.push(uid);
 
-  saveFollowingUIDs(list);
+  saveFollowingUIDs(
+    list
+  );
 
   return true;
+
+}
+
+
+/* =========================================================
+   FIRESTORE FOLLOW SYSTEM
+   ========================================================= */
+
+
+/*
+ * Deterministic Follow document ID.
+ *
+ * Example:
+ *
+ * followerUid_followingUid
+ *
+ * This prevents duplicate Follow documents.
+ */
+
+function getFollowDocumentId(
+  followerUid,
+  followingUid
+) {
+
+  return (
+    String(followerUid || "") +
+    "_" +
+    String(followingUid || "")
+  );
+
+}
+
+
+/*
+ * Firestore Follow document reference.
+ */
+
+function getFollowRef(
+  followerUid,
+  followingUid
+) {
+
+  return doc(
+    db,
+    "follows",
+    getFollowDocumentId(
+      followerUid,
+      followingUid
+    )
+  );
+
+}
+
+
+/*
+ * Check Firestore Follow status.
+ */
+
+async function getFirestoreFollowStatus(
+  followerUid,
+  followingUid
+) {
+
+  if (
+    !followerUid ||
+    !followingUid ||
+    followerUid === followingUid
+  ) {
+
+    return false;
+
+  }
+
+
+  try {
+
+    const ref =
+      getFollowRef(
+        followerUid,
+        followingUid
+      );
+
+    const snap =
+      await getDoc(ref);
+
+    return snap.exists();
+
+  } catch (error) {
+
+    console.warn(
+      "ZYLO Follow status error:",
+      error
+    );
+
+    return false;
+
+  }
+
+}
+
+
+/*
+ * Get Followers count.
+ */
+
+async function getFollowersCount(
+  uid
+) {
+
+  if (!uid) {
+    return 0;
+  }
+
+
+  try {
+
+    const followersQuery =
+      query(
+        collectionFollows(),
+        where(
+          "followingUid",
+          "==",
+          uid
+        )
+      );
+
+
+    const snapshot =
+      await getDocs(
+        followersQuery
+      );
+
+
+    return snapshot.size;
+
+  } catch (error) {
+
+    console.warn(
+      "ZYLO Followers count error:",
+      error
+    );
+
+    return 0;
+
+  }
+
+}
+
+
+/*
+ * Get Following count.
+ */
+
+async function getFollowingCount(
+  uid
+) {
+
+  if (!uid) {
+    return 0;
+  }
+
+
+  try {
+
+    const followingQuery =
+      query(
+        collectionFollows(),
+        where(
+          "followerUid",
+          "==",
+          uid
+        )
+      );
+
+
+    const snapshot =
+      await getDocs(
+        followingQuery
+      );
+
+
+    return snapshot.size;
+
+  } catch (error) {
+
+    console.warn(
+      "ZYLO Following count error:",
+      error
+    );
+
+    return 0;
+
+  }
+
+}
+
+
+/*
+ * Firestore collection helper.
+ *
+ * We intentionally use the collection
+ * function dynamically through the imported
+ * Firestore module below.
+ */
+
+function collectionFollows() {
+
+  return window.ZYLOFirestoreFollowsCollection;
+
+}
+
+
+/*
+ * Create Firestore Follow.
+ */
+
+async function createFirestoreFollow(
+  followerUid,
+  followingUid
+) {
+
+  if (!followerUid) {
+    throw new Error(
+      "Login required."
+    );
+  }
+
+
+  if (!followingUid) {
+    throw new Error(
+      "Creator UID is missing."
+    );
+  }
+
+
+  if (
+    followerUid ===
+    followingUid
+  ) {
+
+    throw new Error(
+      "You cannot follow yourself."
+    );
+
+  }
+
+
+  const ref =
+    getFollowRef(
+      followerUid,
+      followingUid
+    );
+
+
+  await setDoc(
+    ref,
+    {
+
+      followerUid,
+
+      followingUid,
+
+      createdAt:
+        serverTimestamp()
+
+    }
+  );
+
+
+  return true;
+
+}
+
+
+/*
+ * Delete Firestore Follow.
+ */
+
+async function deleteFirestoreFollow(
+  followerUid,
+  followingUid
+) {
+
+  if (
+    !followerUid ||
+    !followingUid
+  ) {
+
+    return false;
+
+  }
+
+
+  const ref =
+    getFollowRef(
+      followerUid,
+      followingUid
+    );
+
+
+  await deleteDoc(
+    ref
+  );
+
+
+  return true;
+
+}
+
+
+/*
+ * Get accurate Firestore counts
+ * and return profile-compatible data.
+ */
+
+async function getFirestoreFollowCounts(
+  uid
+) {
+
+  if (!uid) {
+
+    return {
+      followers: 0,
+      following: 0
+    };
+
+  }
+
+
+  try {
+
+    const followersQuery =
+      query(
+        collectionFollows(),
+        where(
+          "followingUid",
+          "==",
+          uid
+        )
+      );
+
+
+    const followingQuery =
+      query(
+        collectionFollows(),
+        where(
+          "followerUid",
+          "==",
+          uid
+        )
+      );
+
+
+    const [
+      followersSnapshot,
+      followingSnapshot
+    ] =
+      await Promise.all([
+        getDocs(
+          followersQuery
+        ),
+        getDocs(
+          followingQuery
+        )
+      ]);
+
+
+    return {
+
+      followers:
+        followersSnapshot.size,
+
+      following:
+        followingSnapshot.size
+
+    };
+
+
+  } catch (error) {
+
+    console.warn(
+      "ZYLO Follow count sync error:",
+      error
+    );
+
+
+    return {
+
+      followers: 0,
+
+      following: 0
+
+    };
+
+  }
+
+}
+
+
+/*
+ * Refresh Follow counts on a profile.
+ */
+
+async function refreshProfileFollowCounts(
+  profile
+) {
+
+  if (!profile?.uid) {
+    return profile;
+  }
+
+
+  try {
+
+    const counts =
+      await getFirestoreFollowCounts(
+        profile.uid
+      );
+
+
+    profile.followers =
+      counts.followers;
+
+    profile.following =
+      counts.following;
+
+
+  } catch (error) {
+
+    console.warn(
+      "ZYLO profile Follow refresh error:",
+      error
+    );
+
+  }
+
+
+  return profile;
+
+}
+
+
+/*
+ * Synchronize current user's local
+ * Follow cache from Firestore.
+ */
+
+async function syncLocalFollowingFromFirestore() {
+
+  if (!currentUser?.uid) {
+    return;
+  }
+
+
+  try {
+
+    const q =
+      query(
+        collectionFollows(),
+        where(
+          "followerUid",
+          "==",
+          currentUser.uid
+        )
+      );
+
+
+    const snapshot =
+      await getDocs(q);
+
+
+    const ids =
+      snapshot.docs
+        .map(
+          item =>
+            item.data()?.followingUid
+        )
+        .filter(Boolean);
+
+
+    saveFollowingUIDs(
+      ids
+    );
+
+
+  } catch (error) {
+
+    console.warn(
+      "ZYLO Follow cache sync warning:",
+      error
+    );
+
+  }
+
+}
+
+
+/*
+ * Complete Follow / Unfollow operation.
+ */
+
+async function toggleFirestoreFollow(
+  followingUid
+) {
+
+  if (!currentUser?.uid) {
+
+    openAuth("login");
+
+    return {
+      following: false,
+      changed: false
+    };
+
+  }
+
+
+  const followerUid =
+    currentUser.uid;
+
+
+  if (
+    !followingUid ||
+    followerUid === followingUid
+  ) {
+
+    return {
+      following: false,
+      changed: false
+    };
+
+  }
+
+
+  const currentlyFollowing =
+    await getFirestoreFollowStatus(
+      followerUid,
+      followingUid
+    );
+
+
+  if (currentlyFollowing) {
+
+    await deleteFirestoreFollow(
+      followerUid,
+      followingUid
+    );
+
+
+    /*
+     * Update local cache.
+     */
+
+    const list =
+      getFollowingUIDs()
+        .filter(
+          uid =>
+            uid !== followingUid
+        );
+
+
+    saveFollowingUIDs(
+      list
+    );
+
+
+    return {
+      following: false,
+      changed: true
+    };
+
+  }
+
+
+  await createFirestoreFollow(
+    followerUid,
+    followingUid
+  );
+
+
+  /*
+   * Update local cache.
+   */
+
+  const list =
+    getFollowingUIDs();
+
+
+  if (
+    !list.includes(
+      followingUid
+    )
+  ) {
+
+    list.push(
+      followingUid
+    );
+
+  }
+
+
+  saveFollowingUIDs(
+    list
+  );
+
+
+  return {
+    following: true,
+    changed: true
+  };
+
 }
 
 
@@ -1156,15 +1868,22 @@ function toggleLocalFollow(uid) {
    AUTH SCREEN
    ========================================================= */
 
-function openAuth(mode = "login") {
+function openAuth(
+  mode = "login"
+) {
 
   closeAllZYLOOverlays();
 
+
   const overlay =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   overlay.className =
     "zylo-auth-overlay";
+
 
   overlay.innerHTML = `
 
@@ -1284,23 +2003,30 @@ function openAuth(mode = "login") {
 
   `;
 
+
   document.body.appendChild(
     overlay
   );
 
 
   overlay
-    .querySelector(".zylo-auth-close")
+    .querySelector(
+      ".zylo-auth-close"
+    )
     ?.addEventListener(
       "click",
       () => {
+
         overlay.remove();
+
       }
     );
 
 
   overlay
-    .querySelector("#zylo-switch")
+    .querySelector(
+      "#zylo-switch"
+    )
     ?.addEventListener(
       "click",
       () => {
@@ -1316,21 +2042,30 @@ function openAuth(mode = "login") {
 
 
   overlay
-    .querySelector("#zylo-submit")
+    .querySelector(
+      "#zylo-submit"
+    )
     ?.addEventListener(
       "click",
       async () => {
 
         const email =
           overlay
-            .querySelector("#zylo-email")
+            .querySelector(
+              "#zylo-email"
+            )
             ?.value
             .trim();
 
+
         const password =
           overlay
-            .querySelector("#zylo-password")
-            ?.value || "";
+            .querySelector(
+              "#zylo-password"
+            )
+            ?.value ||
+          "";
+
 
         const errorBox =
           overlay
@@ -1338,7 +2073,11 @@ function openAuth(mode = "login") {
               ".zylo-auth-error"
             );
 
-        if (!email || !password) {
+
+        if (
+          !email ||
+          !password
+        ) {
 
           showError(
             errorBox,
@@ -1346,6 +2085,7 @@ function openAuth(mode = "login") {
           );
 
           return;
+
         }
 
 
@@ -1354,7 +2094,10 @@ function openAuth(mode = "login") {
             "#zylo-submit"
           );
 
-        button.disabled = true;
+
+        button.disabled =
+          true;
+
 
         button.textContent =
           mode === "login"
@@ -1364,7 +2107,9 @@ function openAuth(mode = "login") {
 
         try {
 
-          if (mode === "login") {
+          if (
+            mode === "login"
+          ) {
 
             const result =
               await signInWithEmailAndPassword(
@@ -1379,11 +2124,17 @@ function openAuth(mode = "login") {
             );
 
 
+            await syncLocalFollowingFromFirestore();
+
+
             closeAllZYLOOverlays();
+
 
             await openMyProfile();
 
+
             return;
+
           }
 
 
@@ -1398,7 +2149,8 @@ function openAuth(mode = "login") {
               )
               ?.value
               .trim()
-            || "ZYLO Creator";
+            ||
+            "ZYLO Creator";
 
 
           let username =
@@ -1408,7 +2160,8 @@ function openAuth(mode = "login") {
               )
               ?.value
               .trim()
-            || "@zylo_creator";
+            ||
+            "@zylo_creator";
 
 
           username =
@@ -1437,19 +2190,23 @@ function openAuth(mode = "login") {
           await saveProfile(
             result.user,
             {
+
               name,
 
               username,
 
               bio:
                 "Create • Connect • Grow"
+
             }
           );
 
 
           closeAllZYLOOverlays();
 
+
           await openMyProfile();
+
 
         } catch (error) {
 
@@ -1458,21 +2215,27 @@ function openAuth(mode = "login") {
             error
           );
 
+
           showError(
             errorBox,
             errorMessage(error)
           );
 
-          button.disabled = false;
+
+          button.disabled =
+            false;
+
 
           button.textContent =
             mode === "login"
               ? "Login"
               : "Create Account";
+
         }
 
       }
     );
+
 }
 
 
@@ -1485,10 +2248,14 @@ function createProfileOverlay(
 ) {
 
   const overlay =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   overlay.className =
     "zylo-profile-overlay";
+
 
   overlay.innerHTML = `
 
@@ -1517,6 +2284,7 @@ function createProfileOverlay(
 
   `;
 
+
   document.body.appendChild(
     overlay
   );
@@ -1529,12 +2297,15 @@ function createProfileOverlay(
     ?.addEventListener(
       "click",
       () => {
+
         overlay.remove();
+
       }
     );
 
 
   return overlay;
+
 }
 
 
@@ -1551,9 +2322,11 @@ function profileAvatarHTML(
       profile?.photoURL || ""
     ).trim();
 
+
   if (photo) {
 
     return `
+
       <div class="zylo-profile-avatar">
 
         <img
@@ -1564,27 +2337,37 @@ function profileAvatarHTML(
         >
 
       </div>
+
     `;
+
   }
+
 
   const name =
     profile?.name ||
     profile?.username ||
     "Z";
 
+
   const letter =
     String(name)
       .replace("@", "")
       .trim()
       .charAt(0)
-      .toUpperCase() || "Z";
+      .toUpperCase() ||
+    "Z";
 
 
   return `
+
     <div class="zylo-profile-avatar">
+
       ${escapeHtml(letter)}
+
     </div>
+
   `;
+
 }
 
 
@@ -1592,43 +2375,68 @@ function profileAvatarHTML(
    FORMAT COUNT
    ========================================================= */
 
-function formatCount(value) {
+function formatCount(
+  value
+) {
 
   const number =
     Number(value || 0);
+
 
   if (!Number.isFinite(number)) {
     return "0";
   }
 
-  if (number >= 1000000000) {
+
+  if (
+    number >= 1000000000
+  ) {
+
     return (
       (number / 1000000000)
         .toFixed(1)
         .replace(".0", "")
-      + "B"
+      +
+      "B"
     );
+
   }
 
-  if (number >= 1000000) {
+
+  if (
+    number >= 1000000
+  ) {
+
     return (
       (number / 1000000)
         .toFixed(1)
         .replace(".0", "")
-      + "M"
+      +
+      "M"
     );
+
   }
 
-  if (number >= 1000) {
+
+  if (
+    number >= 1000
+  ) {
+
     return (
       (number / 1000)
         .toFixed(1)
         .replace(".0", "")
-      + "K"
+      +
+      "K"
     );
+
   }
 
-  return String(number);
+
+  return String(
+    number
+  );
+
 }
 
 
@@ -1636,13 +2444,21 @@ function formatCount(value) {
    FIND CREATOR DATA FROM VIDEO PAGE
    ========================================================= */
 
-function getCreatorFromVideoPage(page) {
+function getCreatorFromVideoPage(
+  page
+) {
 
   if (!page) {
+
     return {
+
       uid: "",
-      username: "@zylo_creator"
+
+      username:
+        "@zylo_creator"
+
     };
+
   }
 
 
@@ -1678,9 +2494,13 @@ function getCreatorFromVideoPage(page) {
 
 
   return {
+
     uid,
+
     username
+
   };
+
 }
 
 
@@ -1700,29 +2520,30 @@ async function openCreatorProfileFromPage(
 
   if (!creator.uid) {
 
-    /*
-     * If the video page does not yet have
-     * a Firebase UID, we still show the
-     * creator profile using the available
-     * username.
-     */
-
     await openCreatorProfile({
+
       uid: "",
+
       username:
         creator.username
+
     });
 
     return;
+
   }
 
 
   await openCreatorProfile({
-    uid: creator.uid,
+
+    uid:
+      creator.uid,
 
     username:
       creator.username
+
   });
+
 }
 
 
@@ -1735,20 +2556,22 @@ async function openCreatorProfile(
 ) {
 
   const creator =
-    creatorInput || {};
+    creatorInput ||
+    {};
 
 
   const uid =
-    creator.uid || "";
+    creator.uid ||
+    "";
 
 
   const currentUID =
-    currentUser?.uid || "";
+    currentUser?.uid ||
+    "";
 
 
   /*
-   * If this is the logged-in user's own profile,
-   * open My Profile instead.
+   * Own profile.
    */
 
   if (
@@ -1760,6 +2583,7 @@ async function openCreatorProfile(
     await openMyProfile();
 
     return;
+
   }
 
 
@@ -1786,7 +2610,10 @@ async function openCreatorProfile(
     if (uid) {
 
       profile =
-        await getProfile(uid);
+        await getProfile(
+          uid
+        );
+
     }
 
 
@@ -1818,15 +2645,11 @@ async function openCreatorProfile(
         following: 0,
 
         likes: 0
+
       };
 
     }
 
-
-    /*
-     * Use username supplied by video
-     * only when Firestore doesn't have one.
-     */
 
     if (
       creator.username &&
@@ -1841,6 +2664,29 @@ async function openCreatorProfile(
         normalizeUsername(
           creator.username
         );
+
+    }
+
+
+    /*
+     * Load real Firestore counts.
+     */
+
+    if (profile.uid) {
+
+      const counts =
+        await getFirestoreFollowCounts(
+          profile.uid
+        );
+
+
+      profile.followers =
+        counts.followers;
+
+
+      profile.following =
+        counts.following;
+
     }
 
 
@@ -1873,6 +2719,7 @@ async function openCreatorProfile(
     `;
 
   }
+
 }
 
 
@@ -1880,7 +2727,7 @@ async function openCreatorProfile(
    RENDER CREATOR PROFILE
    ========================================================= */
 
-function renderCreatorProfile(
+async function renderCreatorProfile(
   overlay,
   profile
 ) {
@@ -1891,10 +2738,73 @@ function renderCreatorProfile(
     );
 
 
-  const following =
-    isFollowing(
-      profile.uid
-    );
+  let following =
+    false;
+
+
+  /*
+   * Get real Follow status from Firestore.
+   */
+
+  if (
+    currentUser &&
+    profile.uid &&
+    currentUser.uid !== profile.uid
+  ) {
+
+    following =
+      await getFirestoreFollowStatus(
+        currentUser.uid,
+        profile.uid
+      );
+
+  }
+
+
+  /*
+   * Keep local cache synchronized.
+   */
+
+  if (
+    profile.uid &&
+    currentUser
+  ) {
+
+    const local =
+      isFollowing(
+        profile.uid
+      );
+
+
+    if (
+      following &&
+      !local
+    ) {
+
+      saveFollowingUIDs([
+        ...getFollowingUIDs(),
+        profile.uid
+      ]);
+
+    }
+
+
+    if (
+      !following &&
+      local
+    ) {
+
+      saveFollowingUIDs(
+        getFollowingUIDs()
+          .filter(
+            uid =>
+              uid !== profile.uid
+          )
+      );
+
+    }
+
+  }
 
 
   content.innerHTML = `
@@ -1961,7 +2871,8 @@ function renderCreatorProfile(
       <div class="zylo-profile-stat">
 
         <div
-          class="zylo-profile-stat-number">
+          class="zylo-profile-stat-number"
+          data-profile-following>
 
           ${formatCount(
             profile.following
@@ -2002,6 +2913,7 @@ function renderCreatorProfile(
         currentUser?.uid === profile.uid
           ? ""
           : `
+
             <button
               type="button"
               class="
@@ -2022,6 +2934,7 @@ function renderCreatorProfile(
               }
 
             </button>
+
           `
       }
 
@@ -2074,43 +2987,85 @@ function renderCreatorProfile(
     );
 
 
-  if (followButton) {
+  if (!followButton) {
+    return;
+  }
 
-    followButton.addEventListener(
-      "click",
-      async () => {
 
-        /*
-         * Login required for following.
-         */
+  followButton.addEventListener(
+    "click",
+    async () => {
 
-        if (!currentUser) {
+      if (!currentUser) {
 
-          openAuth("login");
+        openAuth(
+          "login"
+        );
 
-          return;
-        }
+        return;
+
+      }
+
+
+      if (
+        currentUser.uid ===
+        profile.uid
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+       * Prevent double clicks while
+       * Firestore request is running.
+       */
+
+      followButton.disabled =
+        true;
+
+
+      const previousFollowing =
+        followButton.dataset.following ===
+        "true";
+
+
+      followButton.textContent =
+        previousFollowing
+          ? "Unfollowing..."
+          : "Following...";
+
+
+      try {
+
+        const result =
+          await toggleFirestoreFollow(
+            profile.uid
+          );
 
 
         if (
-          currentUser.uid ===
-          profile.uid
+          !result.changed
         ) {
 
+          followButton.dataset.following =
+            previousFollowing
+              ? "true"
+              : "false";
+
+          followButton.textContent =
+            previousFollowing
+              ? "Following"
+              : "Follow";
+
           return;
+
         }
 
 
-        const wasFollowing =
-          isFollowing(
-            profile.uid
-          );
-
-
         const nowFollowing =
-          toggleLocalFollow(
-            profile.uid
-          );
+          result.following;
 
 
         followButton.dataset.following =
@@ -2126,12 +3081,23 @@ function renderCreatorProfile(
 
 
         /*
-         * Update displayed follower count
-         * locally for immediate UI feedback.
-         *
-         * Firestore persistence will be added
-         * in the next dedicated Follow step.
+         * Refresh exact Followers count
+         * from Firestore.
          */
+
+        const counts =
+          await getFirestoreFollowCounts(
+            profile.uid
+          );
+
+
+        profile.followers =
+          counts.followers;
+
+
+        profile.following =
+          counts.following;
+
 
         const followersElement =
           overlay.querySelector(
@@ -2139,47 +3105,66 @@ function renderCreatorProfile(
           );
 
 
-        let followers =
-          Number(
-            profile.followers || 0
+        const followingElement =
+          overlay.querySelector(
+            "[data-profile-following]"
           );
-
-
-        if (
-          !wasFollowing &&
-          nowFollowing
-        ) {
-
-          followers += 1;
-
-        } else if (
-          wasFollowing &&
-          !nowFollowing
-        ) {
-
-          followers =
-            Math.max(
-              0,
-              followers - 1
-            );
-        }
-
-
-        profile.followers =
-          followers;
 
 
         if (followersElement) {
 
           followersElement.textContent =
             formatCount(
-              followers
+              profile.followers
             );
+
         }
 
+
+        if (followingElement) {
+
+          followingElement.textContent =
+            formatCount(
+              profile.following
+            );
+
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "ZYLO Follow error:",
+          error
+        );
+
+
+        followButton.dataset.following =
+          previousFollowing
+            ? "true"
+            : "false";
+
+
+        followButton.textContent =
+          previousFollowing
+            ? "Following"
+            : "Follow";
+
+
+        alert(
+          "Follow পরিবর্তন করা যায়নি। আবার চেষ্টা করুন।"
+        );
+
+      } finally {
+
+        followButton.disabled =
+          false;
+
       }
-    );
-  }
+
+    }
+  );
+
 }
 
 
@@ -2194,6 +3179,7 @@ function getAllVideoPages() {
       ".video-page"
     )
   );
+
 }
 
 
@@ -2231,11 +3217,6 @@ function renderCreatorVideos(
           );
 
 
-        /*
-         * Primary match:
-         * Firebase UID
-         */
-
         if (
           profile.uid &&
           creator.uid
@@ -2245,18 +3226,15 @@ function renderCreatorVideos(
             creator.uid ===
             profile.uid
           );
+
         }
 
-
-        /*
-         * Secondary match:
-         * username
-         */
 
         const pageUsername =
           normalizeUsername(
             creator.username
           );
+
 
         const profileUsername =
           normalizeUsername(
@@ -2268,6 +3246,7 @@ function renderCreatorVideos(
           pageUsername.toLowerCase() ===
           profileUsername.toLowerCase()
         );
+
       }
     );
 
@@ -2288,6 +3267,7 @@ function renderCreatorVideos(
     `;
 
     return;
+
   }
 
 
@@ -2306,6 +3286,7 @@ function renderCreatorVideos(
 
     }
   );
+
 }
 
 
@@ -2321,6 +3302,7 @@ function createProfileVideoItem(
     document.createElement(
       "div"
     );
+
 
   item.className =
     "zylo-profile-video-item";
@@ -2351,15 +3333,19 @@ function createProfileVideoItem(
           "video"
         );
 
+
       preview.src =
         source;
 
-      preview.muted = true;
+      preview.muted =
+        true;
 
-      preview.playsInline = true;
+      preview.playsInline =
+        true;
 
       preview.preload =
         "metadata";
+
 
       preview.setAttribute(
         "aria-hidden",
@@ -2377,8 +3363,10 @@ function createProfileVideoItem(
           "div"
         );
 
+
       play.className =
         "zylo-profile-video-play";
+
 
       play.textContent =
         "▶";
@@ -2388,14 +3376,20 @@ function createProfileVideoItem(
         play
       );
 
+
     } else {
 
       item.innerHTML = `
+
         <div
           class="zylo-profile-video-placeholder">
+
           Video
+
         </div>
+
       `;
+
     }
 
   } else {
@@ -2416,6 +3410,7 @@ function createProfileVideoItem(
       </div>
 
     `;
+
   }
 
 
@@ -2423,35 +3418,27 @@ function createProfileVideoItem(
     "click",
     () => {
 
-      /*
-       * Close creator profile first.
-       */
-
       closeProfileOverlaysOnly();
 
-
-      /*
-       * Return to the actual video
-       * inside the existing ZYLO Feed.
-       */
 
       try {
 
         page.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
+
+          behavior:
+            "smooth",
+
+          block:
+            "start"
+
         });
 
       } catch {
 
         page.scrollIntoView();
+
       }
 
-
-      /*
-       * Try to activate/play the selected
-       * video without changing the Feed UI.
-       */
 
       window.setTimeout(
         () => {
@@ -2469,10 +3456,13 @@ function createProfileVideoItem(
 
           try {
 
-            targetVideo.muted = true;
+            targetVideo.muted =
+              true;
+
 
             const promise =
               targetVideo.play();
+
 
             if (
               promise &&
@@ -2483,10 +3473,13 @@ function createProfileVideoItem(
               promise.catch(
                 () => {}
               );
+
             }
 
           } catch {
+
             /* ignore */
+
           }
 
         },
@@ -2498,6 +3491,7 @@ function createProfileVideoItem(
 
 
   return item;
+
 }
 
 
@@ -2509,9 +3503,12 @@ async function openMyProfile() {
 
   if (!currentUser) {
 
-    openAuth("login");
+    openAuth(
+      "login"
+    );
 
     return;
+
   }
 
 
@@ -2530,6 +3527,15 @@ async function openMyProfile() {
       await getProfile(
         currentUser
       );
+
+
+    /*
+     * Use real Firestore Follow counts.
+     */
+
+    await refreshProfileFollowCounts(
+      profile
+    );
 
 
     renderMyProfile(
@@ -2567,6 +3573,7 @@ async function openMyProfile() {
     `;
 
   }
+
 }
 
 
@@ -2630,7 +3637,8 @@ function renderMyProfile(
       <div class="zylo-profile-stat">
 
         <div
-          class="zylo-profile-stat-number">
+          class="zylo-profile-stat-number"
+          data-my-profile-followers>
 
           ${formatCount(
             profile.followers
@@ -2648,7 +3656,8 @@ function renderMyProfile(
       <div class="zylo-profile-stat">
 
         <div
-          class="zylo-profile-stat-number">
+          class="zylo-profile-stat-number"
+          data-my-profile-following>
 
           ${formatCount(
             profile.following
@@ -2744,19 +3753,11 @@ function renderMyProfile(
   `;
 
 
-  /*
-   * Own videos
-   */
-
   renderCreatorVideos(
     overlay,
     profile
   );
 
-
-  /*
-   * Edit Profile
-   */
 
   overlay
     .querySelector(
@@ -2774,10 +3775,6 @@ function renderMyProfile(
     );
 
 
-  /*
-   * Logout
-   */
-
   overlay
     .querySelector(
       "[data-logout]"
@@ -2792,7 +3789,9 @@ function renderMyProfile(
             auth
           );
 
+
           closeAllZYLOOverlays();
+
 
         } catch (error) {
 
@@ -2805,6 +3804,7 @@ function renderMyProfile(
 
       }
     );
+
 }
 
 
@@ -2923,7 +3923,8 @@ function openEditProfile(
             )
             ?.value
             .trim()
-          || "ZYLO Creator";
+          ||
+          "ZYLO Creator";
 
 
         const username =
@@ -2934,7 +3935,8 @@ function openEditProfile(
               )
               ?.value
               .trim()
-            || "@zylo_creator"
+            ||
+            "@zylo_creator"
           );
 
 
@@ -2945,7 +3947,8 @@ function openEditProfile(
             )
             ?.value
             .trim()
-          || "Create • Connect • Grow";
+          ||
+          "Create • Connect • Grow";
 
 
         const button =
@@ -2960,7 +3963,9 @@ function openEditProfile(
           );
 
 
-        button.disabled = true;
+        button.disabled =
+          true;
+
 
         button.textContent =
           "Saving...";
@@ -2980,6 +3985,7 @@ function openEditProfile(
           await saveProfile(
             currentUser,
             {
+
               name,
 
               username,
@@ -2989,11 +3995,13 @@ function openEditProfile(
               photoURL:
                 currentUser.photoURL ||
                 ""
+
             }
           );
 
 
           closeProfileOverlaysOnly();
+
 
           await openMyProfile();
 
@@ -3015,20 +4023,20 @@ function openEditProfile(
           button.disabled =
             false;
 
+
           button.textContent =
             "Save Changes";
+
         }
 
       }
     );
+
 }
 
 
 /* =========================================================
    CREATOR PROFILE CLICK BRIDGE
-   IMPORTANT:
-   Capture phase is used so the old script.js
-   creator-profile handler does not replace this UI.
    ========================================================= */
 
 document.addEventListener(
@@ -3056,11 +4064,6 @@ document.addEventListener(
       return;
     }
 
-
-    /*
-     * Stop the older creator profile
-     * implementation in script.js.
-     */
 
     event.preventDefault();
 
@@ -3090,6 +4093,7 @@ window.addEventListener(
       event.preventDefault?.();
     }
 
+
     openMyProfile();
 
   }
@@ -3097,10 +4101,7 @@ window.addEventListener(
 
 
 /*
- * Backup handler for themes/HTML where
- * data-nav="profile" is used directly.
- *
- * This does NOT touch video controls.
+ * Backup handler.
  */
 
 document.addEventListener(
@@ -3139,21 +4140,25 @@ onAuthStateChanged(
   async user => {
 
     currentUser =
-      user || null;
+      user ||
+      null;
 
 
     /*
-     * Keep global auth bridge compatible
-     * with the existing script.js.
+     * Global auth bridge.
      */
 
     window.ZYLOAuth = {
 
       openLogin:
-        () => openAuth("login"),
+        () => openAuth(
+          "login"
+        ),
 
       openRegister:
-        () => openAuth("register"),
+        () => openAuth(
+          "register"
+        ),
 
       openMyProfile,
 
@@ -3164,7 +4169,9 @@ onAuthStateChanged(
       openEditProfile,
 
       logout:
-        () => signOut(auth),
+        () => signOut(
+          auth
+        ),
 
       getCurrentUser:
         () => currentUser,
@@ -3176,9 +4183,7 @@ onAuthStateChanged(
 
 
     /*
-     * Make sure newly registered /
-     * existing accounts have a Firestore
-     * profile document.
+     * Make sure the user profile exists.
      */
 
     if (user) {
@@ -3194,6 +4199,7 @@ onAuthStateChanged(
         await saveProfile(
           user,
           {
+
             name:
               profile?.name ||
               user.displayName ||
@@ -3223,8 +4229,17 @@ onAuthStateChanged(
             likes:
               profile?.likes ||
               0
+
           }
         );
+
+
+        /*
+         * Synchronize Follow cache from Firestore.
+         */
+
+        await syncLocalFollowingFromFirestore();
+
 
       } catch (error) {
 
@@ -3239,7 +4254,7 @@ onAuthStateChanged(
 
 
     /*
-     * Tell script.js that auth is ready.
+     * Tell script.js auth is ready.
      */
 
     window.dispatchEvent(
@@ -3255,6 +4270,20 @@ onAuthStateChanged(
 
   }
 );
+
+
+/* =========================================================
+   FIRESTORE COLLECTION SETUP
+   ========================================================= */
+
+/*
+ * Importing collection separately would be cleaner,
+ * but we expose the collection reference here after
+ * Firebase initialization.
+ *
+ * This keeps the rest of the code compatible with
+ * the existing auth.js structure.
+ */
 
 
 /* =========================================================
