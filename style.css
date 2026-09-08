@@ -1322,3 +1322,265 @@ body {
         min-height: 100vh;
     }
 }
+
+/* =========================================================
+   ZYLO — SEARCH + COMMENT TIKTOK STYLE OVERLAY FIX
+   ========================================================= */
+
+.zylo-search-overlay,
+.zylo-comment-panel {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 100000 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  box-sizing: border-box !important;
+  background: rgba(0,0,0,.65) !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .18s ease, visibility .18s ease;
+}
+
+.zylo-search-overlay.open,
+.zylo-search-overlay.active,
+.zylo-comment-panel.open,
+.zylo-comment-panel.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* =========================
+   SEARCH
+   ========================= */
+
+.zylo-search-overlay {
+  align-items: stretch !important;
+  justify-content: stretch !important;
+}
+
+.zylo-search-inner {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #fff !important;
+  color: #111 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+  padding: max(12px, env(safe-area-inset-top))
+           14px
+           max(16px, env(safe-area-inset-bottom)) !important;
+}
+
+.zylo-search-close {
+  position: absolute !important;
+  top: max(10px, env(safe-area-inset-top)) !important;
+  left: 8px !important;
+  width: 44px !important;
+  height: 44px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #111 !important;
+  font-size: 32px !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  z-index: 2 !important;
+}
+
+.zylo-search-input {
+  width: 100% !important;
+  height: 46px !important;
+  margin-top: 4px !important;
+  padding: 0 18px 0 52px !important;
+  border: 0 !important;
+  outline: none !important;
+  background: #f1f1f1 !important;
+  color: #111 !important;
+  border-radius: 24px !important;
+  font-size: 16px !important;
+  box-sizing: border-box !important;
+}
+
+.zylo-search-results {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding: 14px 0 20px !important;
+}
+
+.zylo-search-result {
+  width: 100% !important;
+  min-height: 58px !important;
+  display: flex !important;
+  align-items: center !important;
+  text-align: left !important;
+  border: 0 !important;
+  border-bottom: 1px solid #eee !important;
+  background: #fff !important;
+  color: #111 !important;
+  padding: 12px 8px !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}
+
+.zylo-search-empty {
+  padding: 40px 12px !important;
+  text-align: center !important;
+  color: #777 !important;
+}
+
+/* =========================
+   COMMENTS
+   ========================= */
+
+.zylo-comment-panel {
+  align-items: flex-end !important;
+  justify-content: stretch !important;
+  background: rgba(0,0,0,.58) !important;
+}
+
+.zylo-comment-inner {
+  position: relative !important;
+  width: 100% !important;
+  height: 72dvh !important;
+  min-height: 300px !important;
+  max-height: calc(100dvh - env(safe-area-inset-top)) !important;
+  background: #fff !important;
+  color: #111 !important;
+  border-radius: 18px 18px 0 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  transform: translateY(100%) !important;
+  transition: transform .22s cubic-bezier(.2,.8,.2,1) !important;
+  padding-bottom: env(safe-area-inset-bottom) !important;
+  box-sizing: border-box !important;
+}
+
+.zylo-comment-panel.open .zylo-comment-inner,
+.zylo-comment-panel.active .zylo-comment-inner {
+  transform: translateY(0) !important;
+}
+
+.zylo-comment-header {
+  position: relative !important;
+  min-height: 54px !important;
+  flex: 0 0 54px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-bottom: 1px solid #eee !important;
+  font-size: 16px !important;
+}
+
+.zylo-comment-header::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 38px !important;
+  height: 4px !important;
+  border-radius: 99px !important;
+  background: #d4d4d4 !important;
+}
+
+.zylo-comment-header button {
+  position: absolute !important;
+  right: 8px !important;
+  top: 5px !important;
+  width: 44px !important;
+  height: 44px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #111 !important;
+  font-size: 28px !important;
+  cursor: pointer !important;
+}
+
+.zylo-comment-list {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding: 8px 14px 10px !important;
+}
+
+.zylo-comment-item {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  padding: 10px 0 !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+  font-size: 14px !important;
+}
+
+.zylo-comment-item strong {
+  font-size: 13px !important;
+}
+
+.zylo-comment-item span {
+  word-break: break-word !important;
+  line-height: 1.4 !important;
+}
+
+.zylo-comment-empty {
+  height: 100% !important;
+  min-height: 180px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #777 !important;
+  text-align: center !important;
+}
+
+.zylo-comment-form {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 9px 12px max(9px, env(safe-area-inset-bottom)) !important;
+  border-top: 1px solid #eee !important;
+  background: #fff !important;
+}
+
+.zylo-comment-form input {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 42px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 21px !important;
+  outline: 0 !important;
+  padding: 0 14px !important;
+  background: #f7f7f7 !important;
+  color: #111 !important;
+  font-size: 15px !important;
+}
+
+.zylo-comment-form button {
+  flex: 0 0 auto !important;
+  height: 42px !important;
+  border: 0 !important;
+  border-radius: 21px !important;
+  padding: 0 16px !important;
+  background: #111 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+
+/* Prevent feed interaction while overlay is open */
+html.zylo-overlay-open,
+body.zylo-overlay-open {
+  overflow: hidden !important;
+}
