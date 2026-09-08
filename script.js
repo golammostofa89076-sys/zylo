@@ -879,8 +879,7 @@
       }
     });
   }
-
-   /* =========================================================
+  /* =========================================================
      COMMENTS
      ========================================================= */
 
@@ -908,12 +907,7 @@
   }
 
   function openComments(button) {
-    if (!button) return;
-
-    const page = button.closest?.(".video-page");
-    if (!page) return;
-
-    const id = page.dataset?.videoId || page.id || "";
+    const id = getVideoIdFromButton(button);
     if (!id) return;
 
     closeCommentPanel();
@@ -923,9 +917,6 @@
     const panel = document.createElement("div");
     panel.className = "zylo-comment-panel";
     panel.dataset.zyloGenerated = "true";
-    panel.setAttribute("role", "dialog");
-    panel.setAttribute("aria-modal", "true");
-    panel.setAttribute("aria-label", "Comments");
 
     panel.innerHTML = `
       <div class="zylo-comment-inner">
@@ -941,7 +932,7 @@
                   (comment) => `
                     <div class="zylo-comment-item">
                       <strong>${escapeHTML(comment.username || "zylo_creator")}</strong>
-                      <span>${escapeHTML(comment.text || "")}</span>
+                      <span>${escapeHTML(comment.text)}</span>
                     </div>
                   `
                 ).join("")
@@ -964,92 +955,80 @@
 
     document.body.appendChild(panel);
 
-    /*
-       Make the generated panel visible even if an older cached CSS file
-       does not contain the .open animation rule. Normal styling remains
-       controlled by style.css; these values are only a safety fallback.
-    */
-    panel.style.setProperty("display", "flex", "important");
-    panel.style.setProperty("position", "fixed", "important");
-    panel.style.setProperty("inset", "0", "important");
-    panel.style.setProperty("z-index", "99999", "important");
-    panel.style.setProperty("opacity", "1", "important");
-    panel.style.setProperty("visibility", "visible", "important");
-    panel.style.setProperty("pointer-events", "auto", "important");
-
-    const inner = $(".zylo-comment-inner", panel);
-    if (inner) {
-      inner.style.setProperty("display", "flex", "important");
-      inner.style.setProperty("flex-direction", "column", "important");
-      inner.style.setProperty("position", "absolute", "important");
-      inner.style.setProperty("left", "0", "important");
-      inner.style.setProperty("right", "0", "important");
-      inner.style.setProperty("bottom", "0", "important");
-      inner.style.setProperty("max-height", "82vh", "important");
-      inner.style.setProperty("min-height", "42vh", "important");
-      inner.style.setProperty("background", "#fff", "important");
-      inner.style.setProperty("border-radius", "18px 18px 0 0", "important");
-      inner.style.setProperty("overflow", "hidden", "important");
-    }
-
+    /* Make the newly-created panel visible. */
     requestAnimationFrame(() => {
-      panel.classList.add("open", "active");
+      panel.classList.add("open");
     });
+
+    /* Compact TikTok-style bottom sheet. */
+    const inner = $(".zylo-comment-inner", panel);
+
+    if (inner) {
+      inner.style.setProperty("height", "55dvh", "important");
+      inner.style.setProperty("max-height", "55dvh", "important");
+      inner.style.setProperty("min-height", "0", "important");
+    }
 
     const form = $(".zylo-comment-form", panel);
     const input = $("input", form);
 
-    if (form && input) {
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+    if (!form || !input) return;
 
-        const text = input.value.trim();
-        if (!text) return;
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
 
-        const all = getComments();
-        if (!Array.isArray(all[id])) all[id] = [];
+      const text = input.value.trim();
+      if (!text) return;
 
-        all[id].push({
-          id: makeId("comment"),
-          uid: getUserUID(),
-          username: getUsername(),
-          text,
-          createdAt: Date.now()
-        });
+      const all = getComments();
 
-        setComments(all);
-        input.value = "";
+      if (!Array.isArray(all[id])) {
+        all[id] = [];
+      }
 
-        openComments(button);
+      all[id].push({
+        id: makeId("comment"),
+        uid: getUserUID(),
+        username: getUsername(),
+        text,
+        createdAt: Date.now()
       });
+
+      setComments(all);
+
+      input.value = "";
+
+      /* Re-render comments while keeping the same video. */
+      openComments(button);
+    });
+
+    const closeButton = $(
+      "[data-zylo-comment-close]",
+      panel
+    );
+
+    if (closeButton) {
+      closeButton.addEventListener(
+        "click",
+        (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          closeCommentPanel();
+        }
+      );
     }
 
-    const closeButton = $("[data-zylo-comment-close]", panel);
-    closeButton?.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      closeCommentPanel();
-    });
-
-    panel.addEventListener("click", (event) => {
-      if (event.target === panel) {
-        closeCommentPanel();
-      }
-    });
-
     window.setTimeout(() => {
-      try { input?.focus({ preventScroll: true }); }
-      catch { input?.focus(); }
+      try {
+        input.focus();
+      } catch {}
     }, 80);
   }
 
   function setupCommentButtons() {
     const selector = '[aria-label="Comments"], .comment-btn';
 
-    const handleComment = (event) => {
-      const target = event.target;
-      const button = target?.closest?.(selector);
+    const handleComment = (button, event) => {
       if (!button) return;
 
       event.preventDefault();
@@ -1059,24 +1038,32 @@
     };
 
     /*
-       Capture phase makes the button reliable on mobile even if another
-       bubbling handler on the feed/video stops the normal click event.
-    */
-    document.addEventListener("click", handleComment, true);
-
-    /*
-       Also bind directly to the current buttons for maximum reliability.
-    */
+     * Direct listeners for buttons that already exist.
+     * This makes the Comment button work immediately.
+     */
     $$(selector).forEach((button) => {
       if (button.dataset.zyloCommentBound === "true") return;
+
       button.dataset.zyloCommentBound = "true";
 
       button.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-        openComments(button);
+        handleComment(button, event);
       });
+    });
+
+    /*
+     * Delegated backup for dynamically-created video buttons.
+     */
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest(selector);
+
+      if (!button) return;
+
+      if (button.dataset.zyloCommentBound === "true") {
+        return;
+      }
+
+      handleComment(button, event);
     });
   }
 
@@ -1087,7 +1074,10 @@
   async function shareVideo(button) {
     const page = button.closest(".video-page");
     const id = page?.dataset?.videoId || "";
-    const url = `${window.location.origin}${window.location.pathname}#video-${encodeURIComponent(id)}`;
+
+    const url =
+      `${window.location.origin}${window.location.pathname}` +
+      `#video-${encodeURIComponent(id)}`;
 
     try {
       if (navigator.share) {
@@ -1098,8 +1088,13 @@
         });
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(url);
+
         button.classList.add("active");
-        window.setTimeout(() => button.classList.remove("active"), 1200);
+
+        window.setTimeout(
+          () => button.classList.remove("active"),
+          1200
+        );
       }
     } catch {}
   }
@@ -1187,11 +1182,15 @@
       if (isInteractiveTarget(event.target)) return;
 
       const page = event.target.closest(".video-page");
+
       if (!page) return;
 
       const now = Date.now();
 
-      if (lastTarget === page && now - lastTap < 320) {
+      if (
+        lastTarget === page &&
+        now - lastTap < 320
+      ) {
         const likeButton = $(".like-btn", page);
 
         if (likeButton) {
@@ -1215,6 +1214,7 @@
         page?.dataset?.ownerUid ||
         page?.dataset?.uid ||
         "creator",
+
       username:
         page?.dataset?.creatorUsername ||
         page?.dataset?.username ||
@@ -1229,17 +1229,29 @@
 
     if (!panel) {
       panel = document.createElement("div");
+
       panel.id = "zyloCreatorProfile";
       panel.className = "zylo-profile-panel";
 
       panel.innerHTML = `
         <div class="zylo-profile-inner">
-          <button type="button" class="zylo-profile-close" aria-label="Close">×</button>
+
+          <button
+            type="button"
+            class="zylo-profile-close"
+            aria-label="Close"
+          >×</button>
+
           <div class="zylo-profile-avatar">Z</div>
+
           <h2 class="zylo-profile-name"></h2>
+
           <p class="zylo-profile-handle"></p>
 
-          <button type="button" class="zylo-profile-follow">
+          <button
+            type="button"
+            class="zylo-profile-follow"
+          >
             Follow
           </button>
 
@@ -1247,6 +1259,7 @@
             <h3>Videos</h3>
             <div class="zylo-profile-video-list"></div>
           </div>
+
         </div>
       `;
 
@@ -1260,19 +1273,30 @@
       $(".zylo-profile-follow", panel)?.addEventListener(
         "click",
         () => {
-          const follows = getStorage(CONFIG.STORAGE.FOLLOWS, []);
+          const follows = getStorage(
+            CONFIG.STORAGE.FOLLOWS,
+            []
+          );
+
           const uid = panel.dataset.creatorUid;
           const index = follows.indexOf(uid);
 
           if (index >= 0) {
             follows.splice(index, 1);
-            $(".zylo-profile-follow", panel).textContent = "Follow";
+
+            $(".zylo-profile-follow", panel).textContent =
+              "Follow";
           } else {
             follows.push(uid);
-            $(".zylo-profile-follow", panel).textContent = "Following";
+
+            $(".zylo-profile-follow", panel).textContent =
+              "Following";
           }
 
-          setStorage(CONFIG.STORAGE.FOLLOWS, follows);
+          setStorage(
+            CONFIG.STORAGE.FOLLOWS,
+            follows
+          );
         }
       );
     }
@@ -1285,9 +1309,15 @@
     $(".zylo-profile-handle", panel).textContent =
       `@${creator.username || "zylo_creator"}`;
 
-    const follows = getStorage(CONFIG.STORAGE.FOLLOWS, []);
+    const follows = getStorage(
+      CONFIG.STORAGE.FOLLOWS,
+      []
+    );
+
     $(".zylo-profile-follow", panel).textContent =
-      follows.includes(creator.uid) ? "Following" : "Follow";
+      follows.includes(creator.uid)
+        ? "Following"
+        : "Follow";
 
     const list = $(".zylo-profile-video-list", panel);
 
@@ -1295,6 +1325,7 @@
       .getPages()
       .filter((item) => {
         const data = getCreatorData(item);
+
         return data.uid === creator.uid;
       });
 
@@ -1303,36 +1334,50 @@
     creatorPages.forEach((item) => {
       const thumb = document.createElement("div");
 
+      thumb.className =
+        "zylo-profile-video-item";
 
-                              thumb.className = "zylo-profile-video-item";
       thumb.textContent =
-        item.dataset.videoId || "Video";
+        item.dataset.videoId ||
+        "Video";
 
       thumb.addEventListener("click", () => {
-        const index = VideoEngine.getPages().indexOf(item);
+        const index =
+          VideoEngine
+            .getPages()
+            .indexOf(item);
 
         if (index >= 0) {
           panel.remove();
-          VideoEngine.scrollToPage(index, "smooth");
+
+          VideoEngine.scrollToPage(
+            index,
+            "smooth"
+          );
         }
       });
 
       list.appendChild(thumb);
     });
 
-    panel.classList.add("open", "active");
+    panel.classList.add(
+      "open",
+      "active"
+    );
   }
 
   function setupCreatorProfileButtons() {
     document.addEventListener("click", (event) => {
-      const button = event.target.closest(".profile-action");
+      const button =
+        event.target.closest(".profile-action");
 
       if (!button) return;
 
       event.preventDefault();
       event.stopPropagation();
 
-      const page = button.closest(".video-page");
+      const page =
+        button.closest(".video-page");
 
       if (page) {
         showCreatorProfile(page);
@@ -1346,16 +1391,24 @@
 
   function setupNavigation() {
     document.addEventListener("click", (event) => {
-      const nav = event.target.closest(".nav-item");
+      const nav =
+        event.target.closest(".nav-item");
 
       if (!nav) return;
 
-      const type = nav.dataset.nav;
+      const type =
+        nav.dataset.nav;
 
       if (type === "home") {
         event.preventDefault();
+
         VideoEngine.refresh();
-        VideoEngine.scrollToPage(0, "smooth");
+
+        VideoEngine.scrollToPage(
+          0,
+          "smooth"
+        );
+
         return;
       }
 
@@ -1365,26 +1418,34 @@
          * We only emit an event so auth.js can react.
          */
         window.dispatchEvent(
-          new CustomEvent("zylo:openprofile")
+          new CustomEvent(
+            "zylo:openprofile"
+          )
         );
       }
     });
 
     document.addEventListener("click", (event) => {
-      const tab = event.target.closest("[data-feed-tab]");
+      const tab =
+        event.target.closest("[data-feed-tab]");
 
       if (!tab) return;
 
-      const type = tab.dataset.feedTab;
+      const type =
+        tab.dataset.feedTab;
 
-      if (type === "for-you" || type === "following") {
+      if (
+        type === "for-you" ||
+        type === "following"
+      ) {
         filterFeed(type);
       }
     });
   }
 
   function filterFeed(type) {
-    const pages = $$(".video-page");
+    const pages =
+      $$(".video-page");
 
     pages.forEach((page) => {
       if (type === "for-you") {
@@ -1393,19 +1454,36 @@
         return;
       }
 
-      const creator = getCreatorData(page);
-      const follows = getStorage(CONFIG.STORAGE.FOLLOWS, []);
+      const creator =
+        getCreatorData(page);
 
-      /* Keep every video page mounted. Following mode is handled without deleting/hiding feed pages. */
+      const follows =
+        getStorage(
+          CONFIG.STORAGE.FOLLOWS,
+          []
+        );
+
+      /*
+       * Keep every video page mounted.
+       * Following mode is handled without
+       * deleting/hiding feed pages.
+       */
       page.hidden = false;
       page.style.display = "";
-      page.dataset.followingMatch = follows.includes(creator.uid) ? "true" : "false";
+
+      page.dataset.followingMatch =
+        follows.includes(creator.uid)
+          ? "true"
+          : "false";
     });
 
     VideoEngine.refresh();
 
     window.setTimeout(() => {
-      VideoEngine.scrollToPage(0, "auto");
+      VideoEngine.scrollToPage(
+        0,
+        "auto"
+      );
     }, 80);
   }
 
@@ -1414,87 +1492,137 @@
      ========================================================= */
 
   function createSearchOverlay() {
-    let overlay = $("#zyloSearchOverlay");
+    let overlay =
+      $("#zyloSearchOverlay");
 
     if (overlay) return overlay;
 
-    overlay = document.createElement("div");
-    overlay.id = "zyloSearchOverlay";
-    overlay.className = "zylo-search-overlay";
+    overlay =
+      document.createElement("div");
+
+    overlay.id =
+      "zyloSearchOverlay";
+
+    overlay.className =
+      "zylo-search-overlay";
 
     overlay.innerHTML = `
       <div class="zylo-search-inner">
-        <button type="button" class="zylo-search-close">×</button>
+
+        <button
+          type="button"
+          class="zylo-search-close"
+        >
+          ×
+        </button>
+
         <input
           class="zylo-search-input"
           type="search"
           placeholder="Search videos or creators..."
           autocomplete="off"
         />
+
         <div class="zylo-search-results"></div>
+
       </div>
     `;
 
     document.body.appendChild(overlay);
 
-    $(".zylo-search-close", overlay)?.addEventListener(
-      "click",
-      () => overlay.remove()
+    $(".zylo-search-close", overlay)
+      ?.addEventListener(
+        "click",
+        () => overlay.remove()
+      );
+
+    const input =
+      $(".zylo-search-input", overlay);
+
+    input.addEventListener(
+      "input",
+      () => {
+        performSearch(
+          input.value,
+          overlay
+        );
+      }
     );
-
-    const input = $(".zylo-search-input", overlay);
-
-    input.addEventListener("input", () => {
-      performSearch(input.value, overlay);
-    });
 
     return overlay;
   }
 
-  function performSearch(query, overlay) {
-    const term = String(query || "").trim().toLowerCase();
-    const results = $(".zylo-search-results", overlay);
+  function performSearch(
+    query,
+    overlay
+  ) {
+    const term =
+      String(query || "")
+        .trim()
+        .toLowerCase();
+
+    const results =
+      $(".zylo-search-results", overlay);
 
     if (!term) {
       results.innerHTML = "";
       return;
     }
 
-    const pages = VideoEngine.getPages().filter((page) => {
-      const creator = getCreatorData(page);
+    const pages =
+      VideoEngine
+        .getPages()
+        .filter((page) => {
+          const creator =
+            getCreatorData(page);
 
-      const text = [
-        page.dataset.videoId,
-        page.dataset.title,
-        page.dataset.description,
-        creator.username
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+          const text = [
+            page.dataset.videoId,
+            page.dataset.title,
+            page.dataset.description,
+            creator.username
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
 
-      return text.includes(term);
-    });
+          return text.includes(term);
+        });
 
     results.innerHTML = "";
 
     pages.forEach((page) => {
-      const item = document.createElement("button");
+      const item =
+        document.createElement("button");
+
       item.type = "button";
-      item.className = "zylo-search-result";
+
+      item.className =
+        "zylo-search-result";
+
       item.textContent =
         page.dataset.title ||
         page.dataset.videoId ||
         getCreatorData(page).username;
 
-      item.addEventListener("click", () => {
-        const index = VideoEngine.getPages().indexOf(page);
+      item.addEventListener(
+        "click",
+        () => {
+          const index =
+            VideoEngine
+              .getPages()
+              .indexOf(page);
 
-        if (index >= 0) {
-          overlay.remove();
-          VideoEngine.scrollToPage(index, "smooth");
+          if (index >= 0) {
+            overlay.remove();
+
+            VideoEngine.scrollToPage(
+              index,
+              "smooth"
+            );
+          }
         }
-      });
+      );
 
       results.appendChild(item);
     });
@@ -1502,101 +1630,167 @@
 
   function setupSearch() {
     document.addEventListener("click", (event) => {
-      const button = event.target.closest(".search-btn");
+      const button =
+        event.target.closest(".search-btn");
 
       if (!button) return;
 
       event.preventDefault();
       event.stopPropagation();
 
-      const overlay = createSearchOverlay();
-      overlay.classList.add("open", "active");
+      const overlay =
+        createSearchOverlay();
+
+      overlay.classList.add(
+        "open",
+        "active"
+      );
 
       window.setTimeout(() => {
-        $(".zylo-search-input", overlay)?.focus();
+        $(".zylo-search-input", overlay)
+          ?.focus();
       }, 50);
     });
   }
 
-  /* =========================================================
+   
+     /* =========================================================
      CREATE / UPLOAD
      ========================================================= */
 
   function getUploadBox() {
-    return $("#uploadBox") || $(".upload-box");
+    return (
+      $("#uploadBox") ||
+      $(".upload-box")
+    );
   }
 
   function openUploadBox() {
-    const box = getUploadBox();
+    const box =
+      getUploadBox();
 
     if (!box) {
-      console.warn("ZYLO: upload box not found.");
+      console.warn(
+        "ZYLO: upload box not found."
+      );
       return;
     }
 
     box.hidden = false;
     box.style.display = "flex";
-    box.classList.add("open", "active");
+
+    box.classList.add(
+      "open",
+      "active"
+    );
   }
 
   function closeUploadBox() {
-    const box = getUploadBox();
+    const box =
+      getUploadBox();
 
     if (!box) return;
 
-    box.classList.remove("open", "active");
+    box.classList.remove(
+      "open",
+      "active"
+    );
+
     box.hidden = true;
     box.style.display = "none";
   }
 
   function setupUploadCloseButtons() {
-    document.addEventListener("click", (event) => {
-      if (
-        event.target.closest(
-          "#closeUpload,.close-upload,.upload-close,[data-close-upload]"
-        )
-      ) {
-        event.preventDefault();
-        closeUploadBox();
+    document.addEventListener(
+      "click",
+      (event) => {
+        if (
+          event.target.closest(
+            "#closeUpload,.close-upload," +
+            ".upload-close,[data-close-upload]"
+          )
+        ) {
+          event.preventDefault();
+
+          closeUploadBox();
+        }
       }
-    });
+    );
   }
 
   function setupCreateButton() {
-    document.addEventListener("click", (event) => {
-      const button = event.target.closest("#createBtn,.create-btn");
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            "#createBtn,.create-btn"
+          );
 
-      if (!button) return;
+        if (!button) return;
 
-      event.preventDefault();
-      event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
 
-      openUploadBox();
-    });
+        openUploadBox();
+      }
+    );
   }
 
   function createUploadedPage(data) {
-    const feed = getFeed();
+    const feed =
+      $(".video-feed");
+
     if (!feed) return null;
 
-    const page = document.createElement("section");
-    page.className = "video-page";
-    page.dataset.videoId = data.id;
-    page.dataset.creatorUid = data.uid || getUserUID();
-    page.dataset.creatorUsername = data.username || getUsername();
-    page.dataset.uploaded = "true";
+    const page =
+      document.createElement("section");
+
+    page.className =
+      "video-page";
+
+    page.dataset.videoId =
+      data.id;
+
+    page.dataset.creatorUid =
+      data.uid ||
+      getUserUID();
+
+    page.dataset.creatorUsername =
+      data.username ||
+      getUsername();
+
+    page.dataset.uploaded =
+      "true";
 
     /*
-     * The existing CSS/UI remains responsible for the visual layout.
-     * We create only the minimum video element and metadata.
+     * The existing CSS/UI remains responsible
+     * for the visual layout.
+     * We create only the minimum video element
+     * and metadata.
      */
-    const video = document.createElement("video");
-    video.src = data.url;
+    const video =
+      document.createElement("video");
+
+    video.src =
+      data.url;
+
     video.muted = true;
     video.playsInline = true;
-    video.setAttribute("playsinline", "");
-    video.setAttribute("muted", "");
-    video.preload = "metadata";
+
+    video.setAttribute(
+      "playsinline",
+      ""
+    );
+
+    video.setAttribute(
+      "muted",
+      ""
+    );
+
+    video.preload =
+      "metadata";
+
     video.loop = false;
 
     page.appendChild(video);
@@ -1609,44 +1803,77 @@
     if (!file) return;
 
     if (!file.type.startsWith("video/")) {
-      alert("Please select a video file.");
+      alert(
+        "Please select a video file."
+      );
+
       return;
     }
 
-    const uid = getUserUID();
-    const username = getUsername();
+    const uid =
+      getUserUID();
 
-    const formData = new FormData();
-    formData.append("video", file);
-    formData.append("uid", uid);
-    formData.append("username", username);
+    const username =
+      getUsername();
+
+    const formData =
+      new FormData();
+
+    formData.append(
+      "video",
+      file
+    );
+
+    formData.append(
+      "uid",
+      uid
+    );
+
+    formData.append(
+      "username",
+      username
+    );
 
     let serverURL = "";
 
     try {
-      const response = await fetch(
-        `${CONFIG.API_BASE_URL}/api/upload`,
-        {
-          method: "POST",
-          body: formData
-        }
-      );
+      const response =
+        await fetch(
+          `${CONFIG.API_BASE_URL}/api/upload`,
+          {
+            method: "POST",
+            body: formData
+          }
+        );
 
-      const result = await response.json();
+      const result =
+        await response.json();
 
-      if (response.ok && result?.url) {
-        serverURL = result.url;
+      if (
+        response.ok &&
+        result?.url
+      ) {
+        serverURL =
+          result.url;
       }
     } catch (error) {
-      console.warn("ZYLO upload server error:", error);
+      console.warn(
+        "ZYLO upload server error:",
+        error
+      );
     }
 
     /*
      * Local object URL is used as immediate fallback.
-     * It is intentionally stored only for the current browser session.
+     * It is intentionally stored only for the
+     * current browser session.
      */
-    const localURL = URL.createObjectURL(file);
-    const finalURL = serverURL || localURL;
+    const localURL =
+      URL.createObjectURL(file);
+
+    const finalURL =
+      serverURL ||
+      localURL;
 
     const videoData = {
       id: makeId("video"),
@@ -1658,23 +1885,39 @@
       createdAt: Date.now()
     };
 
-    const uploads = getStorage(
-      CONFIG.STORAGE.UPLOADED_VIDEOS,
-      []
+    const uploads =
+      getStorage(
+        CONFIG.STORAGE.UPLOADED_VIDEOS,
+        []
+      );
+
+    uploads.unshift(
+      videoData
     );
 
-    uploads.unshift(videoData);
-    setStorage(CONFIG.STORAGE.UPLOADED_VIDEOS, uploads);
+    setStorage(
+      CONFIG.STORAGE.UPLOADED_VIDEOS,
+      uploads
+    );
 
-    const page = createUploadedPage(videoData);
+    const page =
+      createUploadedPage(
+        videoData
+      );
 
     VideoEngine.refresh();
 
     if (page) {
-      const index = VideoEngine.getPages().indexOf(page);
+      const index =
+        VideoEngine
+          .getPages()
+          .indexOf(page);
 
       if (index >= 0) {
-        VideoEngine.scrollToPage(index, "smooth");
+        VideoEngine.scrollToPage(
+          index,
+          "smooth"
+        );
       }
     }
 
@@ -1682,36 +1925,62 @@
   }
 
   function restoreUploadedVideos() {
-    const uploads = getStorage(
-      CONFIG.STORAGE.UPLOADED_VIDEOS,
-      []
-    );
+    const uploads =
+      getStorage(
+        CONFIG.STORAGE.UPLOADED_VIDEOS,
+        []
+      );
 
-    if (!Array.isArray(uploads) || !uploads.length) return;
+    if (
+      !Array.isArray(uploads) ||
+      !uploads.length
+    ) {
+      return;
+    }
 
-    const feed = getFeed();
+    const feed =
+      $(".video-feed");
+
     if (!feed) return;
 
-    const existingIds = new Set(
-      $$(".video-page", feed)
-        .map((page) => page.dataset.videoId)
-        .filter(Boolean)
-    );
+    const existingIds =
+      new Set(
+        $$(".video-page", feed)
+          .map(
+            (page) =>
+              page.dataset.videoId
+          )
+          .filter(Boolean)
+      );
 
     uploads
       .slice()
       .reverse()
       .forEach((data) => {
-        if (!data?.id || existingIds.has(data.id)) return;
+        if (
+          !data?.id ||
+          existingIds.has(data.id)
+        ) {
+          return;
+        }
 
         /*
-         * Server URL survives reload. Blob URL does not.
-         * For an old local-only upload, we skip it rather than
-         * showing a broken video.
+         * Server URL survives reload.
+         * Blob URL does not.
+         * For an old local-only upload,
+         * skip it rather than showing
+         * a broken video.
          */
-        const url = data.serverURL || data.url;
+        const url =
+          data.serverURL ||
+          data.url;
 
-        if (!url || String(url).startsWith("blob:")) return;
+        if (
+          !url ||
+          String(url).startsWith("blob:")
+        ) {
+          return;
+        }
 
         createUploadedPage({
           ...data,
@@ -1723,19 +1992,26 @@
   }
 
   function setupUploadInput() {
-    document.addEventListener("change", (event) => {
-      const input = event.target.closest("#videoInput");
+    document.addEventListener(
+      "change",
+      (event) => {
+        const input =
+          event.target.closest(
+            "#videoInput"
+          );
 
-      if (!input) return;
+        if (!input) return;
 
-      const file = input.files?.[0];
+        const file =
+          input.files?.[0];
 
-      if (!file) return;
+        if (!file) return;
 
-      uploadVideo(file);
+        uploadVideo(file);
 
-      input.value = "";
-    });
+        input.value = "";
+      }
+    );
   }
 
   /* =========================================================
@@ -1743,19 +2019,33 @@
      ========================================================= */
 
   function setupVideoClick() {
-    document.addEventListener("click", (event) => {
-      if (isInteractiveTarget(event.target)) return;
+    document.addEventListener(
+      "click",
+      (event) => {
+        if (
+          isInteractiveTarget(
+            event.target
+          )
+        ) {
+          return;
+        }
 
-      const video = event.target.closest("video");
-      if (!video) return;
+        const video =
+          event.target.closest("video");
 
-      if (video.paused) {
-        video.muted = true;
-        VideoEngine.playVideo(video);
-      } else {
-        video.pause();
+        if (!video) return;
+
+        if (video.paused) {
+          video.muted = true;
+
+          VideoEngine.playVideo(
+            video
+          );
+        } else {
+          video.pause();
+        }
       }
-    });
+    );
   }
 
   /* =========================================================
@@ -1763,27 +2053,42 @@
      ========================================================= */
 
   function setupVisibilityHandling() {
-    document.addEventListener("visibilitychange", () => {
-      const pages = VideoEngine.getPages();
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        const pages =
+          VideoEngine.getPages();
 
-      if (document.hidden) {
-        pages.forEach((page) => {
-          const video = $("video", page);
-          if (video) {
-            try { video.pause(); } catch {}
-          }
-        });
-        return;
+        if (document.hidden) {
+          pages.forEach(
+            (page) => {
+              const video =
+                $("video", page);
+
+              if (video) {
+                try {
+                  video.pause();
+                } catch {}
+              }
+            }
+          );
+
+          return;
+        }
+
+        const index =
+          VideoEngine.getActiveIndex();
+
+        if (index >= 0) {
+          VideoEngine.activate(
+            index,
+            {
+              updateHash: false
+            }
+          );
+        }
       }
-
-      const index = VideoEngine.getActiveIndex();
-
-      if (index >= 0) {
-        VideoEngine.activate(index, {
-          updateHash: false
-        });
-      }
-    });
+    );
   }
 
   /* =========================================================
@@ -1791,31 +2096,58 @@
      ========================================================= */
 
   function setupKeyboardNavigation() {
-    document.addEventListener("keydown", (event) => {
-      if (isInteractiveTarget(event.target)) return;
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          isInteractiveTarget(
+            event.target
+          )
+        ) {
+          return;
+        }
 
-      if (event.key === "ArrowDown" || event.key === "PageDown") {
-        event.preventDefault();
-        VideoEngine.next();
+        if (
+          event.key === "ArrowDown" ||
+          event.key === "PageDown"
+        ) {
+          event.preventDefault();
+
+          VideoEngine.next();
+        }
+
+        if (
+          event.key === "ArrowUp" ||
+          event.key === "PageUp"
+        ) {
+          event.preventDefault();
+
+          VideoEngine.previous();
+        }
+
+        if (
+          event.key === "Escape"
+        ) {
+          closeCommentPanel();
+
+          const search =
+            $("#zyloSearchOverlay");
+
+          if (search) {
+            search.remove();
+          }
+
+          const profile =
+            $("#zyloCreatorProfile");
+
+          if (profile) {
+            profile.remove();
+          }
+
+          closeUploadBox();
+        }
       }
-
-      if (event.key === "ArrowUp" || event.key === "PageUp") {
-        event.preventDefault();
-        VideoEngine.previous();
-      }
-
-      if (event.key === "Escape") {
-        closeCommentPanel();
-
-        const search = $("#zyloSearchOverlay");
-        if (search) search.remove();
-
-        const profile = $("#zyloCreatorProfile");
-        if (profile) profile.remove();
-
-        closeUploadBox();
-      }
-    });
+    );
   }
 
   /* =========================================================
@@ -1851,20 +2183,34 @@
 
     openHashVideo();
 
-    window.addEventListener("hashchange", openHashVideo);
+    window.addEventListener(
+      "hashchange",
+      openHashVideo
+    );
 
-    window.addEventListener("resize", () => {
-      VideoEngine.refresh();
-    });
+    window.addEventListener(
+      "resize",
+      () => {
+        VideoEngine.refresh();
+      }
+    );
 
-    window.addEventListener("zylo:authloaded", () => {
-      VideoEngine.refresh();
-    });
+    window.addEventListener(
+      "zylo:authloaded",
+      () => {
+        VideoEngine.refresh();
+      }
+    );
 
-    console.log("ZYLO frontend initialized");
+    console.log(
+      "ZYLO frontend initialized"
+    );
   }
 
-  if (document.readyState === "loading") {
+  if (
+    document.readyState ===
+    "loading"
+  ) {
     document.addEventListener(
       "DOMContentLoaded",
       initializeZYLO,
@@ -1878,7 +2224,8 @@
      GLOBAL API
      ========================================================= */
 
-  window.ZYLOVideoEngine = VideoEngine;
+  window.ZYLOVideoEngine =
+    VideoEngine;
 
   window.ZYLO = {
     VideoEngine,
@@ -1889,4 +2236,7 @@
     getUserUID,
     getUsername
   };
-})(); 
+
+})();
+   
+ 
