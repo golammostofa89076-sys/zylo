@@ -2638,8 +2638,1975 @@
           width: min(680px, 100%) !important;
         }
       }
+
+        /* =========================================================
+     COMMENTS
+     ========================================================= */
+
+  function getCommentsStore() {
+    const value = getStorage(
+      CONFIG.STORAGE.COMMENTS,
+      {}
+    );
+
+    return value &&
+      typeof value === "object" &&
+      !Array.isArray(value)
+      ? value
+      : {};
+  }
+
+  function saveCommentsStore(store) {
+    setStorage(
+      CONFIG.STORAGE.COMMENTS,
+      store
+    );
+  }
+
+  function getComments(videoId) {
+    const store =
+      getCommentsStore();
+
+    const comments =
+      store[videoId];
+
+    return Array.isArray(
+      comments
+    )
+      ? comments
+      : [];
+  }
+
+  function createCommentPanel() {
+    ensureOverlayStyles();
+
+    let panel =
+      document.getElementById(
+        "zyloCommentPanel"
+      );
+
+    if (panel) {
+      return panel;
+    }
+
+    panel =
+      document.createElement(
+        "div"
+      );
+
+    panel.id =
+      "zyloCommentPanel";
+
+    panel.className =
+      "zylo-comment-panel";
+
+    panel.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    panel.innerHTML = `
+      <div class="zylo-comment-inner"
+           role="dialog"
+           aria-modal="true"
+           aria-label="Comments">
+
+        <div class="zylo-comment-header">
+          <strong>
+            Comments
+          </strong>
+
+          <button
+            type="button"
+            class="zylo-comment-close"
+            aria-label="Close comments">
+            ×
+          </button>
+        </div>
+
+        <div
+          class="zylo-comment-list"
+          id="zyloCommentList">
+        </div>
+
+        <form
+          class="zylo-comment-form"
+          id="zyloCommentForm">
+
+          <input
+            id="zyloCommentInput"
+            type="text"
+            maxlength="500"
+            autocomplete="off"
+            placeholder="Add a comment…"
+            aria-label="Add a comment"
+          />
+
+          <button
+            type="submit">
+            Post
+          </button>
+
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(
+      panel
+    );
+
+    const closeButton =
+      panel.querySelector(
+        ".zylo-comment-close"
+      );
+
+    const form =
+      panel.querySelector(
+        "#zyloCommentForm"
+      );
+
+    closeButton?.addEventListener(
+      "click",
+      () => closeComments()
+    );
+
+    form?.addEventListener(
+      "submit",
+      (event) => {
+        event.preventDefault();
+
+        const input =
+          panel.querySelector(
+            "#zyloCommentInput"
+          );
+
+        const text =
+          input?.value?.trim() ||
+          "";
+
+        if (!text) {
+          return;
+        }
+
+        addComment(
+          panel.dataset.videoId,
+          text
+        );
+
+        if (input) {
+          input.value = "";
+          input.focus();
+        }
+      }
+    );
+
+    panel.addEventListener(
+      "click",
+      (event) => {
+        if (
+          event.target === panel
+        ) {
+          closeComments();
+        }
+      }
+    );
+
+    return panel;
+  }
+
+  function renderComments(
+    videoId
+  ) {
+    const panel =
+      createCommentPanel();
+
+    const list =
+      panel.querySelector(
+        "#zyloCommentList"
+      );
+
+    if (!list) return;
+
+    const comments =
+      getComments(videoId);
+
+    if (!comments.length) {
+      list.innerHTML = `
+        <div class="zylo-comment-empty">
+          <div>
+            <div style="font-size:32px;margin-bottom:8px;">
+              💬
+            </div>
+            <div>
+              No comments yet
+            </div>
+            <div style="font-size:13px;margin-top:5px;">
+              Be the first to comment.
+            </div>
+          </div>
+        </div>
+      `;
+
+      return;
+    }
+
+    list.innerHTML =
+      comments
+        .map(
+          (comment) => `
+            <div class="zylo-comment-item">
+              <strong>
+                ${escapeHTML(
+                  comment.username ||
+                    "zylo_user"
+                )}
+              </strong>
+
+              <span>
+                ${escapeHTML(
+                  comment.text ||
+                    ""
+                )}
+              </span>
+            </div>
+          `
+        )
+        .join("");
+
+    requestAnimationFrame(
+      () => {
+        list.scrollTop =
+          list.scrollHeight;
+      }
+    );
+  }
+
+  function addComment(
+    videoId,
+    text
+  ) {
+    if (!videoId || !text) {
+      return;
+    }
+
+    const store =
+      getCommentsStore();
+
+    if (!Array.isArray(
+      store[videoId]
+    )) {
+      store[videoId] = [];
+    }
+
+    store[videoId].push({
+      id: makeId("comment"),
+      username:
+        getUsername(),
+      text,
+      createdAt:
+        Date.now()
+    });
+
+    saveCommentsStore(
+      store
+    );
+
+    renderComments(
+      videoId
+    );
+
+    Analytics.track(
+      "comment",
+      {
+        videoId
+      }
+    );
+  }
+
+  function openComments(
+    videoId
+  ) {
+    if (!videoId) return;
+
+    ensureOverlayStyles();
+
+    const panel =
+      createCommentPanel();
+
+    panel.dataset.videoId =
+      videoId;
+
+    renderComments(
+      videoId
+    );
+
+    document.documentElement
+      .classList.add(
+        "zylo-overlay-open"
+      );
+
+    document.body.classList.add(
+      "zylo-overlay-open"
+    );
+
+    panel.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    panel.classList.add(
+      "open",
+      "active"
+    );
+
+    Analytics.track(
+      "comment_open",
+      {
+        videoId
+      }
+    );
+
+    const input =
+      panel.querySelector(
+        "#zyloCommentInput"
+      );
+
+    window.setTimeout(
+      () => {
+        try {
+          input?.focus({
+            preventScroll:
+              true
+          });
+        } catch {
+          input?.focus();
+        }
+      },
+      220
+    );
+  }
+
+  function closeComments() {
+    const panel =
+      document.getElementById(
+        "zyloCommentPanel"
+      );
+
+    if (!panel) return;
+
+    panel.classList.remove(
+      "active",
+      "open"
+    );
+
+    panel.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    document.documentElement
+      .classList.remove(
+        "zylo-overlay-open"
+      );
+
+    document.body.classList.remove(
+      "zylo-overlay-open"
+    );
+
+    try {
+      document.activeElement?.blur();
+    } catch {}
+  }
+
+  function setupCommentButtons() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            ".comment-btn"
+          );
+
+        if (!button) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const page =
+          button.closest(
+            ".video-page"
+          );
+
+        const videoId =
+          page?.dataset?.videoId ||
+          page?.id ||
+          "";
+
+        if (!videoId) {
+          return;
+        }
+
+        openComments(
+          videoId
+        );
+      },
+      true
+    );
+  }
+
+  /* =========================================================
+     SEARCH
+     ========================================================= */
+
+  function createSearchOverlay() {
+    ensureOverlayStyles();
+
+    let overlay =
+      document.getElementById(
+        "zyloSearchOverlay"
+      );
+
+    if (overlay) {
+      return overlay;
+    }
+
+    overlay =
+      document.createElement(
+        "div"
+      );
+
+    overlay.id =
+      "zyloSearchOverlay";
+
+    overlay.className =
+      "zylo-search-overlay";
+
+    overlay.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    overlay.innerHTML = `
+      <div class="zylo-search-inner">
+
+        <div class="zylo-search-top">
+
+          <button
+            type="button"
+            class="zylo-search-close"
+            aria-label="Back">
+            ‹
+          </button>
+
+          <div class="zylo-search-input-wrap">
+            <input
+              class="zylo-search-input"
+              id="zyloSearchInput"
+              type="search"
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+              placeholder="Search"
+              aria-label="Search"
+            />
+          </div>
+
+        </div>
+
+        <div
+          class="zylo-search-results"
+          id="zyloSearchResults">
+        </div>
+
+      </div>
+    `;
+
+    document.body.appendChild(
+      overlay
+    );
+
+    const closeButton =
+      overlay.querySelector(
+        ".zylo-search-close"
+      );
+
+    closeButton?.addEventListener(
+      "click",
+      () => closeSearch()
+    );
+
+    overlay.addEventListener(
+      "click",
+      (event) => {
+        if (
+          event.target ===
+          overlay
+        ) {
+          closeSearch();
+        }
+      }
+    );
+
+    const input =
+      overlay.querySelector(
+        "#zyloSearchInput"
+      );
+
+    input?.addEventListener(
+      "input",
+      () => {
+        renderSearchResults(
+          input.value
+        );
+      }
+    );
+
+    input?.addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          event.key ===
+          "Escape"
+        ) {
+          closeSearch();
+        }
+      }
+    );
+
+    return overlay;
+  }
+
+  function getSearchItems() {
+    const pages =
+      VideoEngine.getPages();
+
+    return pages.map(
+      (page) => ({
+        page,
+        videoId:
+          page.dataset.videoId ||
+          "",
+        creator:
+          page.dataset
+            .creatorUsername ||
+          page.dataset
+            .creatorUid ||
+          "zylo_creator",
+        title:
+          page.dataset.title ||
+          ""
+      })
+    );
+  }
+
+  function renderSearchResults(
+    query = ""
+  ) {
+    const overlay =
+      createSearchOverlay();
+
+    const results =
+      overlay.querySelector(
+        "#zyloSearchResults"
+      );
+
+    if (!results) {
+      return;
+    }
+
+    const search =
+      String(query)
+        .trim()
+        .toLowerCase();
+
+    const items =
+      getSearchItems();
+
+    const filtered =
+      search
+        ? items.filter(
+            (item) =>
+              item.title
+                .toLowerCase()
+                .includes(search) ||
+              item.creator
+                .toLowerCase()
+                .includes(search) ||
+              item.videoId
+                .toLowerCase()
+                .includes(search)
+          )
+        : items;
+
+    if (!filtered.length) {
+      results.innerHTML = `
+        <div class="zylo-search-empty">
+          No results found
+        </div>
+      `;
+
+      return;
+    }
+
+    results.innerHTML =
+      filtered
+        .map(
+          (item) => `
+            <button
+              type="button"
+              class="zylo-search-result"
+              data-video-id="${escapeHTML(
+                item.videoId
+              )}">
+              <div>
+                <strong>
+                  ${escapeHTML(
+                    item.creator
+                  )}
+                </strong>
+
+                <div style="font-size:13px;color:#777;margin-top:4px;">
+                  ${escapeHTML(
+                    item.title ||
+                      item.videoId
+                  )}
+                </div>
+              </div>
+            </button>
+          `
+        )
+        .join("");
+
+    results
+      .querySelectorAll(
+        ".zylo-search-result"
+      )
+      .forEach(
+        (button) => {
+          button.addEventListener(
+            "click",
+            () => {
+              const videoId =
+                button.dataset
+                  .videoId;
+
+              closeSearch();
+
+              openVideoById(
+                videoId
+              );
+            }
+          );
+        }
+      );
+  }
+
+  function openSearch() {
+    ensureOverlayStyles();
+
+    const overlay =
+      createSearchOverlay();
+
+    document.documentElement
+      .classList.add(
+        "zylo-overlay-open"
+      );
+
+    document.body.classList.add(
+      "zylo-overlay-open"
+    );
+
+    overlay.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    overlay.classList.add(
+      "open",
+      "active"
+    );
+
+    renderSearchResults("");
+
+    const input =
+      overlay.querySelector(
+        "#zyloSearchInput"
+      );
+
+    window.setTimeout(
+      () => {
+        try {
+          input?.focus({
+            preventScroll:
+              true
+          });
+        } catch {
+          input?.focus();
+        }
+      },
+      180
+    );
+  }
+
+  function closeSearch() {
+    const overlay =
+      document.getElementById(
+        "zyloSearchOverlay"
+      );
+
+    if (!overlay) return;
+
+    overlay.classList.remove(
+      "active",
+      "open"
+    );
+
+    overlay.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    document.documentElement
+      .classList.remove(
+        "zylo-overlay-open"
+      );
+
+    document.body.classList.remove(
+      "zylo-overlay-open"
+    );
+
+    try {
+      document.activeElement?.blur();
+    } catch {}
+  }
+
+  function setupSearchButton() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            ".search-btn"
+          );
+
+        if (!button) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        openSearch();
+      },
+      true
+    );
+  }
+
+  /* =========================================================
+     OPEN VIDEO
+     ========================================================= */
+
+  function openVideoById(
+    videoId
+  ) {
+    if (!videoId) {
+      return;
+    }
+
+    const pages =
+      VideoEngine.getPages();
+
+    const page =
+      pages.find(
+        (item) =>
+          item.dataset.videoId ===
+          videoId
+      );
+
+    if (!page) {
+      return;
+    }
+
+    const index =
+      pages.indexOf(page);
+
+    if (index < 0) {
+      return;
+    }
+
+    VideoEngine.scrollToPage(
+      index,
+      "smooth"
+    );
+  }
+
+  /* =========================================================
+     SHARE
+     ========================================================= */
+
+  function buildShareURL(
+    videoId
+  ) {
+    try {
+      const url =
+        new URL(
+          window.location.href
+        );
+
+      url.hash =
+        `video-${encodeURIComponent(
+          videoId
+        )}`;
+
+      return url.href;
+    } catch {
+      return window.location.href;
+    }
+  }
+
+  async function shareVideo(
+    videoId
+  ) {
+    if (!videoId) {
+      return;
+    }
+
+    const url =
+      buildShareURL(
+        videoId
+      );
+
+    const title =
+      "ZYLO Video";
+
+    try {
+      if (
+        navigator.share
+      ) {
+        await navigator.share({
+          title,
+          text:
+            "Watch this video on ZYLO",
+          url
+        });
+
+        Analytics.track(
+          "share",
+          {
+            videoId,
+            method:
+              "navigator.share"
+          }
+        );
+
+        return;
+      }
+    } catch (error) {
+      if (
+        error?.name ===
+        "AbortError"
+      ) {
+        return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(
+        url
+      );
+
+      showToast(
+        "Link copied"
+      );
+
+      Analytics.track(
+        "share",
+        {
+          videoId,
+          method:
+            "clipboard"
+        }
+      );
+    } catch {
+      showToast(
+        "Unable to copy link"
+      );
+    }
+  }
+
+  function setupShareButtons() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            ".share-btn"
+          );
+
+        if (!button) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const page =
+          button.closest(
+            ".video-page"
+          );
+
+        const videoId =
+          page?.dataset?.videoId ||
+          page?.id ||
+          "";
+
+        shareVideo(
+          videoId
+        );
+      },
+      true
+    );
+  }
+
+  /* =========================================================
+     MUSIC
+     ========================================================= */
+
+  function setupMusicButtons() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            ".music-btn"
+          );
+
+        if (!button) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const page =
+          button.closest(
+            ".video-page"
+          );
+
+        const video =
+          getVideo(page);
+
+        if (!video) return;
+
+        video.muted =
+          !video.muted;
+
+        button.classList.toggle(
+          "active",
+          !video.muted
+        );
+
+        showToast(
+          video.muted
+            ? "Sound off"
+            : "Sound on"
+        );
+      },
+      true
+    );
+  }
+
+  /* =========================================================
+     FULLSCREEN
+     ========================================================= */
+
+  async function toggleFullscreen(
+    page
+  ) {
+    if (!page) return;
+
+    try {
+      if (
+        document.fullscreenElement
+      ) {
+        await document.exitFullscreen();
+        return;
+      }
+
+      if (
+        page.requestFullscreen
+      ) {
+        await page.requestFullscreen();
+        return;
+      }
+
+      const video =
+        getVideo(page);
+
+      if (
+        video?.webkitEnterFullscreen
+      ) {
+        video.webkitEnterFullscreen();
+      }
+    } catch (error) {
+      console.warn(
+        "ZYLO fullscreen error:",
+        error
+      );
+    }
+  }
+
+  function setupFullscreenButtons() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            ".fullscreen-btn"
+          );
+
+        if (!button) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const page =
+          button.closest(
+            ".video-page"
+          );
+
+        toggleFullscreen(
+          page
+        );
+      },
+      true
+    );
+  }
+
+  /* =========================================================
+     DOUBLE TAP LIKE
+     ========================================================= */
+
+  function setupDoubleTapLike() {
+    let lastTap = 0;
+
+    document.addEventListener(
+      "click",
+      (event) => {
+        if (
+          isInteractiveTarget(
+            event.target
+          )
+        ) {
+          return;
+        }
+
+        const page =
+          event.target.closest(
+            ".video-page"
+          );
+
+        if (!page) return;
+
+        const now =
+          Date.now();
+
+        if (
+          now - lastTap <
+          320
+        ) {
+          const likeButton =
+            page.querySelector(
+              ".like-btn"
+            );
+
+          likeButton?.click();
+        }
+
+        lastTap = now;
+      },
+      true
+    );
+  }
+
+  /* =========================================================
+     CREATOR PROFILE
+     ========================================================= */
+
+  function openCreatorProfile(
+    page
+  ) {
+    if (!page) return;
+
+    const username =
+      page.dataset
+        .creatorUsername ||
+      page.dataset
+        .creatorUid ||
+      "zylo_creator";
+
+    const uid =
+      page.dataset
+        .creatorUid ||
+      username;
+
+    if (
+      window.ZYLOAuth &&
+      typeof window.ZYLOAuth.openCreatorProfile ===
+        "function"
+    ) {
+      window.ZYLOAuth.openCreatorProfile({
+        uid,
+        username
+      });
+
+      return;
+    }
+
+    const event =
+      new CustomEvent(
+        "zylo:opencreatorprofile",
+        {
+          detail: {
+            uid,
+            username
+          }
+        }
+      );
+
+    window.dispatchEvent(
+      event
+    );
+  }
+
+  function setupCreatorProfileButtons() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target.closest(
+            ".profile-action"
+          );
+
+        if (!button) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const page =
+          button.closest(
+            ".video-page"
+          );
+
+        openCreatorProfile(
+          page
+        );
+      },
+      true
+    );
+  }
+
+  /* =========================================================
+     TOP NAVIGATION
+     ========================================================= */
+
+  function setupTopNavigation() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const tab =
+          event.target.closest(
+            ".top-tab"
+          );
+
+        if (!tab) return;
+
+        const tabs =
+          $$(".top-tab");
+
+        tabs.forEach(
+          (item) =>
+            item.classList.toggle(
+              "active",
+              item === tab
+            )
+        );
+
+        const mode =
+          tab.dataset.feedTab ||
+          tab.textContent
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "-");
+
+        window.dispatchEvent(
+          new CustomEvent(
+            "zylo:feedtab",
+            {
+              detail: {
+                mode
+              }
+            }
+          )
+        );
+      }
+    );
+  }
+
+  /* =========================================================
+     BOTTOM NAVIGATION
+     ========================================================= */
+
+  function setupBottomNavigation() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        const item =
+          event.target.closest(
+            ".bottom-nav .nav-item"
+          );
+
+        if (!item) return;
+
+        const nav =
+          item.dataset.nav ||
+          item.textContent
+            .trim()
+            .toLowerCase();
+
+        if (
+          nav ===
+          "profile"
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (
+            window.ZYLOAuth &&
+            typeof window.ZYLOAuth.openMyProfile ===
+              "function"
+          ) {
+            window.ZYLOAuth.openMyProfile();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent(
+                "zylo:openprofile"
+              )
+            );
+          }
+
+          return;
+        }
+
+        if (
+          nav === "home"
+        ) {
+          event.preventDefault();
+
+          VideoEngine.scrollToPage(
+            0,
+            "smooth"
+          );
+
+          return;
+        }
+
+        if (
+          nav === "discover"
+        ) {
+          event.preventDefault();
+
+          openSearch();
+
+          return;
+        }
+      },
+      true
+    );
+  }
+
+  /* =========================================================
+     CREATE / UPLOAD
+     ========================================================= */
+
+  function openUpload() {
+    const box =
+      document.getElementById(
+        "uploadBox"
+      );
+
+    if (!box) return;
+
+    box.classList.add(
+      "open",
+      "active"
+    );
+
+    box.style.display =
+      "flex";
+  }
+
+  function closeUpload() {
+    const box =
+      document.getElementById(
+        "uploadBox"
+      );
+
+    if (!box) return;
+
+    box.classList.remove(
+      "open",
+      "active"
+    );
+
+    box.style.display =
+      "none";
+  }
+
+  function setupCreateButton() {
+    const button =
+      document.getElementById(
+        "createBtn"
+      );
+
+    if (!button) return;
+
+    button.addEventListener(
+      "click",
+      (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        openUpload();
+      },
+      true
+    );
+  }
+
+  function setupUploadModalButtons() {
+    const close =
+      document.getElementById(
+        "closeUpload"
+      );
+
+    const cancel =
+      document.getElementById(
+        "uploadCancel"
+      );
+
+    close?.addEventListener(
+      "click",
+      () => closeUpload()
+    );
+
+    cancel?.addEventListener(
+      "click",
+      () => closeUpload()
+    );
+  }
+
+  /* =========================================================
+     RESTORE UPLOADED VIDEOS
+     ========================================================= */
+
+  function restoreUploadedVideos() {
+    const items =
+      getStorage(
+        CONFIG.STORAGE
+          .UPLOADED_VIDEOS,
+        []
+      );
+
+    if (
+      !Array.isArray(
+        items
+      ) ||
+      !items.length
+    ) {
+      return;
+    }
+
+    const feed =
+      document.querySelector(
+        ".video-feed"
+      );
+
+    if (!feed) return;
+
+    items.forEach(
+      (item) => {
+        if (!item?.url) {
+          return;
+        }
+
+        if (
+          $(
+            `.video-page[data-video-id="${CSS.escape(
+              item.id ||
+                item.videoId ||
+                ""
+            )}"]`,
+            feed
+          )
+        ) {
+          return;
+        }
+
+        const page =
+          document.createElement(
+            "section"
+          );
+
+        page.className =
+          "video-page";
+
+        page.dataset.videoId =
+          item.id ||
+          item.videoId ||
+          makeId("video");
+
+        page.dataset.title =
+          item.title ||
+          "";
+
+        page.dataset.creatorUsername =
+          item.username ||
+          getUsername();
+
+        page.dataset.creatorUid =
+          item.uid ||
+          getUserUID();
+
+        page.innerHTML = `
+          <video
+            src="${escapeHTML(
+              item.url
+            )}"
+            muted
+            playsinline
+            webkit-playsinline
+            preload="none">
+          </video>
+        `;
+
+        feed.appendChild(
+          page
+        );
+      }
+    );
+  }
+
+  /* =========================================================
+     VIDEO INPUT
+     ========================================================= */
+
+  function setupUploadInput() {
+    const input =
+      document.getElementById(
+        "videoInput"
+      );
+
+    const preview =
+      document.getElementById(
+        "uploadPreviewVideo"
+      );
+
+    if (!input) return;
+
+    input.addEventListener(
+      "change",
+      () => {
+        const file =
+          input.files?.[0];
+
+        if (
+          !file ||
+          !preview
+        ) {
+          return;
+        }
+
+        try {
+          if (
+            preview.dataset
+              .objectURL
+          ) {
+            URL.revokeObjectURL(
+              preview.dataset
+                .objectURL
+            );
+          }
+
+          const url =
+            URL.createObjectURL(
+              file
+            );
+
+          preview.src =
+            url;
+
+          preview.dataset.objectURL =
+            url;
+
+          preview.muted =
+            true;
+
+          preview.playsInline =
+            true;
+
+          preview
+            .play()
+            .catch(
+              () => {}
+            );
+        } catch {}
+      }
+    );
+  }
+
+  /* =========================================================
+     VIDEO CLICK
+     ========================================================= */
+
+  function setupVideoClick() {
+    document.addEventListener(
+      "click",
+      (event) => {
+        if (
+          isInteractiveTarget(
+            event.target
+          )
+        ) {
+          return;
+        }
+
+        const video =
+          event.target.closest(
+            ".video-page video"
+          );
+
+        if (!video) return;
+
+        if (
+          video.paused
+        ) {
+          video.play().catch(
+            () => {}
+          );
+        } else {
+          video.pause();
+        }
+      },
+      true
+    );
+  }
+
+  /* =========================================================
+     VISIBILITY
+     ========================================================= */
+
+  function setupVisibility() {
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        const pages =
+          VideoEngine.getPages();
+
+        if (
+          document.hidden
+        ) {
+          pages.forEach(
+            (page) => {
+              const video =
+                getVideo(page);
+
+              try {
+                video?.pause();
+              } catch {}
+            }
+          );
+
+          return;
+        }
+
+        const index =
+          VideoEngine.getActiveIndex();
+
+        if (index >= 0) {
+          const page =
+            pages[index];
+
+          const video =
+            getVideo(page);
+
+          if (video) {
+            video.dataset
+              .zyloActive =
+              "true";
+
+            video.play().catch(
+              () => {}
+            );
+          }
+        }
+      }
+    );
+  }
+
+  /* =========================================================
+     KEYBOARD / BACK
+     ========================================================= */
+
+  function closeAnyOverlay() {
+    const search =
+      document.getElementById(
+        "zyloSearchOverlay"
+      );
+
+    if (
+      search?.classList.contains(
+        "active"
+      )
+    ) {
+      closeSearch();
+      return true;
+    }
+
+    const comments =
+      document.getElementById(
+        "zyloCommentPanel"
+      );
+
+    if (
+      comments?.classList.contains(
+        "active"
+      )
+    ) {
+      closeComments();
+      return true;
+    }
+
+    return false;
+  }
+
+  function setupKeyboard() {
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          event.key ===
+          "Escape"
+        ) {
+          if (
+            closeAnyOverlay()
+          ) {
+            event.preventDefault();
+          }
+        }
+      }
+    );
+
+    window.addEventListener(
+      "popstate",
+      () => {
+        closeAnyOverlay();
+      }
+    );
+  }
+
+  /* =========================================================
+     TOAST
+     ========================================================= */
+
+  function showToast(
+    message
+  ) {
+    let toast =
+      document.getElementById(
+        "zyloToast"
+      );
+
+    if (!toast) {
+      toast =
+        document.createElement(
+          "div"
+        );
+
+      toast.id =
+        "zyloToast";
+
+      toast.style.position =
+        "fixed";
+
+      toast.style.left =
+        "50%";
+
+      toast.style.bottom =
+        "90px";
+
+      toast.style.transform =
+        "translateX(-50%)";
+
+      toast.style.zIndex =
+        "200000";
+
+      toast.style.background =
+        "rgba(0,0,0,.82)";
+
+      toast.style.color =
+        "#fff";
+
+      toast.style.padding =
+        "10px 16px";
+
+      toast.style.borderRadius =
+        "22px";
+
+      toast.style.fontSize =
+        "14px";
+
+      toast.style.pointerEvents =
+        "none";
+
+      toast.style.opacity =
+        "0";
+
+      toast.style.transition =
+        "opacity .18s ease";
+
+      document.body.appendChild(
+        toast
+      );
+    }
+
+    toast.textContent =
+      message;
+
+    toast.style.opacity =
+      "1";
+
+    clearTimeout(
+      toast._timer
+    );
+
+    toast._timer =
+      window.setTimeout(
+        () => {
+          toast.style.opacity =
+            "0";
+        },
+        1800
+      );
+  }
+
+  /* =========================================================
+     GLOBAL API
+     ========================================================= */
+
+  window.ZYLO = {
+    CONFIG,
+
+    VideoEngine,
+
+    Analytics,
+
+    openSearch,
+
+    closeSearch,
+
+    openComments,
+
+    closeComments,
+
+    openVideoById,
+
+    shareVideo,
+
+    openUpload,
+
+    closeUpload,
+
+    showToast
+  };
+
+  /* =========================================================
+     SAFE INITIALIZATION
+     ========================================================= */
+
+  function safeInit(
+    name,
+    fn
+  ) {
+    try {
+      fn();
+    } catch (error) {
+      console.error(
+        `ZYLO ${name} initialization failed:`,
+        error
+      );
+    }
+  }
+
+  function init() {
+    ensureOverlayStyles();
+
+    warmVideoCDN();
+
+    safeInit(
+      "Analytics",
+      () =>
+        Analytics.setup()
+    );
+
+    safeInit(
+      "Auth",
+      () =>
+        loadAuthJS()
+    );
+
+    safeInit(
+      "Uploaded Videos",
+      () =>
+        restoreUploadedVideos()
+    );
+
+    safeInit(
+      "Video Click",
+      () =>
+        setupVideoClick()
+    );
+
+    safeInit(
+      "Like",
+      () =>
+        setupLikeButtons()
+    );
+
+    safeInit(
+      "Save",
+      () =>
+        setupSaveButtons()
+    );
+
+    safeInit(
+      "Comments",
+      () =>
+        setupCommentButtons()
+    );
+
+    safeInit(
+      "Search",
+      () =>
+        setupSearchButton()
+    );
+
+    safeInit(
+      "Share",
+      () =>
+        setupShareButtons()
+    );
+
+    safeInit(
+      "Music",
+      () =>
+        setupMusicButtons()
+    );
+
+    safeInit(
+      "Fullscreen",
+      () =>
+        setupFullscreenButtons()
+    );
+
+    safeInit(
+      "Double Tap",
+      () =>
+        setupDoubleTapLike()
+    );
+
+    safeInit(
+      "Creator Profile",
+      () =>
+        setupCreatorProfileButtons()
+    );
+
+    safeInit(
+      "Top Navigation",
+      () =>
+        setupTopNavigation()
+    );
+
+    safeInit(
+      "Bottom Navigation",
+      () =>
+        setupBottomNavigation()
+    );
+
+    safeInit(
+      "Create Button",
+      () =>
+        setupCreateButton()
+    );
+
+    safeInit(
+      "Upload Modal",
+      () =>
+        setupUploadModalButtons()
+    );
+
+    safeInit(
+      "Upload Input",
+      () =>
+        setupUploadInput()
+    );
+
+    safeInit(
+      "Visibility",
+      () =>
+        setupVisibility()
+    );
+
+    safeInit(
+      "Keyboard",
+      () =>
+        setupKeyboard()
+    );
+
+    safeInit(
+      "Video Engine",
+      () =>
+        VideoEngine.init()
+    );
+
+    safeInit(
+      "Hash",
+      () =>
+        openHashVideo()
+    );
+
+    console.log(
+      "ZYLO v1016 initialized successfully."
+    );
+  }
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      init,
+      {
+        once: true
+      }
+    );
+  } else {
+    init();
+  }
+
+})();
     `;
 
     document.head.appendChild(style);
   }
                        
+
+ 
