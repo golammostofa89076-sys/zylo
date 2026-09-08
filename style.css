@@ -1625,3 +1625,236 @@ body.zylo-overlay-open {
 
   transform: translateY(0) !important;
 }
+/* =========================================================
+   ZYLO - TIKTOK STYLE COMMENT BOTTOM SHEET
+   ========================================================= */
+
+.zylo-comment-panel {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+
+  background: rgba(0, 0, 0, 0.42) !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.zylo-comment-panel .zylo-comment-inner {
+  position: relative !important;
+
+  width: 100% !important;
+  height: 58dvh !important;
+  max-height: 58dvh !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  background: #fff !important;
+
+  border-radius: 18px 18px 0 0 !important;
+
+  overflow: hidden !important;
+
+  transform: translateY(0) !important;
+}
+
+/* Top header */
+
+.zylo-comment-header {
+  flex: 0 0 58px !important;
+
+  height: 58px !important;
+  min-height: 58px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  position: relative !important;
+
+  border-bottom: 1px solid #eeeeee !important;
+
+  background: #fff !important;
+}
+
+.zylo-comment-header strong {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+
+.zylo-comment-header button {
+  position: absolute !important;
+
+  right: 16px !important;
+  top: 50% !important;
+
+  transform: translateY(-50%) !important;
+
+  width: 42px !important;
+  height: 42px !important;
+
+  border: 0 !important;
+  background: transparent !important;
+
+  font-size: 32px !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+}
+
+/* Comments list */
+
+.zylo-comment-list {
+  flex: 1 1 auto !important;
+
+  min-height: 0 !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  padding: 14px 16px 12px !important;
+
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.zylo-comment-item {
+  display: flex !important;
+  flex-direction: column !important;
+
+  gap: 3px !important;
+
+  padding: 10px 0 !important;
+
+  border-bottom: 1px solid #f2f2f2 !important;
+}
+
+.zylo-comment-item strong {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.zylo-comment-item span {
+  font-size: 15px !important;
+  line-height: 1.4 !important;
+
+  word-break: break-word !important;
+}
+
+.zylo-comment-empty {
+  width: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 60px 20px !important;
+
+  font-size: 16px !important;
+  color: #777 !important;
+  text-align: center !important;
+}
+
+/* Bottom comment input */
+
+.zylo-comment-form {
+  flex: 0 0 auto !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  gap: 10px !important;
+
+  padding: 10px 14px !important;
+
+  padding-bottom: max(
+    10px,
+    env(safe-area-inset-bottom)
+  ) !important;
+
+  background: #fff !important;
+
+  border-top: 1px solid #eeeeee !important;
+}
+
+.zylo-comment-form input {
+  flex: 1 1 auto !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 46px !important;
+
+  padding: 0 16px !important;
+
+  border: 1px solid #dddddd !important;
+  border-radius: 24px !important;
+
+  background: #f7f7f7 !important;
+
+  font-size: 15px !important;
+  outline: none !important;
+}
+
+.zylo-comment-form input:focus {
+  border-color: #bbbbbb !important;
+}
+
+.zylo-comment-form button {
+  flex: 0 0 auto !important;
+
+  height: 46px !important;
+  min-width: 72px !important;
+
+  padding: 0 18px !important;
+
+  border: 0 !important;
+  border-radius: 23px !important;
+
+  background: #000 !important;
+  color: #fff !important;
+
+  font-size: 15px !important;
+  font-weight: 700 !important;
+
+  cursor: pointer !important;
+}
+
+/* Mobile keyboard */
+@media (max-width: 600px) {
+
+  .zylo-comment-panel .zylo-comment-inner {
+    height: 55dvh !important;
+    max-height: 55dvh !important;
+  }
+
+  .zylo-comment-header {
+    height: 54px !important;
+    min-height: 54px !important;
+  }
+
+  .zylo-comment-form {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .zylo-comment-form input {
+    height: 44px !important;
+    font-size: 15px !important;
+  }
+
+  .zylo-comment-form button {
+    height: 44px !important;
+    min-width: 68px !important;
+  }
+}
+
