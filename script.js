@@ -954,8 +954,14 @@
       </div>
     `;
 
-    document.body.appendChild(panel);
+    
+document.body.appendChild(panel);
 
+requestAnimationFrame(() => {
+  panel.classList.add("open");
+});
+
+const form = $(".zylo-comment-form", panel);
     const form = $(".zylo-comment-form", panel);
     const input = $("input", form);
 
