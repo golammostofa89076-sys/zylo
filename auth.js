@@ -1,11 +1,18 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+/* =========================================================
+   ZYLO AUTH + PROFILE + FIREBASE FOLLOW SYSTEM
+   Project: zylo-217f2
+   ========================================================= */
+
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 
 import {
   getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
   onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
@@ -15,22 +22,18 @@ import {
   getDoc,
   setDoc,
   deleteDoc,
-  getDocs,
+  collection,
   query,
   where,
+  getDocs,
+  getCountFromServer,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 
 /* =========================================================
-   ZYLO AUTH + PROFILE + FIRESTORE FOLLOW SYSTEM
-   Version: PROFILE-02
-   ========================================================= */
-
-
-/* =========================
    FIREBASE CONFIG
-========================= */
+   ========================================================= */
 
 const firebaseConfig = {
   apiKey: "AIzaSyBc3AVM3BYmKpIbm288w9VR9AVPVIt9Cgo",
@@ -42,9 +45,9 @@ const firebaseConfig = {
 };
 
 
-/* =========================
-   INITIALIZE FIREBASE
-========================= */
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -54,965 +57,247 @@ let currentUser = null;
 
 
 /* =========================================================
-   STYLE
+   CONSTANTS
    ========================================================= */
 
-const style = document.createElement("style");
-
-style.textContent = `
-
-/* =========================================================
-   AUTH OVERLAY
-   ========================================================= */
-
-.zylo-auth-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-
-  width: 100%;
-  height: 100%;
-
-  background: rgba(0, 0, 0, .78);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 20px;
-
-  box-sizing: border-box;
-
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-}
-
-
-/* =========================
-   AUTH CARD
-========================= */
-
-.zylo-auth-card {
-  width: min(420px, 100%);
-  max-height: 90vh;
-
-  overflow-y: auto;
-
-  background: #fff;
-
-  border-radius: 22px;
-
-  padding: 24px;
-
-  box-sizing: border-box;
-
-  position: relative;
-}
-
-.zylo-auth-card h2 {
-  margin: 0 0 8px;
-  color: #111;
-}
-
-.zylo-auth-sub {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-
-/* =========================
-   INPUT
-========================= */
-
-.zylo-auth-card label {
-  display: block;
-
-  margin: 13px 0 6px;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  color: #111;
-}
-
-.zylo-auth-card input {
-  width: 100%;
-  height: 48px;
-
-  border: 1px solid #ddd;
-  border-radius: 12px;
-
-  padding: 0 14px;
-
-  box-sizing: border-box;
-
-  font-size: 15px;
-
-  outline: none;
-}
-
-.zylo-auth-card input:focus {
-  border-color: #999;
-}
-
-
-/* =========================
-   BUTTONS
-========================= */
-
-.zylo-auth-primary {
-  width: 100%;
-  height: 48px;
-
-  border: 0;
-  border-radius: 12px;
-
-  background: #111;
-  color: #fff;
-
-  font-size: 15px;
-  font-weight: 700;
-
-  margin-top: 18px;
-
-  cursor: pointer;
-}
-
-.zylo-auth-primary:disabled {
-  opacity: .55;
-  cursor: default;
-}
-
-.zylo-auth-secondary {
-  width: 100%;
-  height: 46px;
-
-  border: 1px solid #ddd;
-  border-radius: 12px;
-
-  background: #fff;
-  color: #111;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  margin-top: 10px;
-
-  cursor: pointer;
-}
-
-.zylo-auth-close {
-  position: absolute;
-
-  top: 12px;
-  right: 14px;
-
-  width: 40px;
-  height: 40px;
-
-  border: 0;
-
-  background: transparent;
-
-  font-size: 28px;
-  line-height: 40px;
-
-  cursor: pointer;
-
-  color: #111;
-}
-
-
-/* =========================
-   SWITCH
-========================= */
-
-.zylo-auth-switch {
-  text-align: center;
-
-  margin-top: 16px;
-
-  font-size: 14px;
-
-  color: #555;
-}
-
-.zylo-auth-switch button {
-  border: 0;
-
-  background: transparent;
-
-  font-weight: 700;
-
-  cursor: pointer;
-
-  color: #111;
-}
-
-
-/* =========================
-   ERROR
-========================= */
-
-.zylo-auth-error {
-  display: none;
-
-  margin-top: 12px;
-
-  padding: 10px;
-
-  border-radius: 10px;
-
-  background: #fff0f0;
-
-  color: #b00020;
-
-  font-size: 13px;
-
-  line-height: 1.4;
-}
+const FOLLOWING_CACHE_KEY = "zylo_following_uids";
+const FOLLOWING_CACHE_KEY_V3 = "zylo_follows_v3";
 
 
 /* =========================================================
-   FULL SCREEN PROFILE
+   BASIC HELPERS
    ========================================================= */
-
-.zylo-profile-overlay {
-  position: fixed;
-
-  inset: 0;
-
-  z-index: 99998;
-
-  width: 100%;
-  height: 100%;
-
-  background: #fff;
-
-  color: #111;
-
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
-  overflow-y: auto;
-
-  -webkit-overflow-scrolling: touch;
-}
-
-
-/* =========================
-   PROFILE HEADER
-========================= */
-
-.zylo-profile-header {
-  position: sticky;
-
-  top: 0;
-
-  z-index: 5;
-
-  height: 58px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  background: rgba(255,255,255,.96);
-
-  border-bottom: 1px solid #eee;
-
-  backdrop-filter: blur(10px);
-}
-
-.zylo-profile-title {
-  font-size: 17px;
-
-  font-weight: 800;
-
-  color: #111;
-}
-
-.zylo-profile-header-close {
-  position: absolute;
-
-  left: 10px;
-
-  top: 9px;
-
-  width: 40px;
-  height: 40px;
-
-  border: 0;
-
-  border-radius: 50%;
-
-  background: transparent;
-
-  font-size: 28px;
-
-  line-height: 40px;
-
-  cursor: pointer;
-
-  color: #111;
-}
-
-
-/* =========================
-   PROFILE CONTENT
-========================= */
-
-.zylo-profile-content {
-  width: 100%;
-
-  max-width: 720px;
-
-  margin: 0 auto;
-
-  padding: 24px 18px 100px;
-
-  box-sizing: border-box;
-
-  text-align: center;
-}
-
-
-/* =========================
-   AVATAR
-========================= */
-
-.zylo-profile-avatar-wrap {
-  display: flex;
-
-  justify-content: center;
-
-  margin-top: 6px;
-
-  margin-bottom: 14px;
-}
-
-.zylo-profile-avatar {
-  width: 96px;
-  height: 96px;
-
-  border-radius: 50%;
-
-  background: #111;
-
-  color: #fff;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  overflow: hidden;
-
-  font-size: 34px;
-
-  font-weight: 800;
-
-  flex-shrink: 0;
-}
-
-.zylo-profile-avatar img {
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-
-  display: block;
-}
-
-
-/* =========================
-   NAME / USERNAME
-========================= */
-
-.zylo-profile-display-name {
-  margin-top: 2px;
-
-  font-size: 23px;
-
-  font-weight: 800;
-
-  line-height: 1.2;
-}
-
-.zylo-profile-username {
-  margin-top: 6px;
-
-  color: #777;
-
-  font-size: 15px;
-}
-
-.zylo-profile-bio {
-  max-width: 520px;
-
-  margin: 13px auto 0;
-
-  color: #444;
-
-  font-size: 14px;
-
-  line-height: 1.5;
-
-  white-space: pre-wrap;
-
-  word-break: break-word;
-}
-
-
-/* =========================
-   STATS
-========================= */
-
-.zylo-profile-stats {
-  display: flex;
-
-  justify-content: center;
-
-  align-items: center;
-
-  gap: 34px;
-
-  margin: 22px auto 18px;
-}
-
-.zylo-profile-stat {
-  min-width: 62px;
-
-  text-align: center;
-}
-
-.zylo-profile-stat-number {
-  font-size: 18px;
-
-  font-weight: 800;
-
-  color: #111;
-}
-
-.zylo-profile-stat-label {
-  margin-top: 4px;
-
-  font-size: 12px;
-
-  color: #777;
-}
-
-
-/* =========================
-   PROFILE ACTIONS
-========================= */
-
-.zylo-profile-actions {
-  display: flex;
-
-  justify-content: center;
-
-  gap: 10px;
-
-  margin: 0 auto 24px;
-}
-
-.zylo-profile-action-btn {
-  min-width: 150px;
-
-  height: 42px;
-
-  padding: 0 20px;
-
-  border-radius: 10px;
-
-  border: 1px solid #ddd;
-
-  background: #fff;
-
-  color: #111;
-
-  font-size: 14px;
-
-  font-weight: 700;
-
-  cursor: pointer;
-
-  box-sizing: border-box;
-}
-
-.zylo-profile-action-btn.primary {
-  background: #111;
-
-  color: #fff;
-
-  border-color: #111;
-}
-
-.zylo-profile-action-btn:disabled {
-  opacity: .55;
-
-  cursor: default;
-}
-
-
-/* =========================
-   PROFILE DIVIDER
-========================= */
-
-.zylo-profile-divider {
-  width: 100%;
-
-  height: 1px;
-
-  background: #eee;
-
-  margin: 8px 0 0;
-}
-
-
-/* =========================
-   TABS
-========================= */
-
-.zylo-profile-tabs {
-  display: flex;
-
-  width: 100%;
-
-  height: 48px;
-
-  border-bottom: 1px solid #eee;
-}
-
-.zylo-profile-tab {
-  flex: 1;
-
-  height: 48px;
-
-  border: 0;
-
-  background: transparent;
-
-  color: #888;
-
-  font-size: 14px;
-
-  font-weight: 700;
-
-  cursor: pointer;
-
-  position: relative;
-}
-
-.zylo-profile-tab.active {
-  color: #111;
-}
-
-.zylo-profile-tab.active::after {
-  content: "";
-
-  position: absolute;
-
-  left: 25%;
-
-  right: 25%;
-
-  bottom: -1px;
-
-  height: 2px;
-
-  background: #111;
-
-  border-radius: 2px;
-}
-
-
-/* =========================
-   VIDEO GRID
-========================= */
-
-.zylo-profile-video-section {
-  width: 100%;
-
-  margin-top: 0;
-}
-
-.zylo-profile-video-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  gap: 2px;
-
-  width: 100%;
-
-  margin-top: 2px;
-}
-
-.zylo-profile-video-item {
-  position: relative;
-
-  width: 100%;
-
-  aspect-ratio: 9 / 14;
-
-  overflow: hidden;
-
-  background: #111;
-
-  cursor: pointer;
-}
-
-.zylo-profile-video-item video {
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-
-  display: block;
-}
-
-.zylo-profile-video-placeholder {
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  background: #111;
-
-  color: #fff;
-
-  font-size: 12px;
-
-  text-align: center;
-
-  padding: 10px;
-
-  box-sizing: border-box;
-}
-
-.zylo-profile-video-play {
-  position: absolute;
-
-  right: 7px;
-  bottom: 7px;
-
-  width: 24px;
-  height: 24px;
-
-  border-radius: 50%;
-
-  background: rgba(0,0,0,.62);
-
-  color: #fff;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  font-size: 11px;
-}
-
-
-/* =========================
-   EMPTY PROFILE
-========================= */
-
-.zylo-profile-empty {
-  padding: 45px 20px;
-
-  color: #888;
-
-  font-size: 14px;
-
-  line-height: 1.5;
-}
-
-
-/* =========================
-   LOADING
-========================= */
-
-.zylo-profile-loading {
-  padding: 55px 20px;
-
-  color: #777;
-
-  font-size: 14px;
-}
-
-
-/* =========================
-   EDIT PROFILE
-========================= */
-
-.zylo-edit-profile-content {
-  text-align: left;
-}
-
-.zylo-edit-profile-content h2 {
-  text-align: center;
-
-  margin-bottom: 20px;
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 520px) {
-
-  .zylo-profile-content {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .zylo-profile-stats {
-    gap: 25px;
-  }
-
-  .zylo-profile-action-btn {
-    min-width: 135px;
-  }
-
-  .zylo-profile-display-name {
-    font-size: 21px;
-  }
-
-}
-
-`;
-
-document.head.appendChild(style);
-
-
-/* =========================================================
-   HELPERS
-   ========================================================= */
-
-function closeAllZYLOOverlays() {
-
-  document
-    .querySelectorAll(
-      ".zylo-auth-overlay, .zylo-profile-overlay"
-    )
-    .forEach(element => {
-      element.remove();
-    });
-
-}
-
-
-function closeProfileOverlaysOnly() {
-
-  document
-    .querySelectorAll(
-      ".zylo-profile-overlay"
-    )
-    .forEach(element => {
-      element.remove();
-    });
-
-}
-
 
 function escapeHtml(value) {
-
   return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
-
 }
 
 
-function showError(box, message) {
+function normalizeUsername(value) {
+  let username = String(value ?? "").trim();
 
-  if (!box) return;
+  if (!username) return "@user";
 
-  box.textContent = message;
+  if (!username.startsWith("@")) {
+    username = "@" + username;
+  }
 
-  box.style.display = "block";
+  return username;
+}
 
+
+function formatCount(value) {
+  const number = Number(value) || 0;
+
+  if (number >= 1000000000) {
+    return (number / 1000000000).toFixed(1).replace(".0", "") + "B";
+  }
+
+  if (number >= 1000000) {
+    return (number / 1000000).toFixed(1).replace(".0", "") + "M";
+  }
+
+  if (number >= 1000) {
+    return (number / 1000).toFixed(1).replace(".0", "") + "K";
+  }
+
+  return String(number);
 }
 
 
 function errorMessage(error) {
+  const code = error?.code || "";
 
   const messages = {
-
-    "auth/email-already-in-use":
-      "এই ইমেইল দিয়ে আগে থেকেই অ্যাকাউন্ট আছে।",
-
-    "auth/invalid-email":
-      "ইমেইল ঠিকানা সঠিক নয়।",
-
-    "auth/weak-password":
-      "পাসওয়ার্ড আরও শক্তিশালী দিন।",
-
-    "auth/invalid-credential":
-      "ইমেইল অথবা পাসওয়ার্ড ভুল।",
-
-    "auth/user-not-found":
-      "এই ইমেইলে কোনো অ্যাকাউন্ট পাওয়া যায়নি।",
-
-    "auth/wrong-password":
-      "পাসওয়ার্ড ভুল।",
-
-    "auth/network-request-failed":
-      "ইন্টারনেট সংযোগ পরীক্ষা করুন।",
-
-    "auth/too-many-requests":
-      "অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।"
-
+    "auth/invalid-credential": "Email বা password সঠিক নয়।",
+    "auth/invalid-email": "সঠিক email দিন।",
+    "auth/email-already-in-use": "এই email দিয়ে আগে থেকেই account আছে।",
+    "auth/weak-password": "Password কমপক্ষে 6 অক্ষরের হতে হবে।",
+    "auth/user-not-found": "এই email-এর কোনো account পাওয়া যায়নি।",
+    "auth/wrong-password": "Password সঠিক নয়।",
+    "auth/too-many-requests": "অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।",
+    "auth/network-request-failed": "Internet connection সমস্যা হয়েছে।"
   };
 
-  return (
-    messages[error?.code] ||
-    "সমস্যা হয়েছে। আবার চেষ্টা করুন।"
-  );
+  return messages[code] || error?.message || "একটি সমস্যা হয়েছে।";
+}
 
+
+function showError(message) {
+  const existing = document.querySelector(".zylo-auth-error");
+
+  if (existing) {
+    existing.textContent = message;
+    return;
+  }
+
+  const error = document.createElement("div");
+
+  error.className = "zylo-auth-error";
+
+  error.textContent = message;
+
+  Object.assign(error.style, {
+    position: "fixed",
+    left: "50%",
+    bottom: "25px",
+    transform: "translateX(-50%)",
+    zIndex: "999999",
+    background: "#ff3040",
+    color: "#fff",
+    padding: "12px 18px",
+    borderRadius: "12px",
+    fontSize: "14px",
+    maxWidth: "90%",
+    textAlign: "center",
+    boxShadow: "0 8px 30px rgba(0,0,0,.3)"
+  });
+
+  document.body.appendChild(error);
+
+  setTimeout(() => {
+    error.remove();
+  }, 3500);
 }
 
 
 /* =========================================================
-   USER PROFILE STORAGE
+   OVERLAY HELPERS
+   ========================================================= */
+
+function closeAllZYLOOverlays() {
+  [
+    "#zyloAuthOverlay",
+    "#zyloProfileOverlay",
+    "#zyloCreatorProfile",
+    "#zyloEditProfileOverlay"
+  ].forEach(selector => {
+    const element = document.querySelector(selector);
+    if (element) element.remove();
+  });
+}
+
+
+function closeProfileOverlaysOnly() {
+  [
+    "#zyloProfileOverlay",
+    "#zyloCreatorProfile",
+    "#zyloEditProfileOverlay"
+  ].forEach(selector => {
+    const element = document.querySelector(selector);
+    if (element) element.remove();
+  });
+}
+
+
+/* =========================================================
+   PROFILE STORAGE
    ========================================================= */
 
 async function saveProfile(user, data = {}) {
+  if (!user?.uid) return null;
 
-  if (!user?.uid) {
-    throw new Error("User is not available.");
-  }
+  const ref = doc(db, "users", user.uid);
 
-  const ref =
-    doc(
-      db,
-      "users",
-      user.uid
-    );
+  const existingSnap = await getDoc(ref);
 
-  const name =
-    data.name ||
-    user.displayName ||
-    "ZYLO Creator";
+  const existing = existingSnap.exists()
+    ? existingSnap.data()
+    : {};
 
-  const username =
-    data.username ||
-    "@zylo_creator";
+  const profile = {
+    uid: user.uid,
 
-  const bio =
-    data.bio ||
-    "Create • Connect • Grow";
+    email:
+      data.email ??
+      existing.email ??
+      user.email ??
+      "",
 
-  const photoURL =
-    data.photoURL ||
-    user.photoURL ||
-    "";
+    name:
+      data.name ??
+      existing.name ??
+      user.displayName ??
+      "ZYLO User",
 
-  await setDoc(
-    ref,
-    {
-      uid:
-        user.uid,
+    username:
+      data.username ??
+      existing.username ??
+      normalizeUsername(
+        user.displayName ||
+        "user"
+      ),
 
-      email:
-        user.email ||
-        "",
+    bio:
+      data.bio ??
+      existing.bio ??
+      "",
 
-      name,
+    photoURL:
+      data.photoURL ??
+      existing.photoURL ??
+      user.photoURL ??
+      "",
 
-      username,
+    followers:
+      Number(data.followers ?? existing.followers ?? 0),
 
-      bio,
+    following:
+      Number(data.following ?? existing.following ?? 0),
 
-      photoURL,
+    likes:
+      Number(data.likes ?? existing.likes ?? 0),
 
-      followers:
-        Number(data.followers ?? 0),
+    updatedAt: serverTimestamp()
+  };
 
-      following:
-        Number(data.following ?? 0),
+  await setDoc(ref, profile, { merge: true });
 
-      likes:
-        Number(data.likes ?? 0),
-
-      updatedAt:
-        serverTimestamp()
-
-    },
-    {
-      merge: true
-    }
-  );
-
+  return profile;
 }
 
 
 async function getProfile(userOrUid) {
-
   const uid =
     typeof userOrUid === "string"
       ? userOrUid
       : userOrUid?.uid;
 
-  if (!uid) {
-    return null;
-  }
+  if (!uid) return null;
 
-  const ref =
-    doc(
-      db,
-      "users",
-      uid
-    );
+  try {
+    const snap = await getDoc(doc(db, "users", uid));
 
-  const snap =
-    await getDoc(ref);
+    if (!snap.exists()) {
+      return null;
+    }
 
-  if (snap.exists()) {
-
-    const data =
-      snap.data();
+    const data = snap.data();
 
     return {
-
       uid,
 
-      email:
-        data.email || "",
+      email: data.email || "",
 
       name:
         data.name ||
-        data.displayName ||
-        "ZYLO Creator",
+        "ZYLO User",
 
       username:
         normalizeUsername(
           data.username ||
-          data.handle ||
-          "@zylo_creator"
+          data.name ||
+          "user"
         ),
 
       bio:
         data.bio ||
-        "Create • Connect • Grow",
+        "",
 
       photoURL:
         data.photoURL ||
@@ -1026,1187 +311,808 @@ async function getProfile(userOrUid) {
 
       likes:
         Number(data.likes || 0)
-
     };
 
+  } catch (error) {
+    console.warn("ZYLO profile read error:", error);
+    return null;
   }
-
-  return {
-
-    uid,
-
-    email:
-      typeof userOrUid === "object"
-        ? userOrUid?.email || ""
-        : "",
-
-    name:
-      typeof userOrUid === "object"
-        ? userOrUid?.displayName ||
-          "ZYLO Creator"
-        : "ZYLO Creator",
-
-    username:
-      "@zylo_creator",
-
-    bio:
-      "Create • Connect • Grow",
-
-    photoURL:
-      typeof userOrUid === "object"
-        ? userOrUid?.photoURL || ""
-        : "",
-
-    followers: 0,
-
-    following: 0,
-
-    likes: 0
-
-  };
-
-}
-
-
-function normalizeUsername(value) {
-
-  let username =
-    String(value || "").trim();
-
-  if (!username) {
-    return "@zylo_creator";
-  }
-
-  if (!username.startsWith("@")) {
-    username =
-      "@" + username;
-  }
-
-  return username;
-
 }
 
 
 /* =========================================================
-   FOLLOW STORAGE
+   FOLLOW CACHE
    ========================================================= */
-
-/*
- * Primary local cache used by auth.js.
- */
-
-const FOLLOW_STORAGE_KEY =
-  "zylo_following_uids";
-
-
-/*
- * Older/current script.js may use this cache.
- *
- * We keep both synchronized so Follow status
- * does not become inconsistent between
- * Profile and Feed.
- */
-
-const FOLLOW_STORAGE_KEY_LEGACY =
-  "zylo_follows_v3";
-
 
 function getFollowingUIDs() {
+  try {
+    const primary =
+      JSON.parse(
+        localStorage.getItem(FOLLOWING_CACHE_KEY) || "[]"
+      );
 
-  const keys = [
-    FOLLOW_STORAGE_KEY,
-    FOLLOW_STORAGE_KEY_LEGACY
-  ];
-
-  const combined = [];
-
-  keys.forEach(key => {
-
-    try {
-
-      const raw =
-        localStorage.getItem(key);
-
-      const data =
-        JSON.parse(
-          raw || "[]"
-        );
-
-      if (Array.isArray(data)) {
-
-        data.forEach(uid => {
-
-          if (uid) {
-            combined.push(uid);
-          }
-
-        });
-
-      }
-
-    } catch {
-
-      /* ignore invalid local cache */
-
+    if (Array.isArray(primary)) {
+      return primary;
     }
-
-  });
-
-
-  return [
-    ...new Set(combined)
-  ];
-
-}
-
-
-function saveFollowingUIDs(list) {
+  } catch {}
 
   try {
+    const secondary =
+      JSON.parse(
+        localStorage.getItem(FOLLOWING_CACHE_KEY_V3) || "[]"
+      );
 
-    const unique =
-      [
-        ...new Set(
-          (
-            Array.isArray(list)
-              ? list
-              : []
-          ).filter(Boolean)
-        )
-      ];
+    if (Array.isArray(secondary)) {
+      return secondary;
+    }
+  } catch {}
+
+  return [];
+}
 
 
+function saveFollowingUIDs(uids) {
+  const unique = [
+    ...new Set(
+      (uids || [])
+        .filter(Boolean)
+        .map(String)
+    )
+  ];
+
+  try {
     localStorage.setItem(
-      FOLLOW_STORAGE_KEY,
+      FOLLOWING_CACHE_KEY,
       JSON.stringify(unique)
     );
 
-
-    /*
-     * Keep the existing feed Follow cache
-     * synchronized.
-     */
-
     localStorage.setItem(
-      FOLLOW_STORAGE_KEY_LEGACY,
+      FOLLOWING_CACHE_KEY_V3,
       JSON.stringify(unique)
     );
-
-
   } catch (error) {
-
-    console.warn(
-      "ZYLO follow storage error:",
-      error
-    );
-
+    console.warn("ZYLO follow cache error:", error);
   }
-
 }
 
 
-function isFollowing(uid) {
+function addFollowToCache(uid) {
+  const list = getFollowingUIDs();
 
-  if (!uid) {
-    return false;
+  if (!list.includes(uid)) {
+    list.push(uid);
   }
 
-  return getFollowingUIDs()
-    .includes(uid);
-
+  saveFollowingUIDs(list);
 }
 
 
-function toggleLocalFollow(uid) {
-
-  if (!uid) {
-    return false;
-  }
-
+function removeFollowFromCache(uid) {
   const list =
-    getFollowingUIDs();
+    getFollowingUIDs()
+      .filter(id => id !== uid);
 
-  const index =
-    list.indexOf(uid);
-
-  if (index >= 0) {
-
-    list.splice(
-      index,
-      1
-    );
-
-    saveFollowingUIDs(
-      list
-    );
-
-    return false;
-  }
-
-  list.push(uid);
-
-  saveFollowingUIDs(
-    list
-  );
-
-  return true;
-
+  saveFollowingUIDs(list);
 }
 
 
 /* =========================================================
-   FIRESTORE FOLLOW SYSTEM
+   FOLLOW DOCUMENT
    ========================================================= */
 
-
-/*
- * Deterministic Follow document ID.
- *
- * Example:
- *
- * followerUid_followingUid
- *
- * This prevents duplicate Follow documents.
- */
-
-function getFollowDocumentId(
-  followerUid,
-  followingUid
-) {
-
-  return (
-    String(followerUid || "") +
-    "_" +
-    String(followingUid || "")
-  );
-
+function followDocId(followerUid, followingUid) {
+  return `${followerUid}_${followingUid}`;
 }
 
 
-/*
- * Firestore Follow document reference.
- */
+async function isFollowing(followingUid) {
+  if (!currentUser?.uid || !followingUid) {
+    return false;
+  }
 
-function getFollowRef(
-  followerUid,
-  followingUid
-) {
+  if (currentUser.uid === followingUid) {
+    return false;
+  }
 
-  return doc(
+  try {
+    const ref = doc(
+      db,
+      "follows",
+      followDocId(
+        currentUser.uid,
+        followingUid
+      )
+    );
+
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      addFollowToCache(followingUid);
+      return true;
+    }
+
+    removeFollowFromCache(followingUid);
+
+    return false;
+
+  } catch (error) {
+    console.warn("ZYLO follow status error:", error);
+
+    return getFollowingUIDs()
+      .includes(followingUid);
+  }
+}
+
+
+/* =========================================================
+   FIREBASE FOLLOW / UNFOLLOW
+   ========================================================= */
+
+async function followUser(followingUid) {
+  if (!currentUser?.uid) {
+    openAuth("login");
+    return false;
+  }
+
+  if (!followingUid) {
+    return false;
+  }
+
+  if (currentUser.uid === followingUid) {
+    return false;
+  }
+
+  const followerUid = currentUser.uid;
+
+  const ref = doc(
     db,
     "follows",
-    getFollowDocumentId(
+    followDocId(
       followerUid,
       followingUid
     )
   );
 
-}
-
-
-/*
- * Check Firestore Follow status.
- */
-
-async function getFirestoreFollowStatus(
-  followerUid,
-  followingUid
-) {
-
-  if (
-    !followerUid ||
-    !followingUid ||
-    followerUid === followingUid
-  ) {
-
-    return false;
-
-  }
-
-
   try {
+    await setDoc(ref, {
+      followerUid,
+      followingUid,
+      createdAt: serverTimestamp()
+    });
 
-    const ref =
-      getFollowRef(
-        followerUid,
-        followingUid
-      );
+    addFollowToCache(followingUid);
 
-    const snap =
-      await getDoc(ref);
-
-    return snap.exists();
+    return true;
 
   } catch (error) {
+    console.error("ZYLO follow error:", error);
 
-    console.warn(
-      "ZYLO Follow status error:",
-      error
+    showError(
+      "Follow করা যায়নি: " +
+      errorMessage(error)
     );
 
     return false;
-
   }
-
 }
 
 
-/*
- * Get Followers count.
- */
-
-async function getFollowersCount(
-  uid
-) {
-
-  if (!uid) {
-    return 0;
+async function unfollowUser(followingUid) {
+  if (!currentUser?.uid) {
+    return false;
   }
-
-
-  try {
-
-    const followersQuery =
-      query(
-        collectionFollows(),
-        where(
-          "followingUid",
-          "==",
-          uid
-        )
-      );
-
-
-    const snapshot =
-      await getDocs(
-        followersQuery
-      );
-
-
-    return snapshot.size;
-
-  } catch (error) {
-
-    console.warn(
-      "ZYLO Followers count error:",
-      error
-    );
-
-    return 0;
-
-  }
-
-}
-
-
-/*
- * Get Following count.
- */
-
-async function getFollowingCount(
-  uid
-) {
-
-  if (!uid) {
-    return 0;
-  }
-
-
-  try {
-
-    const followingQuery =
-      query(
-        collectionFollows(),
-        where(
-          "followerUid",
-          "==",
-          uid
-        )
-      );
-
-
-    const snapshot =
-      await getDocs(
-        followingQuery
-      );
-
-
-    return snapshot.size;
-
-  } catch (error) {
-
-    console.warn(
-      "ZYLO Following count error:",
-      error
-    );
-
-    return 0;
-
-  }
-
-}
-
-
-/*
- * Firestore collection helper.
- *
- * We intentionally use the collection
- * function dynamically through the imported
- * Firestore module below.
- */
-
-function collectionFollows() {
-
-  return window.ZYLOFirestoreFollowsCollection;
-
-}
-
-
-/*
- * Create Firestore Follow.
- */
-
-async function createFirestoreFollow(
-  followerUid,
-  followingUid
-) {
-
-  if (!followerUid) {
-    throw new Error(
-      "Login required."
-    );
-  }
-
 
   if (!followingUid) {
-    throw new Error(
-      "Creator UID is missing."
-    );
+    return false;
   }
 
+  const followerUid = currentUser.uid;
 
-  if (
-    followerUid ===
-    followingUid
-  ) {
-
-    throw new Error(
-      "You cannot follow yourself."
-    );
-
-  }
-
-
-  const ref =
-    getFollowRef(
+  const ref = doc(
+    db,
+    "follows",
+    followDocId(
       followerUid,
       followingUid
-    );
-
-
-  await setDoc(
-    ref,
-    {
-
-      followerUid,
-
-      followingUid,
-
-      createdAt:
-        serverTimestamp()
-
-    }
+    )
   );
 
+  try {
+    await deleteDoc(ref);
 
-  return true;
+    removeFollowFromCache(followingUid);
 
-}
+    return true;
 
+  } catch (error) {
+    console.error("ZYLO unfollow error:", error);
 
-/*
- * Delete Firestore Follow.
- */
-
-async function deleteFirestoreFollow(
-  followerUid,
-  followingUid
-) {
-
-  if (
-    !followerUid ||
-    !followingUid
-  ) {
+    showError(
+      "Unfollow করা যায়নি: " +
+      errorMessage(error)
+    );
 
     return false;
-
   }
-
-
-  const ref =
-    getFollowRef(
-      followerUid,
-      followingUid
-    );
-
-
-  await deleteDoc(
-    ref
-  );
-
-
-  return true;
-
 }
 
 
-/*
- * Get accurate Firestore counts
- * and return profile-compatible data.
- */
+/* =========================================================
+   FOLLOW COUNTS
+   ========================================================= */
 
-async function getFirestoreFollowCounts(
-  uid
-) {
-
-  if (!uid) {
-
-    return {
-      followers: 0,
-      following: 0
-    };
-
-  }
-
+async function getFollowersCount(uid) {
+  if (!uid) return 0;
 
   try {
+    const q = query(
+      collection(db, "follows"),
+      where("followingUid", "==", uid)
+    );
 
-    const followersQuery =
-      query(
-        collectionFollows(),
-        where(
-          "followingUid",
-          "==",
-          uid
-        )
-      );
+    const result =
+      await getCountFromServer(q);
 
-
-    const followingQuery =
-      query(
-        collectionFollows(),
-        where(
-          "followerUid",
-          "==",
-          uid
-        )
-      );
-
-
-    const [
-      followersSnapshot,
-      followingSnapshot
-    ] =
-      await Promise.all([
-        getDocs(
-          followersQuery
-        ),
-        getDocs(
-          followingQuery
-        )
-      ]);
-
-
-    return {
-
-      followers:
-        followersSnapshot.size,
-
-      following:
-        followingSnapshot.size
-
-    };
-
+    return Number(
+      result.data().count || 0
+    );
 
   } catch (error) {
-
     console.warn(
-      "ZYLO Follow count sync error:",
+      "ZYLO followers count error:",
       error
     );
 
+    const profile =
+      await getProfile(uid);
 
-    return {
-
-      followers: 0,
-
-      following: 0
-
-    };
-
+    return Number(
+      profile?.followers || 0
+    );
   }
-
 }
 
 
-/*
- * Refresh Follow counts on a profile.
- */
-
-async function refreshProfileFollowCounts(
-  profile
-) {
-
-  if (!profile?.uid) {
-    return profile;
-  }
-
+async function getFollowingCount(uid) {
+  if (!uid) return 0;
 
   try {
+    const q = query(
+      collection(db, "follows"),
+      where("followerUid", "==", uid)
+    );
 
-    const counts =
-      await getFirestoreFollowCounts(
-        profile.uid
-      );
+    const result =
+      await getCountFromServer(q);
 
-
-    profile.followers =
-      counts.followers;
-
-    profile.following =
-      counts.following;
-
+    return Number(
+      result.data().count || 0
+    );
 
   } catch (error) {
-
     console.warn(
-      "ZYLO profile Follow refresh error:",
+      "ZYLO following count error:",
       error
     );
 
-  }
+    const profile =
+      await getProfile(uid);
 
+    return Number(
+      profile?.following || 0
+    );
+  }
+}
+
+
+/* =========================================================
+   SYNC PROFILE COUNTS
+   ========================================================= */
+
+async function getFreshProfile(uid) {
+  const profile =
+    await getProfile(uid);
+
+  if (!profile) return null;
+
+  const [
+    followers,
+    following
+  ] = await Promise.all([
+    getFollowersCount(uid),
+    getFollowingCount(uid)
+  ]);
+
+  profile.followers = followers;
+  profile.following = following;
 
   return profile;
-
 }
 
 
-/*
- * Synchronize current user's local
- * Follow cache from Firestore.
- */
+/* =========================================================
+   AUTH UI STYLE
+   ========================================================= */
 
-async function syncLocalFollowingFromFirestore() {
-
-  if (!currentUser?.uid) {
+function injectZYLOStyles() {
+  if (document.getElementById("zylo-auth-styles")) {
     return;
   }
 
+  const style =
+    document.createElement("style");
 
-  try {
+  style.id = "zylo-auth-styles";
 
-    const q =
-      query(
-        collectionFollows(),
-        where(
-          "followerUid",
-          "==",
-          currentUser.uid
-        )
-      );
+  style.textContent = `
+    .zylo-auth-overlay,
+    .zylo-profile-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99990;
+      background: rgba(0,0,0,.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
 
+    .zylo-auth-box,
+    .zylo-profile-box {
+      width: min(520px, 100%);
+      max-height: 92vh;
+      overflow-y: auto;
+      background: #111;
+      color: #fff;
+      border-radius: 22px;
+      box-shadow: 0 20px 70px rgba(0,0,0,.45);
+    }
 
-    const snapshot =
-      await getDocs(q);
+    .zylo-auth-header,
+    .zylo-profile-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
 
+    .zylo-close {
+      border: 0;
+      background: transparent;
+      color: #fff;
+      font-size: 26px;
+      cursor: pointer;
+    }
 
-    const ids =
-      snapshot.docs
-        .map(
-          item =>
-            item.data()?.followingUid
-        )
-        .filter(Boolean);
+    .zylo-auth-body {
+      padding: 20px;
+    }
 
+    .zylo-auth-body input,
+    .zylo-edit-input,
+    .zylo-edit-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid rgba(255,255,255,.14);
+      background: #1d1d1d;
+      color: #fff;
+      padding: 13px 14px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      outline: none;
+    }
 
-    saveFollowingUIDs(
-      ids
-    );
+    .zylo-edit-textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
 
+    .zylo-primary-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 16px;
+      background: #fe2c55;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-  } catch (error) {
+    .zylo-secondary-btn {
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 10px;
+      padding: 10px 15px;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+    }
 
-    console.warn(
-      "ZYLO Follow cache sync warning:",
-      error
-    );
+    .zylo-profile-content {
+      padding: 20px;
+    }
 
-  }
+    .zylo-profile-top {
+      text-align: center;
+    }
 
-}
+    .zylo-profile-avatar {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #292929;
+      display: block;
+      margin: 0 auto 12px;
+    }
 
+    .zylo-profile-name {
+      font-size: 21px;
+      font-weight: 800;
+    }
 
-/*
- * Complete Follow / Unfollow operation.
- */
+    .zylo-profile-username {
+      opacity: .72;
+      margin-top: 3px;
+    }
 
-async function toggleFirestoreFollow(
-  followingUid
-) {
+    .zylo-profile-bio {
+      margin: 12px auto 18px;
+      max-width: 420px;
+      opacity: .9;
+      line-height: 1.45;
+    }
 
-  if (!currentUser?.uid) {
+    .zylo-profile-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 15px 0;
+    }
 
-    openAuth("login");
+    .zylo-profile-stat {
+      text-align: center;
+      padding: 10px 4px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.06);
+    }
 
-    return {
-      following: false,
-      changed: false
-    };
+    .zylo-profile-stat strong {
+      display: block;
+      font-size: 18px;
+    }
 
-  }
+    .zylo-profile-stat span {
+      font-size: 12px;
+      opacity: .65;
+    }
 
+    .zylo-profile-actions {
+      display: flex;
+      justify-content: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin: 15px 0 20px;
+    }
 
-  const followerUid =
-    currentUser.uid;
+    .zylo-follow-btn {
+      min-width: 120px;
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 18px;
+      background: #fe2c55;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
+    .zylo-follow-btn.following {
+      background: #2b2b2b;
+      border: 1px solid rgba(255,255,255,.15);
+    }
 
-  if (
-    !followingUid ||
-    followerUid === followingUid
-  ) {
+    .zylo-profile-section-title {
+      font-weight: 800;
+      margin: 18px 0 12px;
+    }
 
-    return {
-      following: false,
-      changed: false
-    };
+    .zylo-profile-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+    }
 
-  }
+    .zylo-profile-video {
+      aspect-ratio: 9 / 14;
+      background: #222;
+      overflow: hidden;
+      cursor: pointer;
+    }
 
+    .zylo-profile-video video,
+    .zylo-profile-video img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-  const currentlyFollowing =
-    await getFirestoreFollowStatus(
-      followerUid,
-      followingUid
-    );
+    .zylo-empty-profile {
+      padding: 30px 10px;
+      text-align: center;
+      opacity: .6;
+    }
 
+    @media (max-width: 480px) {
+      .zylo-auth-overlay,
+      .zylo-profile-overlay {
+        padding: 0;
+        align-items: flex-end;
+      }
 
-  if (currentlyFollowing) {
+      .zylo-auth-box,
+      .zylo-profile-box {
+        width: 100%;
+        max-height: 94vh;
+        border-radius: 22px 22px 0 0;
+      }
+    }
+  `;
 
-    await deleteFirestoreFollow(
-      followerUid,
-      followingUid
-    );
-
-
-    /*
-     * Update local cache.
-     */
-
-    const list =
-      getFollowingUIDs()
-        .filter(
-          uid =>
-            uid !== followingUid
-        );
-
-
-    saveFollowingUIDs(
-      list
-    );
-
-
-    return {
-      following: false,
-      changed: true
-    };
-
-  }
-
-
-  await createFirestoreFollow(
-    followerUid,
-    followingUid
-  );
-
-
-  /*
-   * Update local cache.
-   */
-
-  const list =
-    getFollowingUIDs();
-
-
-  if (
-    !list.includes(
-      followingUid
-    )
-  ) {
-
-    list.push(
-      followingUid
-    );
-
-  }
-
-
-  saveFollowingUIDs(
-    list
-  );
-
-
-  return {
-    following: true,
-    changed: true
-  };
-
+  document.head.appendChild(style);
 }
 
 
 /* =========================================================
-   AUTH SCREEN
+   AUTH OVERLAY
    ========================================================= */
 
-function openAuth(
-  mode = "login"
-) {
+function openAuth(mode = "login") {
+  injectZYLOStyles();
 
-  closeAllZYLOOverlays();
-
-
-  const overlay =
-    document.createElement(
-      "div"
+  const old =
+    document.getElementById(
+      "zyloAuthOverlay"
     );
 
+  if (old) old.remove();
+
+  const overlay =
+    document.createElement("div");
+
+  overlay.id =
+    "zyloAuthOverlay";
 
   overlay.className =
     "zylo-auth-overlay";
 
-
   overlay.innerHTML = `
+    <div class="zylo-auth-box">
 
-    <div class="zylo-auth-card">
+      <div class="zylo-auth-header">
+        <strong id="zyloAuthTitle">
+          ${mode === "register"
+            ? "Create ZYLO Account"
+            : "Login to ZYLO"}
+        </strong>
 
-      <button
-        class="zylo-auth-close"
-        type="button"
-        aria-label="Close">
-        ×
-      </button>
-
-      <h2>
-        ${
-          mode === "login"
-            ? "Login to ZYLO"
-            : "Create your ZYLO account"
-        }
-      </h2>
-
-      <p class="zylo-auth-sub">
-        ${
-          mode === "login"
-            ? "আপনার ZYLO অ্যাকাউন্টে Login করুন।"
-            : "নতুন ZYLO অ্যাকাউন্ট তৈরি করুন।"
-        }
-      </p>
-
-      ${
-        mode === "register"
-          ? `
-
-            <label>Name</label>
-
-            <input
-              id="zylo-name"
-              type="text"
-              placeholder="Your name"
-              autocomplete="name"
-            >
-
-            <label>Username</label>
-
-            <input
-              id="zylo-username"
-              type="text"
-              placeholder="@username"
-              autocomplete="username"
-            >
-
-          `
-          : ""
-      }
-
-      <label>Email</label>
-
-      <input
-        id="zylo-email"
-        type="email"
-        placeholder="you@example.com"
-        autocomplete="email"
-      >
-
-      <label>Password</label>
-
-      <input
-        id="zylo-password"
-        type="password"
-        placeholder="Password"
-        autocomplete="${
-          mode === "login"
-            ? "current-password"
-            : "new-password"
-        }"
-      >
-
-      <div class="zylo-auth-error"></div>
-
-      <button
-        class="zylo-auth-primary"
-        id="zylo-submit"
-        type="button">
-
-        ${
-          mode === "login"
-            ? "Login"
-            : "Create Account"
-        }
-
-      </button>
-
-      <div class="zylo-auth-switch">
-
-        ${
-          mode === "login"
-            ? `
-              অ্যাকাউন্ট নেই?
-              <button
-                id="zylo-switch"
-                type="button">
-                Create Account
-              </button>
-            `
-            : `
-              অ্যাকাউন্ট আছে?
-              <button
-                id="zylo-switch"
-                type="button">
-                Login
-              </button>
-            `
-        }
-
+        <button
+          class="zylo-close"
+          id="zyloAuthClose"
+          type="button"
+        >
+          ×
+        </button>
       </div>
 
-    </div>
+      <div class="zylo-auth-body">
 
+        <form id="zyloAuthForm">
+
+          ${
+            mode === "register"
+              ? `
+                <input
+                  id="zyloName"
+                  type="text"
+                  placeholder="Name"
+                  autocomplete="name"
+                  required
+                >
+
+                <input
+                  id="zyloUsername"
+                  type="text"
+                  placeholder="Username"
+                  autocomplete="username"
+                  required
+                >
+              `
+              : ""
+          }
+
+          <input
+            id="zyloEmail"
+            type="email"
+            placeholder="Email"
+            autocomplete="email"
+            required
+          >
+
+          <input
+            id="zyloPassword"
+            type="password"
+            placeholder="Password"
+            autocomplete="${
+              mode === "register"
+                ? "new-password"
+                : "current-password"
+            }"
+            required
+          >
+
+          <button
+            class="zylo-primary-btn"
+            type="submit"
+          >
+            ${
+              mode === "register"
+                ? "Create Account"
+                : "Login"
+            }
+          </button>
+
+        </form>
+
+        <div style="
+          text-align:center;
+          margin-top:16px;
+          opacity:.8;
+          font-size:14px;
+        ">
+
+          ${
+            mode === "register"
+              ? `
+                Already have an account?
+                <button
+                  type="button"
+                  id="zyloSwitchLogin"
+                  class="zylo-secondary-btn"
+                >
+                  Login
+                </button>
+              `
+              : `
+                Don't have an account?
+                <button
+                  type="button"
+                  id="zyloSwitchRegister"
+                  class="zylo-secondary-btn"
+                >
+                  Register
+                </button>
+              `
+          }
+
+        </div>
+
+      </div>
+    </div>
   `;
 
+  document.body.appendChild(overlay);
 
-  document.body.appendChild(
-    overlay
-  );
-
-
-  overlay
-    .querySelector(
-      ".zylo-auth-close"
-    )
+  document
+    .getElementById("zyloAuthClose")
     ?.addEventListener(
       "click",
-      () => {
-
-        overlay.remove();
-
-      }
+      () => overlay.remove()
     );
 
-
-  overlay
-    .querySelector(
-      "#zylo-switch"
-    )
+  document
+    .getElementById("zyloSwitchLogin")
     ?.addEventListener(
       "click",
-      () => {
-
-        openAuth(
-          mode === "login"
-            ? "register"
-            : "login"
-        );
-
-      }
+      () => openAuth("login")
     );
 
-
-  overlay
-    .querySelector(
-      "#zylo-submit"
-    )
+  document
+    .getElementById("zyloSwitchRegister")
     ?.addEventListener(
       "click",
-      async () => {
+      () => openAuth("register")
+    );
+
+  document
+    .getElementById("zyloAuthForm")
+    ?.addEventListener(
+      "submit",
+      async event => {
+
+        event.preventDefault();
 
         const email =
-          overlay
-            .querySelector(
-              "#zylo-email"
-            )
+          document
+            .getElementById("zyloEmail")
             ?.value
             .trim();
 
-
         const password =
-          overlay
-            .querySelector(
-              "#zylo-password"
-            )
-            ?.value ||
-          "";
-
-
-        const errorBox =
-          overlay
-            .querySelector(
-              ".zylo-auth-error"
-            );
-
-
-        if (
-          !email ||
-          !password
-        ) {
-
-          showError(
-            errorBox,
-            "ইমেইল ও পাসওয়ার্ড দিন।"
-          );
-
-          return;
-
-        }
-
-
-        const button =
-          overlay.querySelector(
-            "#zylo-submit"
-          );
-
-
-        button.disabled =
-          true;
-
-
-        button.textContent =
-          mode === "login"
-            ? "Logging in..."
-            : "Creating...";
-
+          document
+            .getElementById("zyloPassword")
+            ?.value;
 
         try {
 
-          if (
-            mode === "login"
-          ) {
+          if (mode === "register") {
 
-            const result =
+            const name =
+              document
+                .getElementById("zyloName")
+                ?.value
+                .trim();
+
+            const username =
+              normalizeUsername(
+                document
+                  .getElementById("zyloUsername")
+                  ?.value
+                  .trim()
+              );
+
+            const credential =
+              await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+              );
+
+            await updateProfile(
+              credential.user,
+              {
+                displayName: username
+              }
+            );
+
+            currentUser =
+              credential.user;
+
+            await saveProfile(
+              credential.user,
+              {
+                name,
+                username,
+                bio: "",
+                photoURL:
+                  credential.user.photoURL ||
+                  ""
+              }
+            );
+
+          } else {
+
+            const credential =
               await signInWithEmailAndPassword(
                 auth,
                 email,
                 password
               );
 
+            currentUser =
+              credential.user;
 
             await saveProfile(
-              result.user
+              credential.user
             );
-
-
-            await syncLocalFollowingFromFirestore();
-
-
-            closeAllZYLOOverlays();
-
-
-            await openMyProfile();
-
-
-            return;
-
           }
 
+          overlay.remove();
 
-          /* =========================
-             REGISTER
-          ========================= */
-
-          const name =
-            overlay
-              .querySelector(
-                "#zylo-name"
-              )
-              ?.value
-              .trim()
-            ||
-            "ZYLO Creator";
-
-
-          let username =
-            overlay
-              .querySelector(
-                "#zylo-username"
-              )
-              ?.value
-              .trim()
-            ||
-            "@zylo_creator";
-
-
-          username =
-            normalizeUsername(
-              username
-            );
-
-
-          const result =
-            await createUserWithEmailAndPassword(
-              auth,
-              email,
-              password
-            );
-
-
-          await updateProfile(
-            result.user,
-            {
-              displayName:
-                name
-            }
+          window.dispatchEvent(
+            new CustomEvent(
+              "zylo:authready"
+            )
           );
-
-
-          await saveProfile(
-            result.user,
-            {
-
-              name,
-
-              username,
-
-              bio:
-                "Create • Connect • Grow"
-
-            }
-          );
-
-
-          closeAllZYLOOverlays();
-
-
-          await openMyProfile();
-
 
         } catch (error) {
 
@@ -2215,335 +1121,175 @@ function openAuth(
             error
           );
 
-
           showError(
-            errorBox,
             errorMessage(error)
           );
-
-
-          button.disabled =
-            false;
-
-
-          button.textContent =
-            mode === "login"
-              ? "Login"
-              : "Create Account";
-
         }
-
       }
     );
-
 }
 
 
 /* =========================================================
-   PROFILE OVERLAY BASE
+   PROFILE AVATAR
+   ========================================================= */
+
+function profileAvatarHTML(
+  profile,
+  className = "zylo-profile-avatar"
+) {
+  if (profile?.photoURL) {
+
+    return `
+      <img
+        class="${className}"
+        src="${escapeHtml(profile.photoURL)}"
+        alt=""
+      >
+    `;
+
+  }
+
+  const letter =
+    escapeHtml(
+      (
+        profile?.name ||
+        profile?.username ||
+        "Z"
+      )
+        .replace("@", "")
+        .charAt(0)
+        .toUpperCase()
+    );
+
+  return `
+    <div
+      class="${className}"
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:32px;
+        font-weight:800;
+        color:#fff;
+      "
+    >
+      ${letter}
+    </div>
+  `;
+}
+
+
+/* =========================================================
+   PROFILE OVERLAY
    ========================================================= */
 
 function createProfileOverlay(
   title = "Profile"
 ) {
+  injectZYLOStyles();
+
+  closeProfileOverlaysOnly();
 
   const overlay =
-    document.createElement(
-      "div"
-    );
+    document.createElement("div");
 
+  overlay.id =
+    "zyloProfileOverlay";
 
   overlay.className =
     "zylo-profile-overlay";
 
-
   overlay.innerHTML = `
+    <div class="zylo-profile-box">
 
-    <div class="zylo-profile-header">
+      <div class="zylo-profile-header">
 
-      <button
-        class="zylo-profile-header-close"
-        type="button"
-        aria-label="Close">
-        ×
-      </button>
+        <strong>
+          ${escapeHtml(title)}
+        </strong>
 
-      <div class="zylo-profile-title">
-        ${escapeHtml(title)}
+        <button
+          type="button"
+          class="zylo-close"
+          data-profile-close
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div
+        class="zylo-profile-content"
+        id="zyloProfileContent"
+      >
+        <div class="zylo-empty-profile">
+          Loading...
+        </div>
       </div>
 
     </div>
-
-    <main class="zylo-profile-content">
-
-      <div class="zylo-profile-loading">
-        Loading profile...
-      </div>
-
-    </main>
-
   `;
 
-
-  document.body.appendChild(
-    overlay
-  );
-
+  document.body.appendChild(overlay);
 
   overlay
     .querySelector(
-      ".zylo-profile-header-close"
+      "[data-profile-close]"
     )
     ?.addEventListener(
       "click",
-      () => {
-
-        overlay.remove();
-
-      }
+      () => overlay.remove()
     );
-
 
   return overlay;
-
 }
 
 
 /* =========================================================
-   PROFILE AVATAR HTML
+   VIDEO CREATOR DETECTION
    ========================================================= */
 
-function profileAvatarHTML(
-  profile
-) {
-
-  const photo =
-    String(
-      profile?.photoURL || ""
-    ).trim();
-
-
-  if (photo) {
-
-    return `
-
-      <div class="zylo-profile-avatar">
-
-        <img
-          src="${escapeHtml(photo)}"
-          alt=""
-          loading="eager"
-          onerror="this.style.display='none'; this.parentElement.textContent='Z';"
-        >
-
-      </div>
-
-    `;
-
-  }
-
-
-  const name =
-    profile?.name ||
-    profile?.username ||
-    "Z";
-
-
-  const letter =
-    String(name)
-      .replace("@", "")
-      .trim()
-      .charAt(0)
-      .toUpperCase() ||
-    "Z";
-
-
-  return `
-
-    <div class="zylo-profile-avatar">
-
-      ${escapeHtml(letter)}
-
-    </div>
-
-  `;
-
-}
-
-
-/* =========================================================
-   FORMAT COUNT
-   ========================================================= */
-
-function formatCount(
-  value
-) {
-
-  const number =
-    Number(value || 0);
-
-
-  if (!Number.isFinite(number)) {
-    return "0";
-  }
-
-
-  if (
-    number >= 1000000000
-  ) {
-
-    return (
-      (number / 1000000000)
-        .toFixed(1)
-        .replace(".0", "")
-      +
-      "B"
-    );
-
-  }
-
-
-  if (
-    number >= 1000000
-  ) {
-
-    return (
-      (number / 1000000)
-        .toFixed(1)
-        .replace(".0", "")
-      +
-      "M"
-    );
-
-  }
-
-
-  if (
-    number >= 1000
-  ) {
-
-    return (
-      (number / 1000)
-        .toFixed(1)
-        .replace(".0", "")
-      +
-      "K"
-    );
-
-  }
-
-
-  return String(
-    number
-  );
-
-}
-
-
-/* =========================================================
-   FIND CREATOR DATA FROM VIDEO PAGE
-   ========================================================= */
-
-function getCreatorFromVideoPage(
-  page
-) {
-
-  if (!page) {
-
-    return {
-
-      uid: "",
-
-      username:
-        "@zylo_creator"
-
-    };
-
-  }
-
+function getCreatorFromVideoPage(page) {
+  if (!page) return null;
 
   const uid =
-    page.dataset?.creatorUid ||
-    page.dataset?.ownerUid ||
-    page.dataset?.uid ||
-    page.getAttribute(
-      "data-creator-uid"
-    ) ||
-    page.getAttribute(
-      "data-owner-uid"
-    ) ||
+    page.dataset.creatorUid ||
+    page.getAttribute("data-creator-uid") ||
     "";
 
-
-  let username =
-    page.dataset?.creatorUsername ||
-    page.dataset?.username ||
+  const username =
+    page.dataset.creatorUsername ||
     page.getAttribute(
       "data-creator-username"
     ) ||
-    page.getAttribute(
-      "data-username"
-    ) ||
-    "zylo_creator";
-
-
-  username =
-    normalizeUsername(
-      username
-    );
-
+    "";
 
   return {
-
     uid,
-
-    username
-
+    username:
+      normalizeUsername(
+        username || "zylo_creator"
+      )
   };
-
 }
 
 
-/* =========================================================
-   CREATOR PROFILE FROM VIDEO
-   ========================================================= */
-
-async function openCreatorProfileFromPage(
-  page
-) {
-
+function openCreatorProfileFromPage(page) {
   const creator =
-    getCreatorFromVideoPage(
-      page
+    getCreatorFromVideoPage(page);
+
+  if (!creator?.uid) {
+    showError(
+      "Creator information পাওয়া যায়নি।"
     );
-
-
-  if (!creator.uid) {
-
-    await openCreatorProfile({
-
-      uid: "",
-
-      username:
-        creator.username
-
-    });
-
     return;
-
   }
 
-
-  await openCreatorProfile({
-
-    uid:
-      creator.uid,
-
-    username:
-      creator.username
-
-  });
-
+  openCreatorProfile(
+    creator.uid,
+    creator.username
+  );
 }
 
 
@@ -2552,619 +1298,351 @@ async function openCreatorProfileFromPage(
    ========================================================= */
 
 async function openCreatorProfile(
-  creatorInput
+  uid,
+  fallbackUsername = ""
 ) {
-
-  const creator =
-    creatorInput ||
-    {};
-
-
-  const uid =
-    creator.uid ||
-    "";
-
-
-  const currentUID =
-    currentUser?.uid ||
-    "";
-
-
-  /*
-   * Own profile.
-   */
+  if (!uid) return;
 
   if (
-    uid &&
-    currentUID &&
-    uid === currentUID
+    currentUser?.uid &&
+    currentUser.uid === uid
   ) {
-
-    await openMyProfile();
-
+    openMyProfile();
     return;
-
   }
-
-
-  closeProfileOverlaysOnly();
-
 
   const overlay =
     createProfileOverlay(
       "Creator Profile"
     );
 
-
   const content =
     overlay.querySelector(
-      ".zylo-profile-content"
+      "#zyloProfileContent"
     );
-
 
   try {
 
-    let profile = null;
-
-
-    if (uid) {
-
-      profile =
-        await getProfile(
-          uid
-        );
-
-    }
-
+    let profile =
+      await getFreshProfile(uid);
 
     if (!profile) {
 
       profile = {
-
         uid,
-
         name:
-          creator.name ||
-          creator.username ||
+          fallbackUsername
+            .replace("@", "") ||
           "ZYLO Creator",
-
         username:
           normalizeUsername(
-            creator.username ||
-            "@zylo_creator"
+            fallbackUsername ||
+            "zylo_creator"
           ),
-
-        bio:
-          "Create • Connect • Grow",
-
-        photoURL:
-          "",
-
+        bio: "",
+        photoURL: "",
         followers: 0,
-
         following: 0,
-
         likes: 0
-
       };
-
     }
 
-
-    if (
-      creator.username &&
-      (
-        !profile.username ||
-        profile.username ===
-          "@zylo_creator"
-      )
-    ) {
-
-      profile.username =
-        normalizeUsername(
-          creator.username
-        );
-
-    }
-
-
-    /*
-     * Load real Firestore counts.
-     */
-
-    if (profile.uid) {
-
-      const counts =
-        await getFirestoreFollowCounts(
-          profile.uid
-        );
-
-
-      profile.followers =
-        counts.followers;
-
-
-      profile.following =
-        counts.following;
-
-    }
-
-
-    renderCreatorProfile(
-      overlay,
+    await renderCreatorProfile(
+      content,
       profile
     );
-
 
   } catch (error) {
 
     console.error(
-      "ZYLO creator profile error:",
+      "Creator profile error:",
       error
     );
 
-
     content.innerHTML = `
-
-      <div class="zylo-profile-empty">
-
-        Creator profile could not be loaded.
-
-        <br><br>
-
-        আবার চেষ্টা করুন।
-
+      <div class="zylo-empty-profile">
+        Profile load করা যায়নি।
       </div>
-
     `;
-
   }
-
 }
 
 
-/* =========================================================
-   RENDER CREATOR PROFILE
-   ========================================================= */
-
 async function renderCreatorProfile(
-  overlay,
+  content,
   profile
 ) {
+  if (!content) return;
 
-  const content =
-    overlay.querySelector(
-      ".zylo-profile-content"
+  const following =
+    await isFollowing(
+      profile.uid
     );
 
-
-  let following =
-    false;
-
-
-  /*
-   * Get real Follow status from Firestore.
-   */
-
-  if (
-    currentUser &&
-    profile.uid &&
-    currentUser.uid !== profile.uid
-  ) {
-
-    following =
-      await getFirestoreFollowStatus(
-        currentUser.uid,
-        profile.uid
-      );
-
-  }
-
-
-  /*
-   * Keep local cache synchronized.
-   */
-
-  if (
-    profile.uid &&
-    currentUser
-  ) {
-
-    const local =
-      isFollowing(
-        profile.uid
-      );
-
-
-    if (
-      following &&
-      !local
-    ) {
-
-      saveFollowingUIDs([
-        ...getFollowingUIDs(),
-        profile.uid
-      ]);
-
-    }
-
-
-    if (
-      !following &&
-      local
-    ) {
-
-      saveFollowingUIDs(
-        getFollowingUIDs()
-          .filter(
-            uid =>
-              uid !== profile.uid
-          )
-      );
-
-    }
-
-  }
-
-
   content.innerHTML = `
-
-    <div class="zylo-profile-avatar-wrap">
+    <div class="zylo-profile-top">
 
       ${profileAvatarHTML(profile)}
 
-    </div>
-
-
-    <div class="zylo-profile-display-name">
-
-      ${escapeHtml(
-        profile.name ||
-        "ZYLO Creator"
-      )}
-
-    </div>
-
-
-    <div class="zylo-profile-username">
-
-      ${escapeHtml(
-        normalizeUsername(
+      <div class="zylo-profile-name">
+        ${escapeHtml(
+          profile.name ||
           profile.username
-        )
-      )}
-
-    </div>
-
-
-    <div class="zylo-profile-bio">
-
-      ${escapeHtml(
-        profile.bio ||
-        "Create • Connect • Grow"
-      )}
-
-    </div>
-
-
-    <div class="zylo-profile-stats">
-
-      <div class="zylo-profile-stat">
-
-        <div
-          class="zylo-profile-stat-number"
-          data-profile-followers>
-
-          ${formatCount(
-            profile.followers
-          )}
-
-        </div>
-
-        <div class="zylo-profile-stat-label">
-          Followers
-        </div>
-
+        )}
       </div>
 
-
-      <div class="zylo-profile-stat">
-
-        <div
-          class="zylo-profile-stat-number"
-          data-profile-following>
-
-          ${formatCount(
-            profile.following
-          )}
-
-        </div>
-
-        <div class="zylo-profile-stat-label">
-          Following
-        </div>
-
+      <div class="zylo-profile-username">
+        ${escapeHtml(
+          normalizeUsername(
+            profile.username
+          )
+        )}
       </div>
-
-
-      <div class="zylo-profile-stat">
-
-        <div
-          class="zylo-profile-stat-number">
-
-          ${formatCount(
-            profile.likes
-          )}
-
-        </div>
-
-        <div class="zylo-profile-stat-label">
-          Likes
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <div class="zylo-profile-actions">
 
       ${
-        currentUser?.uid === profile.uid
-          ? ""
-          : `
-
-            <button
-              type="button"
-              class="
-                zylo-profile-action-btn
-                primary
-                zylo-follow-profile-btn
-              "
-              data-following="${
-                following
-                  ? "true"
-                  : "false"
-              }">
-
-              ${
-                following
-                  ? "Following"
-                  : "Follow"
-              }
-
-            </button>
-
+        profile.bio
+          ? `
+            <div class="zylo-profile-bio">
+              ${escapeHtml(profile.bio)}
+            </div>
           `
+          : ""
       }
 
-    </div>
+      <div class="zylo-profile-stats">
 
+        <div class="zylo-profile-stat">
+          <strong data-followers-count>
+            ${formatCount(profile.followers)}
+          </strong>
+          <span>Followers</span>
+        </div>
 
-    <div class="zylo-profile-divider"></div>
+        <div class="zylo-profile-stat">
+          <strong>
+            ${formatCount(profile.following)}
+          </strong>
+          <span>Following</span>
+        </div>
 
-
-    <div class="zylo-profile-tabs">
-
-      <button
-        type="button"
-        class="
-          zylo-profile-tab
-          active
-        "
-        data-profile-tab="videos">
-
-        Videos
-
-      </button>
-
-    </div>
-
-
-    <section
-      class="zylo-profile-video-section">
-
-      <div
-        class="zylo-profile-video-grid"
-        data-profile-video-grid>
+        <div class="zylo-profile-stat">
+          <strong>
+            ${formatCount(profile.likes)}
+          </strong>
+          <span>Likes</span>
+        </div>
 
       </div>
 
-    </section>
+      <div class="zylo-profile-actions">
 
+        <button
+          type="button"
+          class="zylo-follow-btn ${
+            following ? "following" : ""
+          }"
+          data-follow-uid="${escapeHtml(profile.uid)}"
+        >
+          ${
+            following
+              ? "Following"
+              : "Follow"
+          }
+        </button>
+
+        <button
+          type="button"
+          class="zylo-secondary-btn"
+          data-share-profile="${escapeHtml(profile.uid)}"
+        >
+          Share Profile
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="zylo-profile-section-title">
+      Videos
+    </div>
+
+    <div
+      class="zylo-profile-grid"
+      id="zyloCreatorVideoGrid"
+    >
+    </div>
   `;
 
 
-  renderCreatorVideos(
-    overlay,
-    profile
-  );
-
+  /* -------------------------------------------------------
+     FOLLOW BUTTON
+     ------------------------------------------------------- */
 
   const followButton =
-    overlay.querySelector(
-      ".zylo-follow-profile-btn"
+    content.querySelector(
+      "[data-follow-uid]"
     );
 
-
-  if (!followButton) {
-    return;
-  }
-
-
-  followButton.addEventListener(
+  followButton?.addEventListener(
     "click",
     async () => {
 
       if (!currentUser) {
+        openAuth("login");
+        return;
+      }
 
-        openAuth(
-          "login"
+      followButton.disabled = true;
+
+      const wasFollowing =
+        followButton.classList.contains(
+          "following"
         );
 
-        return;
+      let success = false;
 
-      }
+      if (wasFollowing) {
 
-
-      if (
-        currentUser.uid ===
-        profile.uid
-      ) {
-
-        return;
-
-      }
-
-
-      /*
-       * Prevent double clicks while
-       * Firestore request is running.
-       */
-
-      followButton.disabled =
-        true;
-
-
-      const previousFollowing =
-        followButton.dataset.following ===
-        "true";
-
-
-      followButton.textContent =
-        previousFollowing
-          ? "Unfollowing..."
-          : "Following...";
-
-
-      try {
-
-        const result =
-          await toggleFirestoreFollow(
+        success =
+          await unfollowUser(
             profile.uid
           );
 
+        if (success) {
 
-        if (
-          !result.changed
-        ) {
-
-          followButton.dataset.following =
-            previousFollowing
-              ? "true"
-              : "false";
+          followButton.classList.remove(
+            "following"
+          );
 
           followButton.textContent =
-            previousFollowing
-              ? "Following"
-              : "Follow";
+            "Follow";
 
-          return;
+          const count =
+            await getFollowersCount(
+              profile.uid
+            );
 
+          const counter =
+            content.querySelector(
+              "[data-followers-count]"
+            );
+
+          if (counter) {
+            counter.textContent =
+              formatCount(count);
+          }
         }
 
+      } else {
 
-        const nowFollowing =
-          result.following;
-
-
-        followButton.dataset.following =
-          nowFollowing
-            ? "true"
-            : "false";
-
-
-        followButton.textContent =
-          nowFollowing
-            ? "Following"
-            : "Follow";
-
-
-        /*
-         * Refresh exact Followers count
-         * from Firestore.
-         */
-
-        const counts =
-          await getFirestoreFollowCounts(
+        success =
+          await followUser(
             profile.uid
           );
 
+        if (success) {
 
-        profile.followers =
-          counts.followers;
-
-
-        profile.following =
-          counts.following;
-
-
-        const followersElement =
-          overlay.querySelector(
-            "[data-profile-followers]"
+          followButton.classList.add(
+            "following"
           );
 
+          followButton.textContent =
+            "Following";
 
-        const followingElement =
-          overlay.querySelector(
-            "[data-profile-following]"
-          );
-
-
-        if (followersElement) {
-
-          followersElement.textContent =
-            formatCount(
-              profile.followers
+          const count =
+            await getFollowersCount(
+              profile.uid
             );
 
-        }
-
-
-        if (followingElement) {
-
-          followingElement.textContent =
-            formatCount(
-              profile.following
+          const counter =
+            content.querySelector(
+              "[data-followers-count]"
             );
 
+          if (counter) {
+            counter.textContent =
+              formatCount(count);
+          }
         }
-
-
-      } catch (error) {
-
-        console.error(
-          "ZYLO Follow error:",
-          error
-        );
-
-
-        followButton.dataset.following =
-          previousFollowing
-            ? "true"
-            : "false";
-
-
-        followButton.textContent =
-          previousFollowing
-            ? "Following"
-            : "Follow";
-
-
-        alert(
-          "Follow পরিবর্তন করা যায়নি। আবার চেষ্টা করুন।"
-        );
-
-      } finally {
-
-        followButton.disabled =
-          false;
-
       }
 
+      followButton.disabled =
+        false;
     }
   );
 
+
+  /* -------------------------------------------------------
+     SHARE PROFILE
+     ------------------------------------------------------- */
+
+  content
+    .querySelector(
+      "[data-share-profile]"
+    )
+    ?.addEventListener(
+      "click",
+      async () => {
+
+        const username =
+          normalizeUsername(
+            profile.username
+          );
+
+        const url =
+          `${window.location.origin}` +
+          `${window.location.pathname}` +
+          `#profile/${encodeURIComponent(
+            profile.uid
+          )}`;
+
+        try {
+
+          if (
+            navigator.share
+          ) {
+
+            await navigator.share({
+              title:
+                `${username} on ZYLO`,
+              text:
+                `Check out ${username} on ZYLO`,
+              url
+            });
+
+          } else if (
+            navigator.clipboard
+          ) {
+
+            await navigator.clipboard.writeText(
+              url
+            );
+
+            showError(
+              "Profile link copied!"
+            );
+          }
+
+        } catch (error) {
+          console.warn(
+            "Profile share cancelled:",
+            error
+          );
+        }
+      }
+    );
+
+
+  /* -------------------------------------------------------
+     CREATOR VIDEOS
+     ------------------------------------------------------- */
+
+  await renderCreatorVideos(
+    profile,
+    content.querySelector(
+      "#zyloCreatorVideoGrid"
+    )
+  );
 }
 
 
@@ -3173,246 +1651,101 @@ async function renderCreatorProfile(
    ========================================================= */
 
 function getAllVideoPages() {
-
   return Array.from(
     document.querySelectorAll(
       ".video-page"
     )
   );
-
 }
 
 
-/* =========================================================
-   RENDER CREATOR VIDEOS
-   ========================================================= */
-
-function renderCreatorVideos(
-  overlay,
-  profile
+async function renderCreatorVideos(
+  profile,
+  grid
 ) {
-
-  const grid =
-    overlay.querySelector(
-      "[data-profile-video-grid]"
-    );
-
-
-  if (!grid) {
-    return;
-  }
-
+  if (!grid) return;
 
   const pages =
-    getAllVideoPages();
-
-
-  const matchingPages =
-    pages.filter(
-      page => {
+    getAllVideoPages()
+      .filter(page => {
 
         const creator =
           getCreatorFromVideoPage(
             page
           );
 
-
-        if (
-          profile.uid &&
-          creator.uid
-        ) {
-
-          return (
-            creator.uid ===
-            profile.uid
-          );
-
-        }
-
-
-        const pageUsername =
-          normalizeUsername(
-            creator.username
-          );
-
-
-        const profileUsername =
-          normalizeUsername(
-            profile.username
-          );
-
-
         return (
-          pageUsername.toLowerCase() ===
-          profileUsername.toLowerCase()
+          creator?.uid &&
+          creator.uid === profile.uid
         );
+      });
 
-      }
-    );
-
-
-  if (!matchingPages.length) {
+  if (!pages.length) {
 
     grid.innerHTML = `
-
       <div
-        class="zylo-profile-empty"
-        style="grid-column:1/-1;">
-
-        এই creator-এর এখনো কোনো ভিডিও
-        এই Feed-এ পাওয়া যায়নি।
-
+        class="zylo-empty-profile"
+        style="grid-column:1/-1;"
+      >
+        No videos yet.
       </div>
-
     `;
 
     return;
-
   }
 
+  grid.innerHTML = "";
 
-  matchingPages.forEach(
-    page => {
+  pages.forEach(page => {
 
-      const item =
-        createProfileVideoItem(
-          page
-        );
-
-
-      grid.appendChild(
-        item
+    const item =
+      createProfileVideoItem(
+        page
       );
 
-    }
-  );
-
+    grid.appendChild(item);
+  });
 }
 
 
-/* =========================================================
-   CREATE PROFILE VIDEO ITEM
-   ========================================================= */
-
-function createProfileVideoItem(
-  page
-) {
-
+function createProfileVideoItem(page) {
   const item =
-    document.createElement(
-      "div"
-    );
-
+    document.createElement("div");
 
   item.className =
-    "zylo-profile-video-item";
-
+    "zylo-profile-video";
 
   const video =
-    page.querySelector(
-      "video"
-    );
-
+    page.querySelector("video");
 
   if (video) {
 
-    const source =
-      video.currentSrc ||
-      video.src ||
-      video.getAttribute(
-        "src"
-      ) ||
-      video.dataset?.src ||
-      "";
+    const clone =
+      video.cloneNode(true);
 
+    clone.controls = false;
+    clone.muted = true;
+    clone.autoplay = false;
+    clone.loop = true;
 
-    if (source) {
-
-      const preview =
-        document.createElement(
-          "video"
-        );
-
-
-      preview.src =
-        source;
-
-      preview.muted =
-        true;
-
-      preview.playsInline =
-        true;
-
-      preview.preload =
-        "metadata";
-
-
-      preview.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
-
-      item.appendChild(
-        preview
-      );
-
-
-      const play =
-        document.createElement(
-          "div"
-        );
-
-
-      play.className =
-        "zylo-profile-video-play";
-
-
-      play.textContent =
-        "▶";
-
-
-      item.appendChild(
-        play
-      );
-
-
-    } else {
-
-      item.innerHTML = `
-
-        <div
-          class="zylo-profile-video-placeholder">
-
-          Video
-
-        </div>
-
-      `;
-
-    }
+    item.appendChild(clone);
 
   } else {
 
-    const title =
-      page.dataset?.title ||
-      page.dataset?.videoId ||
-      "Video";
-
-
     item.innerHTML = `
-
       <div
-        class="zylo-profile-video-placeholder">
-
-        ${escapeHtml(title)}
-
+        style="
+          width:100%;
+          height:100%;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+        "
+      >
+        🎬
       </div>
-
     `;
-
   }
-
 
   item.addEventListener(
     "click",
@@ -3420,78 +1753,36 @@ function createProfileVideoItem(
 
       closeProfileOverlaysOnly();
 
+      const pages =
+        getAllVideoPages();
 
-      try {
+      const index =
+        pages.indexOf(page);
 
-        page.scrollIntoView({
+      if (
+        index >= 0 &&
+        window.ZYLOVideoEngine
+      ) {
 
-          behavior:
-            "smooth",
+        try {
 
-          block:
-            "start"
-
-        });
-
-      } catch {
-
-        page.scrollIntoView();
-
-      }
-
-
-      window.setTimeout(
-        () => {
-
-          const targetVideo =
-            page.querySelector(
-              "video"
+          window.ZYLOVideoEngine
+            .scrollToPage(
+              index,
+              "auto"
             );
 
-
-          if (!targetVideo) {
-            return;
-          }
-
-
-          try {
-
-            targetVideo.muted =
-              true;
-
-
-            const promise =
-              targetVideo.play();
-
-
-            if (
-              promise &&
-              typeof promise.catch ===
-                "function"
-            ) {
-
-              promise.catch(
-                () => {}
-              );
-
-            }
-
-          } catch {
-
-            /* ignore */
-
-          }
-
-        },
-        250
-      );
-
+        } catch {
+          page.scrollIntoView({
+            behavior: "auto",
+            block: "start"
+          });
+        }
+      }
     }
   );
 
-
   return item;
-
 }
 
 
@@ -3500,284 +1791,185 @@ function createProfileVideoItem(
    ========================================================= */
 
 async function openMyProfile() {
-
   if (!currentUser) {
-
-    openAuth(
-      "login"
-    );
-
+    openAuth("login");
     return;
-
   }
-
-
-  closeProfileOverlaysOnly();
-
 
   const overlay =
     createProfileOverlay(
-      "Profile"
+      "My Profile"
     );
 
+  const content =
+    overlay.querySelector(
+      "#zyloProfileContent"
+    );
 
   try {
 
     const profile =
-      await getProfile(
-        currentUser
+      await getFreshProfile(
+        currentUser.uid
       );
 
-
-    /*
-     * Use real Firestore Follow counts.
-     */
-
-    await refreshProfileFollowCounts(
-      profile
+    await renderMyProfile(
+      content,
+      profile || {
+        uid: currentUser.uid,
+        name:
+          currentUser.displayName ||
+          "ZYLO User",
+        username:
+          normalizeUsername(
+            currentUser.displayName ||
+            "user"
+          ),
+        bio: "",
+        photoURL:
+          currentUser.photoURL ||
+          "",
+        followers: 0,
+        following: 0,
+        likes: 0
+      }
     );
-
-
-    renderMyProfile(
-      overlay,
-      profile
-    );
-
 
   } catch (error) {
 
     console.error(
-      "ZYLO my profile error:",
+      "My profile error:",
       error
     );
 
-
-    const content =
-      overlay.querySelector(
-        ".zylo-profile-content"
-      );
-
-
     content.innerHTML = `
-
-      <div class="zylo-profile-empty">
-
-        Profile load করতে সমস্যা হয়েছে।
-
-        <br><br>
-
-        আবার চেষ্টা করুন।
-
+      <div class="zylo-empty-profile">
+        Profile load করা যায়নি।
       </div>
-
     `;
-
   }
-
 }
 
 
-/* =========================================================
-   RENDER MY PROFILE
-   ========================================================= */
-
-function renderMyProfile(
-  overlay,
+async function renderMyProfile(
+  content,
   profile
 ) {
-
-  const content =
-    overlay.querySelector(
-      ".zylo-profile-content"
-    );
-
-
   content.innerHTML = `
 
-    <div class="zylo-profile-avatar-wrap">
+    <div class="zylo-profile-top">
 
       ${profileAvatarHTML(profile)}
 
-    </div>
+      <div class="zylo-profile-name">
+        ${escapeHtml(
+          profile.name
+        )}
+      </div>
 
+      <div class="zylo-profile-username">
+        ${escapeHtml(
+          normalizeUsername(
+            profile.username
+          )
+        )}
+      </div>
 
-    <div class="zylo-profile-display-name">
+      ${
+        profile.bio
+          ? `
+            <div class="zylo-profile-bio">
+              ${escapeHtml(profile.bio)}
+            </div>
+          `
+          : ""
+      }
 
-      ${escapeHtml(
-        profile.name ||
-        "ZYLO Creator"
-      )}
+      <div class="zylo-profile-stats">
 
-    </div>
-
-
-    <div class="zylo-profile-username">
-
-      ${escapeHtml(
-        normalizeUsername(
-          profile.username
-        )
-      )}
-
-    </div>
-
-
-    <div class="zylo-profile-bio">
-
-      ${escapeHtml(
-        profile.bio ||
-        "Create • Connect • Grow"
-      )}
-
-    </div>
-
-
-    <div class="zylo-profile-stats">
-
-      <div class="zylo-profile-stat">
-
-        <div
-          class="zylo-profile-stat-number"
-          data-my-profile-followers>
-
-          ${formatCount(
-            profile.followers
-          )}
-
+        <div class="zylo-profile-stat">
+          <strong>
+            ${formatCount(
+              profile.followers
+            )}
+          </strong>
+          <span>Followers</span>
         </div>
 
-        <div class="zylo-profile-stat-label">
-          Followers
+        <div class="zylo-profile-stat">
+          <strong>
+            ${formatCount(
+              profile.following
+            )}
+          </strong>
+          <span>Following</span>
+        </div>
+
+        <div class="zylo-profile-stat">
+          <strong>
+            ${formatCount(
+              profile.likes
+            )}
+          </strong>
+          <span>Likes</span>
         </div>
 
       </div>
 
+      <div class="zylo-profile-actions">
 
-      <div class="zylo-profile-stat">
+        <button
+          type="button"
+          class="zylo-secondary-btn"
+          id="zyloEditProfileButton"
+        >
+          Edit Profile
+        </button>
 
-        <div
-          class="zylo-profile-stat-number"
-          data-my-profile-following>
+        <button
+          type="button"
+          class="zylo-secondary-btn"
+          id="zyloShareMyProfile"
+        >
+          Share Profile
+        </button>
 
-          ${formatCount(
-            profile.following
-          )}
-
-        </div>
-
-        <div class="zylo-profile-stat-label">
-          Following
-        </div>
-
-      </div>
-
-
-      <div class="zylo-profile-stat">
-
-        <div
-          class="zylo-profile-stat-number">
-
-          ${formatCount(
-            profile.likes
-          )}
-
-        </div>
-
-        <div class="zylo-profile-stat-label">
-          Likes
-        </div>
+        <button
+          type="button"
+          class="zylo-secondary-btn"
+          id="zyloLogoutButton"
+        >
+          Logout
+        </button>
 
       </div>
 
     </div>
 
-
-    <div class="zylo-profile-actions">
-
-      <button
-        type="button"
-        class="
-          zylo-profile-action-btn
-          primary
-        "
-        data-edit-profile>
-
-        Edit Profile
-
-      </button>
-
-
-      <button
-        type="button"
-        class="zylo-profile-action-btn"
-        data-logout>
-
-        Logout
-
-      </button>
-
+    <div class="zylo-profile-section-title">
+      My Videos
     </div>
 
-
-    <div class="zylo-profile-divider"></div>
-
-
-    <div class="zylo-profile-tabs">
-
-      <button
-        type="button"
-        class="
-          zylo-profile-tab
-          active
-        "
-        data-profile-tab="videos">
-
-        Videos
-
-      </button>
-
-    </div>
-
-
-    <section
-      class="zylo-profile-video-section">
-
-      <div
-        class="zylo-profile-video-grid"
-        data-profile-video-grid>
-
-      </div>
-
-    </section>
-
+    <div
+      class="zylo-profile-grid"
+      id="zyloMyVideoGrid"
+    ></div>
   `;
 
 
-  renderCreatorVideos(
-    overlay,
-    profile
-  );
-
-
-  overlay
+  content
     .querySelector(
-      "[data-edit-profile]"
+      "#zyloEditProfileButton"
     )
     ?.addEventListener(
       "click",
-      () => {
-
-        openEditProfile(
-          profile
-        );
-
-      }
+      () => openEditProfile(profile)
     );
 
 
-  overlay
+  content
     .querySelector(
-      "[data-logout]"
+      "#zyloLogoutButton"
     )
     ?.addEventListener(
       "click",
@@ -3785,26 +1977,131 @@ function renderMyProfile(
 
         try {
 
-          await signOut(
-            auth
-          );
-
+          await signOut(auth);
 
           closeAllZYLOOverlays();
 
-
         } catch (error) {
 
-          console.error(
-            "ZYLO logout error:",
-            error
+          showError(
+            errorMessage(error)
           );
-
         }
-
       }
     );
 
+
+  content
+    .querySelector(
+      "#zyloShareMyProfile"
+    )
+    ?.addEventListener(
+      "click",
+      async () => {
+
+        const username =
+          normalizeUsername(
+            profile.username
+          );
+
+        const url =
+          `${window.location.origin}` +
+          `${window.location.pathname}` +
+          `#profile/${encodeURIComponent(
+            profile.uid
+          )}`;
+
+        try {
+
+          if (
+            navigator.share
+          ) {
+
+            await navigator.share({
+              title:
+                `${username} on ZYLO`,
+              text:
+                `Check out ${username} on ZYLO`,
+              url
+            });
+
+          } else if (
+            navigator.clipboard
+          ) {
+
+            await navigator.clipboard.writeText(
+              url
+            );
+
+            showError(
+              "Profile link copied!"
+            );
+          }
+
+        } catch {}
+      }
+    );
+
+
+  await renderMyVideos(
+    profile,
+    content.querySelector(
+      "#zyloMyVideoGrid"
+    )
+  );
+}
+
+
+/* =========================================================
+   MY VIDEOS
+   ========================================================= */
+
+async function renderMyVideos(
+  profile,
+  grid
+) {
+  if (!grid) return;
+
+  const pages =
+    getAllVideoPages()
+      .filter(page => {
+
+        const creator =
+          getCreatorFromVideoPage(
+            page
+          );
+
+        return (
+          creator?.uid &&
+          creator.uid === profile.uid
+        );
+      });
+
+  if (!pages.length) {
+
+    grid.innerHTML = `
+      <div
+        class="zylo-empty-profile"
+        style="grid-column:1/-1;"
+      >
+        You haven't uploaded any videos yet.
+      </div>
+    `;
+
+    return;
+  }
+
+  grid.innerHTML = "";
+
+  pages.forEach(page => {
+
+    grid.appendChild(
+      createProfileVideoItem(
+        page
+      )
+    );
+
+  });
 }
 
 
@@ -3812,164 +2109,155 @@ function renderMyProfile(
    EDIT PROFILE
    ========================================================= */
 
-function openEditProfile(
-  profile
-) {
+function openEditProfile(profile) {
+  injectZYLOStyles();
 
-  closeProfileOverlaysOnly();
+  const old =
+    document.getElementById(
+      "zyloEditProfileOverlay"
+    );
 
+  if (old) old.remove();
 
   const overlay =
-    createProfileOverlay(
-      "Edit Profile"
-    );
+    document.createElement("div");
 
+  overlay.id =
+    "zyloEditProfileOverlay";
 
-  const content =
-    overlay.querySelector(
-      ".zylo-profile-content"
-    );
+  overlay.className =
+    "zylo-profile-overlay";
 
+  overlay.innerHTML = `
 
-  content.innerHTML = `
+    <div class="zylo-profile-box">
 
-    <div
-      class="
-        zylo-edit-profile-content
-      ">
+      <div class="zylo-profile-header">
 
-      <h2>
-        Edit Profile
-      </h2>
+        <strong>
+          Edit Profile
+        </strong>
 
+        <button
+          type="button"
+          class="zylo-close"
+          data-edit-close
+        >
+          ×
+        </button>
 
-      <label>
-        Name
-      </label>
-
-      <input
-        id="zylo-edit-name"
-        type="text"
-        value="${escapeHtml(
-          profile.name ||
-          "ZYLO Creator"
-        )}"
-      >
-
-
-      <label>
-        Username
-      </label>
-
-      <input
-        id="zylo-edit-username"
-        type="text"
-        value="${escapeHtml(
-          normalizeUsername(
-            profile.username
-          )
-        )}"
-      >
-
-
-      <label>
-        Bio
-      </label>
-
-      <input
-        id="zylo-edit-bio"
-        type="text"
-        value="${escapeHtml(
-          profile.bio ||
-          "Create • Connect • Grow"
-        )}"
-      >
-
-
-      <div
-        class="zylo-auth-error"
-        id="zylo-edit-error">
       </div>
 
+      <div class="zylo-profile-content">
 
-      <button
-        type="button"
-        class="
-          zylo-auth-primary
-        "
-        id="zylo-save-profile">
+        <input
+          class="zylo-edit-input"
+          id="zyloEditName"
+          value="${escapeHtml(
+            profile.name
+          )}"
+          placeholder="Name"
+        >
 
-        Save Changes
+        <input
+          class="zylo-edit-input"
+          id="zyloEditUsername"
+          value="${escapeHtml(
+            normalizeUsername(
+              profile.username
+            )
+          )}"
+          placeholder="@username"
+        >
 
-      </button>
+        <textarea
+          class="zylo-edit-textarea"
+          id="zyloEditBio"
+          placeholder="Bio"
+        >${escapeHtml(
+          profile.bio || ""
+        )}</textarea>
+
+        <input
+          class="zylo-edit-input"
+          id="zyloEditPhoto"
+          value="${escapeHtml(
+            profile.photoURL || ""
+          )}"
+          placeholder="Profile photo URL"
+        >
+
+        <button
+          type="button"
+          class="zylo-primary-btn"
+          id="zyloSaveProfile"
+        >
+          Save Profile
+        </button>
+
+      </div>
 
     </div>
-
   `;
+
+  document.body.appendChild(
+    overlay
+  );
+
+  overlay
+    .querySelector(
+      "[data-edit-close]"
+    )
+    ?.addEventListener(
+      "click",
+      () => overlay.remove()
+    );
 
 
   overlay
     .querySelector(
-      "#zylo-save-profile"
+      "#zyloSaveProfile"
     )
     ?.addEventListener(
       "click",
       async () => {
 
         const name =
-          overlay
-            .querySelector(
-              "#zylo-edit-name"
+          document
+            .getElementById(
+              "zyloEditName"
             )
             ?.value
-            .trim()
-          ||
-          "ZYLO Creator";
-
+            .trim() ||
+          "ZYLO User";
 
         const username =
           normalizeUsername(
-            overlay
-              .querySelector(
-                "#zylo-edit-username"
+            document
+              .getElementById(
+                "zyloEditUsername"
               )
               ?.value
               .trim()
-            ||
-            "@zylo_creator"
           );
-
 
         const bio =
-          overlay
-            .querySelector(
-              "#zylo-edit-bio"
+          document
+            .getElementById(
+              "zyloEditBio"
             )
             ?.value
-            .trim()
-          ||
-          "Create • Connect • Grow";
+            .trim() ||
+          "";
 
-
-        const button =
-          overlay.querySelector(
-            "#zylo-save-profile"
-          );
-
-
-        const errorBox =
-          overlay.querySelector(
-            "#zylo-edit-error"
-          );
-
-
-        button.disabled =
-          true;
-
-
-        button.textContent =
-          "Saving...";
-
+        const photoURL =
+          document
+            .getElementById(
+              "zyloEditPhoto"
+            )
+            ?.value
+            .trim() ||
+          "";
 
         try {
 
@@ -3977,66 +2265,44 @@ function openEditProfile(
             currentUser,
             {
               displayName:
-                name
+                username,
+              photoURL:
+                photoURL || null
             }
           );
-
 
           await saveProfile(
             currentUser,
             {
-
               name,
-
               username,
-
               bio,
-
-              photoURL:
-                currentUser.photoURL ||
-                ""
-
+              photoURL
             }
           );
 
-
-          closeProfileOverlaysOnly();
-
+          overlay.remove();
 
           await openMyProfile();
-
 
         } catch (error) {
 
           console.error(
-            "ZYLO profile save error:",
+            "ZYLO profile update error:",
             error
           );
 
-
           showError(
-            errorBox,
             errorMessage(error)
           );
-
-
-          button.disabled =
-            false;
-
-
-          button.textContent =
-            "Save Changes";
-
         }
-
       }
     );
-
 }
 
 
 /* =========================================================
-   CREATOR PROFILE CLICK BRIDGE
+   CREATOR PROFILE CLICK CAPTURE
    ========================================================= */
 
 document.addEventListener(
@@ -4044,33 +2310,22 @@ document.addEventListener(
   event => {
 
     const button =
-      event.target.closest(
+      event.target.closest?.(
         ".profile-action"
       );
 
-
-    if (!button) {
-      return;
-    }
-
+    if (!button) return;
 
     const page =
       button.closest(
         ".video-page"
       );
 
-
-    if (!page) {
-      return;
-    }
-
+    if (!page) return;
 
     event.preventDefault();
-
     event.stopPropagation();
-
     event.stopImmediatePropagation();
-
 
     openCreatorProfileFromPage(
       page
@@ -4082,17 +2337,14 @@ document.addEventListener(
 
 
 /* =========================================================
-   BOTTOM PROFILE NAVIGATION
+   BOTTOM PROFILE
    ========================================================= */
 
 window.addEventListener(
   "zylo:openprofile",
   event => {
 
-    if (event) {
-      event.preventDefault?.();
-    }
-
+    event?.preventDefault?.();
 
     openMyProfile();
 
@@ -4100,29 +2352,19 @@ window.addEventListener(
 );
 
 
-/*
- * Backup handler.
- */
-
 document.addEventListener(
   "click",
   event => {
 
     const button =
-      event.target.closest(
+      event.target.closest?.(
         ".bottom-nav .nav-item[data-nav='profile']"
       );
 
-
-    if (!button) {
-      return;
-    }
-
+    if (!button) return;
 
     event.preventDefault();
-
-    event.stopImmediatePropagation();
-
+    event.stopPropagation();
 
     openMyProfile();
 
@@ -4140,25 +2382,98 @@ onAuthStateChanged(
   async user => {
 
     currentUser =
-      user ||
-      null;
+      user || null;
 
+    if (user) {
 
-    /*
-     * Global auth bridge.
-     */
+      try {
+
+        const existing =
+          await getProfile(
+            user.uid
+          );
+
+        await saveProfile(
+          user,
+          {
+            name:
+              existing?.name ||
+              user.displayName ||
+              "ZYLO User",
+
+            username:
+              existing?.username ||
+              normalizeUsername(
+                user.displayName ||
+                "user"
+              ),
+
+            bio:
+              existing?.bio ||
+              "",
+
+            photoURL:
+              existing?.photoURL ||
+              user.photoURL ||
+              "",
+
+            followers:
+              existing?.followers ||
+              0,
+
+            following:
+              existing?.following ||
+              0,
+
+            likes:
+              existing?.likes ||
+              0
+          }
+        );
+
+        localStorage.setItem(
+          "zylo_uid",
+          user.uid
+        );
+
+        localStorage.setItem(
+          "zylo_username",
+          normalizeUsername(
+            existing?.username ||
+            user.displayName ||
+            "user"
+          )
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "ZYLO profile sync error:",
+          error
+        );
+      }
+
+    } else {
+
+      localStorage.removeItem(
+        "zylo_uid"
+      );
+
+      localStorage.removeItem(
+        "zylo_username"
+      );
+
+      saveFollowingUIDs([]);
+    }
+
 
     window.ZYLOAuth = {
 
-      openLogin:
-        () => openAuth(
-          "login"
-        ),
+      openLogin: () =>
+        openAuth("login"),
 
-      openRegister:
-        () => openAuth(
-          "register"
-        ),
+      openRegister: () =>
+        openAuth("register"),
 
       openMyProfile,
 
@@ -4168,127 +2483,44 @@ onAuthStateChanged(
 
       openEditProfile,
 
-      logout:
-        () => signOut(
-          auth
-        ),
+      logout: () =>
+        signOut(auth),
 
-      getCurrentUser:
-        () => currentUser,
+      getCurrentUser: () =>
+        currentUser,
 
-      currentUser:
-        currentUser
+      currentUser,
 
+      getProfile,
+
+      getFreshProfile,
+
+      isFollowing,
+
+      followUser,
+
+      unfollowUser,
+
+      getFollowersCount,
+
+      getFollowingCount
     };
 
 
-    /*
-     * Make sure the user profile exists.
-     */
-
-    if (user) {
-
-      try {
-
-        const profile =
-          await getProfile(
-            user
-          );
-
-
-        await saveProfile(
-          user,
-          {
-
-            name:
-              profile?.name ||
-              user.displayName ||
-              "ZYLO Creator",
-
-            username:
-              profile?.username ||
-              "@zylo_creator",
-
-            bio:
-              profile?.bio ||
-              "Create • Connect • Grow",
-
-            photoURL:
-              profile?.photoURL ||
-              user.photoURL ||
-              "",
-
-            followers:
-              profile?.followers ||
-              0,
-
-            following:
-              profile?.following ||
-              0,
-
-            likes:
-              profile?.likes ||
-              0
-
-          }
-        );
-
-
-        /*
-         * Synchronize Follow cache from Firestore.
-         */
-
-        await syncLocalFollowingFromFirestore();
-
-
-      } catch (error) {
-
-        console.warn(
-          "ZYLO profile sync warning:",
-          error
-        );
-
-      }
-
-    }
-
-
-    /*
-     * Tell script.js auth is ready.
-     */
-
     window.dispatchEvent(
       new CustomEvent(
-        "zylo:authready",
-        {
-          detail: {
-            user
-          }
-        }
+        "zylo:authready"
       )
     );
-
   }
 );
 
 
 /* =========================================================
-   FIRESTORE COLLECTION SETUP
+   READY EVENT
    ========================================================= */
 
-/*
- * Importing collection separately would be cleaner,
- * but we expose the collection reference here after
- * Firebase initialization.
- *
- * This keeps the rest of the code compatible with
- * the existing auth.js structure.
- */
-
-
-/* =========================================================
-   GLOBAL READY EVENT
-   ========================================================= */
+injectZYLOStyles();
 
 window.dispatchEvent(
   new CustomEvent(
