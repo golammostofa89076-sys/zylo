@@ -497,6 +497,7 @@ async function followUser(followingUid) {
 }
 
 
+
 async function unfollowUser(followingUid) {
   if (!currentUser?.uid) {
     return false;
